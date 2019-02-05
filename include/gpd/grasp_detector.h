@@ -71,6 +71,11 @@ class GraspDetector {
    */
   GraspDetector(const std::string& config_filename);
 
+  /**
+   * \brief Detect grasps in a point cloud.
+   * \param cloud_cam the point cloud
+   * \return list of grasps
+   */
   std::vector<std::unique_ptr<candidate::Hand>> detectGrasps(
       const util::Cloud& cloud);
 
@@ -80,18 +85,27 @@ class GraspDetector {
    */
   void preprocessPointCloud(util::Cloud& cloud);
 
-  void sampleAbovePlane(util::Cloud& cloud);
-
+  /**
+   * Filter grasps based on the robot's workspace.
+   * \param hand_set_list list of grasp candidate sets
+   * \param workspace the robot's workspace as a 3D cube, centered at the origin
+   * \param thresh_rad the angle in radians above which grasps are filtered
+   * \return list of grasps after filtering
+   */
   std::vector<std::unique_ptr<candidate::HandSet>> filterGraspsWorkspace(
       std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
       const std::vector<double>& workspace) const;
 
   /**
-   * \brief Filter side grasps that are close to the table.
+   * Filter grasps based on their approach direction.
    * \param hand_set_list list of grasp candidate sets
+   * \param direction the direction used for filtering
+   * \param thresh_rad the angle in radians above which grasps are filtered
+   * \return list of grasps after filtering
    */
-  std::vector<std::unique_ptr<candidate::HandSet>> filterSideGraspsCloseToTable(
-      std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list);
+  std::vector<std::unique_ptr<candidate::HandSet>> filterGraspsDirection(
+      std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
+      const Eigen::Vector3d& direction, const double thresh_rad);
 
   /**
    * \brief Generate grasp candidates.
@@ -159,20 +173,14 @@ class GraspDetector {
   bool plot_selected_grasps_;   ///< if selected grasps are plotted
 
   // filtering parameters
-  bool filter_table_side_grasps_;  ///< if side grasps close to the table are
-                                   /// filtered
-  bool cluster_grasps_;            ///< if grasps are clustered
+  bool cluster_grasps_;  ///< if grasps are clustered
   double min_aperture_;  ///< the minimum opening width of the robot hand
   double max_aperture_;  ///< the maximum opening width of the robot hand
   std::vector<double> workspace_grasps_;  ///< the workspace of the robot with
                                           /// respect to hand poses
-  std::vector<double> vert_axis_;  ///< vertical axis used for filtering side
-                                   /// grasps that are close to the table
-  double table_height_;            ///< height of table (along vertical axis)
-  double table_thresh_;  ///< distance threshold below which side grasps are
-                         /// considered to be too close to the table
-  double angle_thresh_;  ///< angle threshold below which grasps are considered
-                         /// to be side grasps
+  bool filter_approach_direction_;
+  Eigen::Vector3d direction_;
+  double thresh_rad_;
 
   // selection parameters
   int num_selected_;  ///< the number of selected grasps

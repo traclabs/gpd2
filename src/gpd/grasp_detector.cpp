@@ -141,13 +141,12 @@ GraspDetector::GraspDetector(const std::string& config_filename) {
 
   // Read grasp filtering parameters for side grasps that are too close to the
   // table plane.
-  filter_table_side_grasps_ =
-      config_file.getValueOfKey<bool>("filter_table_side_grasps", false);
-  vert_axis_ =
-      config_file.getValueOfKeyAsStdVectorDouble("vertical_axis", "0 0 1");
-  angle_thresh_ = config_file.getValueOfKey<double>("angle_thresh", 0.1);
-  table_height_ = config_file.getValueOfKey<double>("table_height", 0.5);
-  table_thresh_ = config_file.getValueOfKey<double>("table_thresh_", 0.05);
+  filter_approach_direction_ =
+      config_file.getValueOfKey<bool>("filter_approach_direction", false);
+  std::vector<double> approach =
+      config_file.getValueOfKeyAsStdVectorDouble("direction", "1 0 0");
+  direction_ << approach[0], approach[1], approach[2];
+  thresh_rad_ = config_file.getValueOfKey<double>("thresh_rad", 2.3);
 
   // Read clustering parameters.
   int min_inliers = config_file.getValueOfKey<int>("min_inliers", 1);
@@ -214,16 +213,15 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
   std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_filtered =
       filterGraspsWorkspace(hand_set_list, workspace_grasps_);
   if (plot_filtered_candidates_) {
-    plotter_->plotFingers3D(hands_out, cloud.getCloudOriginal(),
+    plotter_->plotFingers3D(hand_set_list_filtered, cloud.getCloudOriginal(),
                             "Filtered Grasps (Aperture, Workspace)", hand_geom);
   }
-  if (filter_table_side_grasps_) {
+  if (filter_approach_direction_) {
     hand_set_list_filtered =
-        filterSideGraspsCloseToTable(hand_set_list_filtered);
+        filterGraspsDirection(hand_set_list_filtered, direction_, thresh_rad_);
     if (plot_filtered_candidates_) {
-      plotter_->plotFingers3D(hands_out, cloud.getCloudOriginal(),
-                              "Filtered Grasps (Aperture, Workspace)",
-                              hand_geom);
+      plotter_->plotFingers3D(hand_set_list_filtered, cloud.getCloudOriginal(),
+                              "Filtered Grasps (Approach)", hand_geom);
     }
   }
   double t_filter = omp_get_wtime() - t0_filter;
@@ -362,7 +360,7 @@ GraspDetector::filterGraspsWorkspace(
     }
   }
 
-  printf("Number of grasps within workspace and gripper width: %d\n",
+  printf("Number of grasp candidates within workspace and gripper width: %d\n",
          remaining);
 
   return hand_set_list_out;
@@ -391,14 +389,11 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::selectGrasps(
 }
 
 std::vector<std::unique_ptr<candidate::HandSet>>
-GraspDetector::filterSideGraspsCloseToTable(
-    std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list) {
-  const double APPROACH_LENGTH = 0.05;
-
-  int remaining = 0;
+GraspDetector::filterGraspsDirection(
+    std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
+    const Eigen::Vector3d& direction, const double thresh_rad) {
   std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_out;
-  Eigen::Vector3d vert_axis_vec;
-  vert_axis_vec << vert_axis_[0], vert_axis_[1], vert_axis_[2];
+  int remaining = 0;
 
   for (int i = 0; i < hand_set_list.size(); i++) {
     const std::vector<std::unique_ptr<candidate::Hand>>& hands =
@@ -408,17 +403,10 @@ GraspDetector::filterSideGraspsCloseToTable(
 
     for (int j = 0; j < hands.size(); j++) {
       if (is_valid(j)) {
-        double angle =
-            fabs(vert_axis_vec.transpose() * hands[i]->getApproach());
-        double dist = fabs((hands[i]->getPosition() -
-                            APPROACH_LENGTH * hands[i]->getApproach())(2)) -
-                      table_height_;
-
-        // This is a side grasps that is too close to the table.
-        if (angle > angle_thresh_ && dist < table_thresh_) {
+        double angle = acos(direction.transpose() * hands[j]->getApproach());
+        if (angle > thresh_rad) {
           is_valid(j) = false;
         } else {
-          is_valid(j) = true;
           remaining++;
         }
       }
@@ -430,7 +418,7 @@ GraspDetector::filterSideGraspsCloseToTable(
     }
   }
 
-  printf("Number of grasps that are not too close to the table: %d\n",
+  printf("Number of grasp candidates with correct approach direction: %d\n",
          remaining);
 
   return hand_set_list_out;
@@ -480,16 +468,15 @@ bool GraspDetector::createGraspImages(
   std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_filtered =
       filterGraspsWorkspace(hand_set_list, workspace_grasps_);
   if (plot_filtered_candidates_) {
-    plotter_->plotFingers3D(hands_out, cloud.getCloudOriginal(),
+    plotter_->plotFingers3D(hand_set_list_filtered, cloud.getCloudOriginal(),
                             "Filtered Grasps (Aperture, Workspace)", hand_geom);
   }
-  if (filter_table_side_grasps_) {
+  if (filter_approach_direction_) {
     hand_set_list_filtered =
-        filterSideGraspsCloseToTable(hand_set_list_filtered);
+        filterGraspsDirection(hand_set_list_filtered, direction_, thresh_rad_);
     if (plot_filtered_candidates_) {
-      plotter_->plotFingers3D(hands_out, cloud.getCloudOriginal(),
-                              "Filtered Grasps (Aperture, Workspace)",
-                              hand_geom);
+      plotter_->plotFingers3D(hand_set_list_filtered, cloud.getCloudOriginal(),
+                              "Filtered Grasps (Approach)", hand_geom);
     }
   }
 
