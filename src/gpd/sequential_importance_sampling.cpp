@@ -25,11 +25,17 @@ SequentialImportanceSampling::SequentialImportanceSampling(
 
   num_threads_ = config_file.getValueOfKey<int>("num_threads", 1);
 
-  filter_grasps_ = config_file.getValueOfKey<bool>("filter_grasps", false);
   workspace_ =
       config_file.getValueOfKeyAsStdVectorDouble("workspace", "-1 1 -1 1 -1 1");
   workspace_grasps_ = config_file.getValueOfKeyAsStdVectorDouble(
       "workspace_grasps", "-1 1 -1 1 -1 1");
+
+  filter_approach_direction_ =
+      config_file.getValueOfKey<bool>("filter_approach_direction", false);
+  std::vector<double> approach =
+      config_file.getValueOfKeyAsStdVectorDouble("direction", "1 0 0");
+  direction_ << approach[0], approach[1], approach[2];
+  thresh_rad_ = config_file.getValueOfKey<double>("thresh_rad", 2.3);
 
   visualize_rounds_ =
       config_file.getValueOfKey<bool>("visualize_rounds", false);
@@ -73,11 +79,17 @@ SequentialImportanceSampling::detectGrasps(util::Cloud& cloud) {
     return grasps;
   }
 
-  // Filter grasps outside of workspace and robot hand dimensions.
-  std::vector<std::unique_ptr<candidate::HandSet>> filtered_candidates;
-  if (filter_grasps_) {
-    grasp_detector_->filterGraspsWorkspace(hand_set_list, workspace_grasps_);
-    printf("Grasps within workspace: %zu", filtered_candidates.size());
+  hand_set_list =
+      grasp_detector_->filterGraspsWorkspace(hand_set_list, workspace_grasps_);
+  printf("Grasps within workspace: %zu", hand_set_list.size());
+
+  if (filter_approach_direction_) {
+    hand_set_list = grasp_detector_->filterGraspsDirection(
+        hand_set_list, direction_, thresh_rad_);
+    if (visualize_rounds_) {
+      plotter.plotFingers3D(hand_set_list, cloud.getCloudOriginal(),
+                            "Filtered Grasps (Approach)", hand_geom);
+    }
   }
 
   if (visualize_rounds_) {
@@ -122,11 +134,16 @@ SequentialImportanceSampling::detectGrasps(util::Cloud& cloud) {
     std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_new =
         grasp_detector_->generateGraspCandidates(cloud);
 
-    if (filter_grasps_) {
-      grasp_detector_->filterGraspsWorkspace(hand_set_list_new,
-                                             workspace_grasps_);
-      printf("Grasps within gripper width range and workspace: %zu\n",
-             hand_set_list_new.size());
+    hand_set_list_new = grasp_detector_->filterGraspsWorkspace(
+        hand_set_list_new, workspace_grasps_);
+
+    if (filter_approach_direction_) {
+      hand_set_list_new = grasp_detector_->filterGraspsDirection(
+          hand_set_list_new, direction_, thresh_rad_);
+      if (visualize_steps_) {
+        plotter.plotFingers3D(hand_set_list_new, cloud.getCloudOriginal(),
+                              "Filtered Grasps (Approach)", hand_geom);
+      }
     }
 
     if (visualize_rounds_) {

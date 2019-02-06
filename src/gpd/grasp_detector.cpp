@@ -128,19 +128,18 @@ GraspDetector::GraspDetector(const std::string& config_filename) {
       image_geom, hand_search_params.num_threads_,
       hand_search_params.num_orientations_, false, remove_plane);
 
-  // Read grasp filtering parameters.
+  // Read grasp filtering parameters based on robot workspace and gripper width.
   workspace_grasps_ = config_file.getValueOfKeyAsStdVectorDouble(
       "workspace_grasps", "-1 1 -1 1 -1 1");
   min_aperture_ = config_file.getValueOfKey<double>("min_aperture", 0.0);
-  max_aperture_ = config_file.getValueOfKey<double>("max_aperture", 0.85);
+  max_aperture_ = config_file.getValueOfKey<double>("max_aperture", 0.085);
   std::cout << "============ CANDIDATE FILTERING =============\n";
   printStdVector(workspace_grasps_, "candidate_workspace");
   std::cout << "min_aperture: " << min_aperture_ << "\n";
   std::cout << "max_aperture: " << max_aperture_ << "\n";
   std::cout << "==============================================\n";
 
-  // Read grasp filtering parameters for side grasps that are too close to the
-  // table plane.
+  // Read grasp filtering parameters based on approach direction.
   filter_approach_direction_ =
       config_file.getValueOfKey<bool>("filter_approach_direction", false);
   std::vector<double> approach =

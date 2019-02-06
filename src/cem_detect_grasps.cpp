@@ -67,18 +67,20 @@ int DoMain(int argc, char *argv[]) {
   std::vector<double> workspace =
       config_file.getValueOfKeyAsStdVectorDouble("workspace", "-1 1 -1 1 -1 1");
   int num_threads = config_file.getValueOfKey<int>("num_threads", 1);
-  bool remove_plane_for_sampling =
-      config_file.getValueOfKey<int>("remove_plane_for_sampling", false);
+  bool sample_above_plane =
+      config_file.getValueOfKey<int>("sample_above_plane", false);
   printf("num_threads: %d\n", num_threads);
-  printf("remove_plane_for_sampling: %d\n", remove_plane_for_sampling);
+  printf("sample_above_plane: %d\n", sample_above_plane);
 
-  // Detect grasp affordances.
+  // Preprocess the point cloud.
   cloud.filterWorkspace(workspace);
   cloud.voxelizeCloud(VOXEL_SIZE);
   cloud.calculateNormals(num_threads);
-  if (remove_plane_for_sampling) {
+  if (sample_above_plane) {
     cloud.sampleAbovePlane();
   }
+
+  // Detect grasp affordances.
   SequentialImportanceSampling detector(config_filename);
   detector.detectGrasps(cloud);
 
