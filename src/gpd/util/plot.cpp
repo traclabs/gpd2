@@ -7,7 +7,7 @@ void Plot::plotVolumes3D(
     const std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
     const PointCloudRGBA::Ptr &cloud, std::string str, double outer_diameter,
     double finger_width, double hand_depth, double hand_height,
-    double volume_width, double volume_depth, double volume_height) const {
+    double volume_width, double volume_depth, double volume_height){
   Eigen::Vector3d vol_rgb(0.0, 0.8, 0.0);
   Eigen::Vector3d hand_rgb(0.0, 0.5, 0.5);
 
@@ -53,7 +53,7 @@ void Plot::plotVolumes3D(
     const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
     const PointCloudRGBA::Ptr &cloud, std::string str, double outer_diameter,
     double finger_width, double hand_depth, double hand_height,
-    double volume_width, double volume_depth, double volume_height) const {
+    double volume_width, double volume_depth, double volume_height){
   Eigen::Vector3d vol_rgb(0.0, 0.8, 0.0);
   Eigen::Vector3d hand_rgb(0.0, 0.5, 0.5);
 
@@ -88,7 +88,7 @@ void Plot::plotFingers3D(
     const std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
     const PointCloudRGBA::Ptr &cloud, std::string str,
     const candidate::HandGeometry &geometry, bool draw_all,
-    bool draw_frame) const {
+    bool draw_frame){
   const Eigen::Vector3d RGB[3] = {Eigen::Vector3d(0.5, 0, 0),
                                   Eigen::Vector3d(0, 0.5, 0),
                                   Eigen::Vector3d(0, 0, 0.5)};
@@ -175,7 +175,7 @@ void Plot::plotFingers3D(const std::vector<candidate::HandSet> &hand_set_list,
                          const PointCloudRGBA::Ptr &cloud, std::string str,
                          double outer_diameter, double finger_width,
                          double hand_depth, double hand_height, bool draw_all,
-                         int num_axes, int num_orientations) const {
+                         int num_axes, int num_orientations){
   const Eigen::Vector3d RGB[3] = {Eigen::Vector3d(0.5, 0, 0),
                                   Eigen::Vector3d(0, 0.5, 0),
                                   Eigen::Vector3d(0, 0, 0.5)};
@@ -212,7 +212,7 @@ void Plot::plotFingers3D(const std::vector<candidate::Hand> &hand_list,
                          const PointCloudRGBA::Ptr &cloud, std::string str,
                          double outer_diameter, double finger_width,
                          double hand_depth, double hand_height,
-                         bool draw_all) const {
+                         bool draw_all){
   PCLVisualizer viewer = createViewer(str);
   Eigen::Vector3d hand_rgb(0.0, 0.5, 0.5);
 
@@ -232,7 +232,7 @@ void Plot::plotFingers3D(const std::vector<candidate::Hand> &hand_list,
 
 void Plot::plotHand3D(PCLVisualizer &viewer, const candidate::Hand &hand,
                       const candidate::HandGeometry &geometry, int idx,
-                      const Eigen::Vector3d &rgb) const {
+                      const Eigen::Vector3d &rgb){
   plotHand3D(viewer, hand, geometry.outer_diameter_, geometry.finger_width_,
              geometry.depth_, geometry.height_, idx, rgb);
 }
@@ -240,7 +240,7 @@ void Plot::plotHand3D(PCLVisualizer &viewer, const candidate::Hand &hand,
 void Plot::plotHand3D(PCLVisualizer &viewer, const candidate::Hand &hand,
                       double outer_diameter, double finger_width,
                       double hand_depth, double hand_height, int idx,
-                      const Eigen::Vector3d &rgb) const {
+                      const Eigen::Vector3d &rgb){
   const double hw = 0.5 * outer_diameter;
   const double base_depth = 0.02;
   const double approach_depth = 0.07;
@@ -274,7 +274,7 @@ void Plot::plotHand3D(PCLVisualizer &viewer, const candidate::Hand &hand,
 void Plot::plotCube(PCLVisualizer &viewer, const Eigen::Vector3d &position,
                     const Eigen::Quaterniond &rotation, double width,
                     double height, double depth, const std::string &name,
-                    const Eigen::Vector3d &rgb) const {
+                    const Eigen::Vector3d &rgb){
   viewer->addCube(position.cast<float>(), rotation.cast<float>(), width, height,
                   depth, name);
   viewer->setShapeRenderingProperties(
@@ -288,7 +288,7 @@ void Plot::plotCube(PCLVisualizer &viewer, const Eigen::Vector3d &position,
 
 void Plot::plotFrame(PCLVisualizer &viewer, const Eigen::Vector3d &translation,
                      const Eigen::Matrix3d &rotation, const std::string &id,
-                     double axis_length) const {
+                     double axis_length){
   const Eigen::Matrix3d pts = axis_length * rotation;
   const std::string names[3] = {"normal_" + id, "binormal_" + id,
                                 "curvature_" + id};
@@ -307,7 +307,7 @@ void Plot::plotFrame(PCLVisualizer &viewer, const Eigen::Vector3d &translation,
 }
 
 void Plot::plotSamples(const std::vector<int> &index_list,
-                       const PointCloudRGBA::Ptr &cloud) const {
+                       const PointCloudRGBA::Ptr &cloud){
   PointCloudRGBA::Ptr samples_cloud(new PointCloudRGBA);
   for (int i = 0; i < index_list.size(); i++) {
     samples_cloud->points.push_back(cloud->points[index_list[i]]);
@@ -317,7 +317,7 @@ void Plot::plotSamples(const std::vector<int> &index_list,
 }
 
 void Plot::plotSamples(const Eigen::Matrix3Xd &samples,
-                       const PointCloudRGBA::Ptr &cloud) const {
+                       const PointCloudRGBA::Ptr &cloud){
   PointCloudRGBA::Ptr samples_cloud(new PointCloudRGBA);
   for (int i = 0; i < samples.cols(); i++) {
     pcl::PointXYZRGBA p;
@@ -331,7 +331,7 @@ void Plot::plotSamples(const Eigen::Matrix3Xd &samples,
 }
 
 void Plot::plotSamples(const PointCloudRGBA::Ptr &samples_cloud,
-                       const PointCloudRGBA::Ptr &cloud) const {
+                       const PointCloudRGBA::Ptr &cloud){
   PCLVisualizer viewer = createViewer("Samples");
 
   // draw the point cloud
@@ -432,7 +432,7 @@ void Plot::plotNormals(const Cloud &cloud_cam) {
 
 void Plot::plotNormals(const PointCloudRGBA::Ptr &cloud,
                        const PointCloudRGBA::Ptr &cloud_samples,
-                       const Eigen::Matrix3Xd &normals) const {
+                       const Eigen::Matrix3Xd &normals){
   PointCloudPointNormal::Ptr normals_cloud(new PointCloudPointNormal);
   for (int i = 0; i < normals.cols(); i++) {
     pcl::PointNormal p;
@@ -465,7 +465,7 @@ void Plot::plotNormals(const PointCloudRGBA::Ptr &cloud,
 }
 
 void Plot::plotNormals(const PointCloudRGBA::Ptr &cloud,
-                       const Eigen::Matrix3Xd &normals) const {
+                       const Eigen::Matrix3Xd &normals){
   PointCloudPointNormal::Ptr normals_cloud(new PointCloudPointNormal);
   for (int i = 0; i < normals.cols(); i++) {
     pcl::PointNormal p;
@@ -498,7 +498,7 @@ void Plot::plotNormals(const PointCloudRGBA::Ptr &cloud,
 }
 
 void Plot::plotNormals(const Eigen::Matrix3Xd &pts,
-                       const Eigen::Matrix3Xd &normals) const {
+                       const Eigen::Matrix3Xd &normals){
   PointCloudPointNormal::Ptr normals_cloud(new PointCloudPointNormal);
   for (int i = 0; i < normals.cols(); i++) {
     pcl::PointNormal p;
@@ -522,7 +522,7 @@ void Plot::plotNormals(const Eigen::Matrix3Xd &pts,
 }
 
 void Plot::plotLocalAxes(const std::vector<candidate::LocalFrame> &frames,
-                         const PointCloudRGBA::Ptr &cloud) const {
+                         const PointCloudRGBA::Ptr &cloud){
   PCLVisualizer viewer = createViewer("Local Frames");
   viewer->addPointCloud<pcl::PointXYZRGBA>(cloud, "registered point cloud");
   viewer->setPointCloudRenderingProperties(
@@ -548,7 +548,7 @@ void Plot::plotLocalAxes(const std::vector<candidate::LocalFrame> &frames,
 }
 
 void Plot::plotCameraSource(const Eigen::VectorXi &pts_cam_source_in,
-                            const PointCloudRGBA::Ptr &cloud) const {
+                            const PointCloudRGBA::Ptr &cloud){
   PointCloudRGBA::Ptr left_cloud(new PointCloudRGBA);
   PointCloudRGBA::Ptr right_cloud(new PointCloudRGBA);
 
@@ -580,7 +580,7 @@ void Plot::addCloudNormalsToViewer(PCLVisualizer &viewer,
                                    double line_width, double *color_cloud,
                                    double *color_normals,
                                    const std::string &cloud_name,
-                                   const std::string &normals_name) const {
+                                   const std::string &normals_name){
   viewer->addPointCloud<pcl::PointNormal>(cloud, cloud_name);
   viewer->setPointCloudRenderingProperties(
       pcl::visualization::PCL_VISUALIZER_COLOR, color_cloud[0], color_cloud[1],
@@ -595,7 +595,7 @@ void Plot::addCloudNormalsToViewer(PCLVisualizer &viewer,
       color_normals[1], color_normals[2], normals_name);
 }
 
-void Plot::runViewer(PCLVisualizer &viewer) const {
+void Plot::runViewer(PCLVisualizer &viewer){
   while (!viewer->wasStopped()) {
     viewer->spinOnce(100);
     boost::this_thread::sleep(boost::posix_time::microseconds(100000));
@@ -604,36 +604,32 @@ void Plot::runViewer(PCLVisualizer &viewer) const {
   viewer->close();
 }
 
-PCLVisualizer Plot::createViewer(std::string title) const {
+PCLVisualizer Plot::createViewer(std::string title){
   PCLVisualizer viewer(new pcl::visualization::PCLVisualizer(title));
   viewer->setPosition(0, 0);
   viewer->setSize(640, 480);
   viewer->setBackgroundColor(1.0, 1.0, 1.0);
-
-  // pcl::visualization::Camera camera;
-  // camera.clip[0] = 0.00130783;
-  // camera.clip[1] = 1.30783;
-  // camera.focal[0] = 0.776838;
-  // camera.focal[1] = -0.095644;
-  // camera.focal[2] = -0.18991;
-  // camera.pos[0] = 0.439149;
-  // camera.pos[1] = -0.10342;
-  // camera.pos[2] = 0.111626;
-  // camera.view[0] = 0.666149;
-  // camera.view[1] = -0.0276846;
-  // camera.view[2] = 0.745305;
-  // camera.fovy = 0.8575;
-  // camera.window_pos[0] = 0;
-  // camera.window_pos[1] = 0;
-  // camera.window_size[0] = 640;
-  // camera.window_size[1] = 480;
-  // viewer->setCameraParameters(camera);
+  viewer->registerKeyboardCallback(&Plot::keyboardEventOccurred, *this, (void*)viewer.get());
 
   return viewer;
 }
 
+void Plot::keyboardEventOccurred (const pcl::visualization::KeyboardEvent &event,
+                            void* viewer_void)
+{
+  pcl::visualization::PCLVisualizer *viewer = static_cast<pcl::visualization::PCLVisualizer *> (viewer_void);
+  if (event.getKeySym() == "a" && event.keyDown())
+  {
+    if (viewer->contains("ref")) {
+      viewer->removeCoordinateSystem("ref");
+    } else {
+      viewer->addCoordinateSystem(0.1, "ref");
+    }
+  }
+}
+
 void Plot::plotCloud(const PointCloudRGBA::Ptr &cloud_rgb,
-                     const std::string &title) const {
+                     const std::string &title){
   PCLVisualizer viewer = createViewer(title);
   pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> rgb(
       cloud_rgb);
@@ -646,7 +642,7 @@ void Plot::plotCloud(const PointCloudRGBA::Ptr &cloud_rgb,
 }
 
 pcl::PointXYZRGBA Plot::eigenVector3dToPointXYZRGBA(
-    const Eigen::Vector3d &v) const {
+    const Eigen::Vector3d &v){
   pcl::PointXYZRGBA p;
   p.x = v(0);
   p.y = v(1);
@@ -655,7 +651,7 @@ pcl::PointXYZRGBA Plot::eigenVector3dToPointXYZRGBA(
 }
 
 void Plot::setPointColor(const candidate::Hand &hand,
-                         pcl::PointXYZRGBA &p) const {
+                         pcl::PointXYZRGBA &p){
   p.a = 128;
 
   if (hand.isFullAntipodal()) {

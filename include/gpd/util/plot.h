@@ -73,7 +73,7 @@ class Plot {
       const std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
       const PointCloudRGBA::Ptr& cloud, std::string str, double outer_diameter,
       double finger_width, double hand_depth, double hand_height,
-      double volume_width, double volume_depth, double volume_height) const;
+      double volume_width, double volume_depth, double volume_height) ;
 
   /**
    * \brief Plot a list of hands and their associated volumes.
@@ -89,13 +89,13 @@ class Plot {
       const std::vector<std::unique_ptr<candidate::Hand>>& hand_set_list,
       const PointCloudRGBA::Ptr& cloud, std::string str, double outer_diameter,
       double finger_width, double hand_depth, double hand_height,
-      double volume_width, double volume_depth, double volume_height) const;
+      double volume_width, double volume_depth, double volume_height) ;
 
   void plotFingers3D(
       const std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
       const PointCloudRGBA::Ptr& cloud, std::string str,
       const candidate::HandGeometry& geometry, bool draw_all = false,
-      bool draw_frame = false) const;
+      bool draw_frame = false) ;
 
   /**
    * \brief Plot a list of grasp sets with 3D cubes.
@@ -112,7 +112,7 @@ class Plot {
                      double outer_diameter, double finger_width,
                      double hand_depth, double hand_height,
                      bool draw_all = false, int num_axes = 1,
-                     int num_orientations = 8) const;
+                     int num_orientations = 8) ;
 
   void plotFingers3D(
       const std::vector<std::unique_ptr<candidate::Hand>>& hand_list,
@@ -133,7 +133,7 @@ class Plot {
                      const PointCloudRGBA::Ptr& cloud, std::string str,
                      double outer_diameter, double finger_width,
                      double hand_depth, double hand_height,
-                     bool draw_all = false) const;
+                     bool draw_all = false) ;
 
   /**
    * \brief Plot a list of samples.
@@ -141,7 +141,7 @@ class Plot {
    * \param cloud the point cloud to be plotted
    */
   void plotSamples(const std::vector<int>& index_list,
-                   const PointCloudRGBA::Ptr& cloud) const;
+                   const PointCloudRGBA::Ptr& cloud) ;
 
   /**
    * \brief Plot a list of samples.
@@ -149,7 +149,7 @@ class Plot {
    * \param cloud the point cloud to be plotted
    */
   void plotSamples(const Eigen::Matrix3Xd& samples,
-                   const PointCloudRGBA::Ptr& cloud) const;
+                   const PointCloudRGBA::Ptr& cloud) ;
 
   /**
    * \brief Plot a point cloud that contains samples.
@@ -157,13 +157,13 @@ class Plot {
    * \param cloud the point cloud to be plotted
    */
   void plotSamples(const PointCloudRGBA::Ptr& samples_cloud,
-                   const PointCloudRGBA::Ptr& cloud) const;
+                   const PointCloudRGBA::Ptr& cloud) ;
 
   void plotNormals(const util::Cloud& cloud_cam);
 
   void plotNormals(const PointCloudRGBA::Ptr& cloud,
                    const PointCloudRGBA::Ptr& cloud_samples,
-                   const Eigen::Matrix3Xd& normals) const;
+                   const Eigen::Matrix3Xd& normals) ;
 
   /**
    * \brief Plot a list of normals.
@@ -171,7 +171,7 @@ class Plot {
    * \param normals the normals to be plotted
    */
   void plotNormals(const PointCloudRGBA::Ptr& cloud,
-                   const Eigen::Matrix3Xd& normals) const;
+                   const Eigen::Matrix3Xd& normals) ;
 
   /**
    * \brief Plot a list of points and their normals.
@@ -179,7 +179,7 @@ class Plot {
    * \param normals the normals to be plotted
    */
   void plotNormals(const Eigen::Matrix3Xd& pts,
-                   const Eigen::Matrix3Xd& normals) const;
+                   const Eigen::Matrix3Xd& normals) ;
 
   /**
    * \brief Plot a list of local reference frames.
@@ -187,7 +187,7 @@ class Plot {
    * \param cloud the point cloud to be plotted
    */
   void plotLocalAxes(const std::vector<candidate::LocalFrame>& frames,
-                     const PointCloudRGBA::Ptr& cloud) const;
+                     const PointCloudRGBA::Ptr& cloud) ;
 
   /**
    * \brief Plot the camera source for each point in the point cloud.
@@ -196,7 +196,7 @@ class Plot {
    * \param cloud the point cloud to be plotted
    */
   void plotCameraSource(const Eigen::VectorXi& pts_cam_source_in,
-                        const PointCloudRGBA::Ptr& cloud) const;
+                        const PointCloudRGBA::Ptr& cloud) ;
 
   /**
    * \brief Plot a point cloud.
@@ -204,12 +204,12 @@ class Plot {
    * \param str the title of the plot window
    */
   void plotCloud(const PointCloudRGBA::Ptr& cloud_rgb,
-                 const std::string& title) const;
+                 const std::string& title) ;
 
  private:
   void plotHand3D(PCLVisualizer& viewer, const candidate::Hand& hand,
                   const candidate::HandGeometry& geometry, int idx,
-                  const Eigen::Vector3d& rgb) const;
+                  const Eigen::Vector3d& rgb) ;
 
   /**
    * \brief Plot a grasp.
@@ -224,7 +224,7 @@ class Plot {
   void plotHand3D(PCLVisualizer& viewer, const candidate::Hand& hand,
                   double outer_diameter, double finger_width, double hand_depth,
                   double hand_height, int idx,
-                  const Eigen::Vector3d& rgb) const;
+                  const Eigen::Vector3d& rgb) ;
 
   /**
    * \brief Plot a cube.
@@ -239,11 +239,11 @@ class Plot {
   void plotCube(PCLVisualizer& viewer, const Eigen::Vector3d& position,
                 const Eigen::Quaterniond& rotation, double width, double height,
                 double depth, const std::string& name,
-                const Eigen::Vector3d& rgb) const;
+                const Eigen::Vector3d& rgb) ;
 
   void plotFrame(PCLVisualizer& viewer, const Eigen::Vector3d& translation,
                  const Eigen::Matrix3d& rotation, const std::string& id,
-                 double axis_length = 0.02) const;
+                 double axis_length = 0.02) ;
   /**
    * \brief Create a point cloud that stores the visual representations of the
    * grasps.
@@ -252,20 +252,20 @@ class Plot {
    */
   PointCloudRGBA::Ptr createFingersCloud(
       const std::vector<std::unique_ptr<candidate::Hand>>& hand_list,
-      double outer_diameter) const;
+      double outer_diameter) ;
 
   /**
    * \brief Convert an Eigen vector to a PCL point.
    * \param v the Eigen vector to be converted
    */
-  pcl::PointXYZRGBA eigenVector3dToPointXYZRGBA(const Eigen::Vector3d& v) const;
+  pcl::PointXYZRGBA eigenVector3dToPointXYZRGBA(const Eigen::Vector3d& v) ;
 
   /**
    * \brief Set the color of a point.
    * \param hand the grasp that the point belongs to
    * \param p the point for which the color is set
    */
-  void setPointColor(const candidate::Hand& hand, pcl::PointXYZRGBA& p) const;
+  void setPointColor(const candidate::Hand& hand, pcl::PointXYZRGBA& p) ;
 
   /**
    * \brief Add a point cloud with normals to a PCL visualizer.
@@ -282,19 +282,22 @@ class Plot {
                                double line_width, double* color_cloud,
                                double* color_normals,
                                const std::string& cloud_name,
-                               const std::string& normals_name) const;
+                               const std::string& normals_name) ;
 
   /**
    * \brief Run/show a PCL visualizer until an escape key is hit.
    * \param viewer the PCL visualizer to be shown
    */
-  void runViewer(PCLVisualizer& viewer) const;
+  void runViewer(PCLVisualizer& viewer) ;
 
   /**
    * \brief Create a PCL visualizer.
    * \param title the title of the visualization window
    */
-  PCLVisualizer createViewer(std::string title) const;
+  PCLVisualizer createViewer(std::string title);
+
+  void keyboardEventOccurred(const pcl::visualization::KeyboardEvent &event,
+                            void* viewer_void);
 
   int num_orientations_;
   int num_axes_;
