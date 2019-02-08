@@ -127,7 +127,8 @@ std::vector<int> HandSearch::reevaluateHypotheses(
       util::PointList nn_points_frame;
       FingerHand finger_hand(params_.hand_geometry_.finger_width_,
                              params_.hand_geometry_.outer_diameter_,
-                             params_.hand_geometry_.depth_);
+                             params_.hand_geometry_.depth_,
+                             params_.num_finger_placements_);
 
       // Set the lateral and forward axes of the robot hand frame (closing
       // direction and grasp approach direction).
@@ -189,8 +190,9 @@ std::vector<std::unique_ptr<candidate::HandSet>> HandSearch::evalHands(
 #endif
   for (std::size_t i = 0; i < frames.size(); i++) {
     pcl::PointXYZRGBA sample = eigenVectorToPcl(frames[i].getSample());
-    hand_set_list[i] = std::make_unique<HandSet>(params_.hand_geometry_, angles,
-                                                 params_.hand_axes_);
+    hand_set_list[i] = std::make_unique<HandSet>(
+        params_.hand_geometry_, angles, params_.hand_axes_,
+        params_.num_finger_placements_, params_.deepen_hand_);
 
     if (kdtree.radiusSearch(sample, nn_radius_, nn_indices, nn_dists) > 0) {
       nn_points = point_list.slice(nn_indices);

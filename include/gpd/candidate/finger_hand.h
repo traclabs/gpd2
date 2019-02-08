@@ -63,8 +63,8 @@ class FingerHand {
    * \param hand_outer_diameter the maximum aperture of the robot hand
    * \param hand_depth the length of the fingers
    */
-  FingerHand(double finger_width, double hand_outer_diameter,
-             double hand_depth);
+  FingerHand(double finger_width, double hand_outer_diameter, double hand_depth,
+             int num_placements);
 
   /**
    * \brief Find possible finger placements.
@@ -79,6 +79,12 @@ class FingerHand {
    */
   void evaluateFingers(const Eigen::Matrix3Xd& points, double bite,
                        int idx = -1);
+
+  /**
+   * \brief Chhose the middle among all valid finger placements.
+   * \return the index of the middle finger placement
+   */
+  int chooseMiddleHand();
 
   /**
    * \brief Try to move the robot hand as far as possible onto the object.

@@ -84,8 +84,10 @@ class HandSearch {
     Eigen::Matrix4d cam_tf_left_;   ///< pose of the left camera
     Eigen::Matrix4d cam_tf_right_;  ///< pose of the right camera
     int num_orientations_;          ///< number of hand orientations to evaluate
+    int num_finger_placements_;     ///< number of finger placements to evaluate
     std::vector<int> hand_axes_;    ///< the rotation axis about which different
                                     /// hand orientations are generated
+    bool deepen_hand_;  ///< if the hand is pushed forward onto the object
 
     HandGeometry hand_geometry_;  ///< robot hand geometry
   };

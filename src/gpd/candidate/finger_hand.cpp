@@ -4,24 +4,23 @@ namespace gpd {
 namespace candidate {
 
 FingerHand::FingerHand(double finger_width, double hand_outer_diameter,
-                       double hand_depth)
+                       double hand_depth, int num_placements)
     : finger_width_(finger_width),
       hand_depth_(hand_depth),
       lateral_axis_(-1),
       forward_axis_(-1) {
-  int n = 10;  // number of finger placements to consider over a single hand
-               // diameter
-
   // Calculate the finger spacing.
   Eigen::VectorXd fs_half;
-  fs_half.setLinSpaced(n, 0.0, hand_outer_diameter - finger_width);
-  finger_spacing_.resize(2 * n);
+  fs_half.setLinSpaced(num_placements, 0.0, hand_outer_diameter - finger_width);
+  finger_spacing_.resize(2 * num_placements);
   finger_spacing_
       << (fs_half.array() - hand_outer_diameter + finger_width_).matrix(),
       fs_half;
 
-  fingers_ = Eigen::Array<bool, 1, Eigen::Dynamic>::Constant(1, 2 * n, false);
-  hand_ = Eigen::Array<bool, 1, Eigen::Dynamic>::Constant(1, n, false);
+  fingers_ = Eigen::Array<bool, 1, Eigen::Dynamic>::Constant(
+      1, 2 * num_placements, false);
+  hand_ =
+      Eigen::Array<bool, 1, Eigen::Dynamic>::Constant(1, num_placements, false);
 }
 
 void FingerHand::evaluateFingers(const Eigen::Matrix3Xd &points, double bite,
@@ -87,8 +86,7 @@ void FingerHand::evaluateHand(int idx) {
   hand_(idx) = (fingers_(idx) == true && fingers_(n + idx) == true);
 }
 
-int FingerHand::deepenHand(const Eigen::Matrix3Xd &points, double min_depth,
-                           double max_depth) {
+int FingerHand::chooseMiddleHand() {
   std::vector<int> hand_idx;
 
   for (int i = 0; i < hand_.cols(); i++) {
@@ -101,9 +99,15 @@ int FingerHand::deepenHand(const Eigen::Matrix3Xd &points, double min_depth,
     return -1;
   }
 
+  int idx = hand_idx[ceil(hand_idx.size() / 2.0) - 1];
+
+  return idx;
+}
+
+int FingerHand::deepenHand(const Eigen::Matrix3Xd &points, double min_depth,
+                           double max_depth) {
   // Choose middle hand.
-  int hand_eroded_idx =
-      hand_idx[ceil(hand_idx.size() / 2.0) - 1];  // middle index
+  int hand_eroded_idx = chooseMiddleHand();  // middle index
   int opposite_idx =
       fingers_.size() / 2 + hand_eroded_idx;  // opposite finger index
 

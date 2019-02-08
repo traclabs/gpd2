@@ -18,12 +18,18 @@ HandSet::HandSet() {
   hands_.resize(0);
   is_valid_.resize(0);
   angles_.resize(0);
+  deepen_hand_ = true;
 }
 
 HandSet::HandSet(const HandGeometry &hand_geometry,
                  const Eigen::VectorXd &angles,
-                 const std::vector<int> &hand_axes)
-    : hand_geometry_(hand_geometry), angles_(angles), hand_axes_(hand_axes) {
+                 const std::vector<int> &hand_axes, int num_finger_placements,
+                 bool deepen_hand)
+    : hand_geometry_(hand_geometry),
+      angles_(angles),
+      hand_axes_(hand_axes),
+      num_finger_placements_(num_finger_placements),
+      deepen_hand_(deepen_hand) {
   sample_.setZero();
   hands_.resize(0);
   is_valid_.resize(0);
@@ -55,7 +61,8 @@ void HandSet::evalHands(const util::PointList &point_list,
 
   // This object is used to evaluate the finger placement.
   FingerHand finger_hand(hand_geometry_.finger_width_,
-                         hand_geometry_.outer_diameter_, hand_geometry_.depth_);
+                         hand_geometry_.outer_diameter_, hand_geometry_.depth_,
+                         num_finger_placements_);
 
   // Set the forward and lateral axis of the robot hand frame (closing direction
   // and grasp approach direction).
@@ -91,11 +98,15 @@ void HandSet::evalHands(const util::PointList &point_list,
 
     // Check that there is at least one feasible 2-finger placement.
     if (finger_hand.getHand().any()) {
-      // Try to move the hand as deep as possible onto the object.
-      int finger_idx = finger_hand.deepenHand(point_list_cropped.getPoints(),
-                                              hand_geometry_.init_bite_,
-                                              hand_geometry_.depth_);
-
+      int finger_idx;
+      if (deepen_hand_) {
+        // Try to move the hand as deep as possible onto the object.
+        finger_idx = finger_hand.deepenHand(point_list_cropped.getPoints(),
+                                            hand_geometry_.init_bite_,
+                                            hand_geometry_.depth_);
+      } else {
+        finger_idx = finger_hand.chooseMiddleHand();
+      }
       // Calculate points in the closing region of the hand.
       std::vector<int> indices_closing =
           finger_hand.computePointsInClosingRegion(

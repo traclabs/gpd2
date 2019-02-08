@@ -57,6 +57,7 @@ GraspDetector::GraspDetector(const std::string& config_filename) {
       config_file.getValueOfKey<bool>("voxelize", true);
   generator_params.workspace_ =
       config_file.getValueOfKeyAsStdVectorDouble("workspace", "-1 1 -1 1 -1 1");
+
   candidate::HandSearch::Parameters hand_search_params;
   hand_search_params.hand_geometry_ = hand_geom;
   hand_search_params.nn_radius_frames_ =
@@ -67,6 +68,10 @@ GraspDetector::GraspDetector(const std::string& config_filename) {
       config_file.getValueOfKey<int>("num_threads", 1);
   hand_search_params.num_orientations_ =
       config_file.getValueOfKey<int>("num_orientations", 8);
+  hand_search_params.num_finger_placements_ =
+      config_file.getValueOfKey<int>("num_finger_placements", 10);
+  hand_search_params.deepen_hand_ =
+      config_file.getValueOfKey<bool>("deepen_hand", true);
   hand_search_params.hand_axes_ =
       config_file.getValueOfKeyAsStdVectorInt("hand_axes", "2");
   candidates_generator_ = std::make_unique<candidate::CandidatesGenerator>(
@@ -85,6 +90,9 @@ GraspDetector::GraspDetector(const std::string& config_filename) {
   printStdVector(hand_search_params.hand_axes_, "hand axes");
   std::cout << "num_orientations: " << hand_search_params.num_orientations_
             << "\n";
+  std::cout << "num_finger_placements: "
+            << hand_search_params.num_finger_placements_ << "\n";
+  std::cout << "deepen_hand: " << hand_search_params.deepen_hand_ << "\n";
   std::cout << "==============================================\n";
 
   // TODO: Set the camera position.

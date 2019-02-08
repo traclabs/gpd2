@@ -140,7 +140,8 @@ class HandSet {
    * \param rotation_axis the axis about which the orientations are considered
    */
   HandSet(const HandGeometry& hand_geometry, const Eigen::VectorXd& angles,
-          const std::vector<int>& hand_axes);
+          const std::vector<int>& hand_axes, int num_finger_placements,
+          bool deepen_hand);
 
   void evalHandSet(const util::PointList& point_list,
                    const LocalFrame& local_frame);
@@ -292,7 +293,9 @@ class HandSet {
   Eigen::Array<bool, 1, Eigen::Dynamic>
       is_valid_;  ///< indicates for each grasp if it is valid or not
   Eigen::VectorXd
-      angles_;  ///< the hand orientations to consider in the local search
+      angles_;        ///< the hand orientations to consider in the local search
+  bool deepen_hand_;  ///< if the hand is pushed forward onto the object
+  int num_finger_placements_;  ///< number of finger placements to evaluate
 
   HandGeometry hand_geometry_;  ///< the robot hand geometry
   std::vector<int> hand_axes_;  ///< the axes about which the hand frame is
