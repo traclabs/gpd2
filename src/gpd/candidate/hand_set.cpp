@@ -9,8 +9,6 @@ const Eigen::Vector3d HandSet::AXES[3] = {Eigen::Vector3d::UnitX(),
 
 const bool HandSet::MEASURE_TIME = false;
 
-const double MAX = (double)(((214013) >> 16) & 0x7FFF);
-
 int HandSet::seed_ = 0;
 
 HandSet::HandSet() {
@@ -239,14 +237,13 @@ void HandSet::calculateVoxelizedShadowVectorized(
             .cast<int>());
   }
 
-  if (MEASURE_TIME)
+  if (MEASURE_TIME) {
     printf(
         "Shadow (1 camera) calculation. Runtime: %.3f, #points: %d, "
         "num_shadow_points: %d, #shadow: %d, max #shadow: %d\n",
         omp_get_wtime() - t0_set, (int)points.cols(), num_shadow_points,
         (int)shadow_set.size(), n);
-  //    std::cout << "Calculated shadow for 1 camera. Runtime: " <<
-  //    omp_get_wtime() - t0_set << ", #points: " << n << "\n";
+  }
 }
 
 void HandSet::modifyCandidate(Hand &hand, const Eigen::Vector3d &sample,

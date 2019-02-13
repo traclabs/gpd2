@@ -47,15 +47,21 @@ typedef pcl::PointCloud<pcl::PointNormal> PointCloudPointNormal;
 
 typedef boost::shared_ptr<pcl::visualization::PCLVisualizer> PCLVisualizer;
 
-/** Plot class
+/**
  *
- * This class provides a set of visualization methods that visualize the output
- * of the algorithm and
- * some intermediate steps. The visualization is done using PCL Visualizer.
+ * \brief Visualization utilities
+ *
+ * Provides visualization methods that use the PCL Visualizer. Allows to
+ * visualize samples, surface normals, grasps, and point clouds.
  *
  */
 class Plot {
  public:
+  /**
+   * \brief Constructor.
+   * \param num_axes the number of orientation axes
+   * \param num_orientations the number of hand orientations
+   */
   Plot(int num_axes, int num_orientations)
       : num_axes_(num_axes), num_orientations_(num_orientations) {}
 

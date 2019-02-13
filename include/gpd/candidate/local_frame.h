@@ -39,13 +39,13 @@
 namespace gpd {
 namespace candidate {
 
-/** LocalFrame class
+/**
  *
  * \brief Local reference frame.
  *
- * This class estimates the local reference frame for a point neighborhood. The
- * coordinate axes of the local frame are the normal, binormal, and curvature
- * axis.
+ * This class estimates the local reference frame (LRF) for a point
+ * neighborhood. The coordinate axes of the local frame are the normal,
+ * binormal, and curvature axis.
  */
 class LocalFrame {
  public:

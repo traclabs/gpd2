@@ -285,12 +285,11 @@ Grasp *handsToGraspsStruct(const std::vector<Hand> &hands,
     grasps[i].score = hands[i].getScore();
     grasps[i].label = hands[i].isFullAntipodal();
     printf("i: %d\n", i);
-    grasps[i].image = cvMatToArray(
-        images[0]);  // new
-                     // int[images[i].rows*images[i].cols*images[i].channels()];
-                     //    int* img = cvMatToArray(images[0]);
-                     //    grasps[i].image = img;
-                     //    delete[] img;
+    grasps[i].image = cvMatToArray(images[0]);  // new
+    // int[images[i].rows*images[i].cols*images[i].channels()];
+    //    int* img = cvMatToArray(images[0]);
+    //    grasps[i].image = img;
+    //    delete[] img;
   }
 
   return grasps;

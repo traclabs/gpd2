@@ -91,43 +91,23 @@ typedef boost::unordered_set<Eigen::Vector3i, boost::hash<Eigen::Vector3i>,
                              Vector3iEqual, std::allocator<Eigen::Vector3i>>
     Vector3iSet;
 
-/** GraspSet class
+/**
  *
- * \brief Calculate grasp sets.
+ * \brief Calculate a set of grasp candidates.
  *
- * This class calculates grasp sets. A grasp set is a set of grasps that are all
- * calculated for the same point
- * neighborhood. Each grasp in the set has a different orientation. The grasps
- * are calculated by a local search over
- * discretized orientations and positions. This discretization is done by fixing
- * two degrees of orientation and
- * rotating the robot hand about a fixed axis.
+ * This class calculate sets of grasp candidates. The grasp candidates in the
+ * same set share the same point neighborhood and the same local reference
+ * frame (LRF). The grasps are calculated by a local search over discretized
+ * orientations and positions.
+ *
+ * \note For details, check out: Andreas ten Pas, Marcus Gualtieri, Kate
+ * Saenko, and Robert Platt. Grasp Pose Detection in Point Clouds. The
+ * International Journal of Robotics Research, Vol 36, Issue 13-14,
+ * pp. 1455 - 1473. October 2017. https://arxiv.org/abs/1706.09911
  *
  */
 class HandSet {
  public:
-  /**
-   * \brief Comparator for checking uniqueness of two 3D-vectors.
-   */
-  struct UniqueVectorComparator {
-    /**
-     * \brief Compares two 3D-vectors for uniqueness.
-     * \param a the first 3D-vector
-     * \param b the second 3D-vector
-     * \return true if they differ in at least one element, false if all
-     * elements are equal
-     */
-    bool operator()(const Eigen::Vector3i& a, const Eigen::Vector3i& b) {
-      for (int i = 0; i < a.size(); i++) {
-        if (a(i) != b(i)) {
-          return a(i) < b(i);
-        }
-      }
-
-      return false;
-    }
-  };
-
   /**
    * Constructor.
    */
@@ -136,26 +116,35 @@ class HandSet {
   /**
    * \brief Constructor.
    * \param hand_geometry the hand geometry parameters
-   * \param angles the orientations to be considered
-   * \param rotation_axis the axis about which the orientations are considered
+   * \param angles the angles to be evaluated
+   * \param hand_axes the hand axes about which to rotate
+   * \param num_finger_placements the number of finger placements
+   * \param deepen_hand if the hand is pushed forward onto the object
    */
   HandSet(const HandGeometry& hand_geometry, const Eigen::VectorXd& angles,
           const std::vector<int>& hand_axes, int num_finger_placements,
           bool deepen_hand);
 
+  /**
+   * \brief Calculate a set of grasp candidates given a local reference frame.
+   * \param point_list the point neighborhood
+   * \param local_frame the local reference frame
+   */
   void evalHandSet(const util::PointList& point_list,
                    const LocalFrame& local_frame);
 
   /**
-   * \brief Calculate a grasp set given a local reference frame.
+   * \brief Calculate grasp candidates for a given rotation axis.
    * \param point_list the point neighborhood
    * \param local_frame the local reference frame
+   * \param axis the index of the rotation axis
+   * \param start the index of the first free element in `hands_`
    */
   void evalHands(const util::PointList& point_list,
                  const LocalFrame& local_frame, int axis, int start);
 
   /**
-   * \brief Calculate the set of shadow points for a grasp set.
+   * \brief Calculate the "shadow" of the point neighborhood.
    * \param point_list the point neighborhood
    * \param shadow_length the length of the shadow
    */
@@ -180,6 +169,10 @@ class HandSet {
    */
   const Eigen::Vector3d& getSample() const { return sample_; }
 
+  /**
+   * \brief Return the local reference frame.
+   * \return the local reference frame (3 x 3 rotation matrix)
+   */
   const Eigen::Matrix3d& getFrame() const { return frame_; }
 
   /**
@@ -281,21 +274,22 @@ class HandSet {
 
   /**
    * \brief Generate a random integer.
-   * source:
-   * http://software.intel.com/en-us/articles/fast-random-number-generator-on-the-intel-pentiumr-4-processor/
+   * \note Source:
+   * http://software.intel.com/en-us/articles/fast-random-number-generator-on-
+   * the-intel-pentiumr-4-processor/
    */
   inline int fastrand() const;
 
   Eigen::Vector3d sample_;  ///< the center of the point neighborhood
   Eigen::Matrix3d frame_;   ///< the local reference frame
   std::vector<std::unique_ptr<Hand>>
-      hands_;  ///< the grasps contained in this grasp set
+      hands_;  ///< the grasp candidates contained in this set
   Eigen::Array<bool, 1, Eigen::Dynamic>
-      is_valid_;  ///< indicates for each grasp if it is valid or not
+      is_valid_;  ///< indicates for each grasp candidate if it is valid or not
   Eigen::VectorXd
       angles_;        ///< the hand orientations to consider in the local search
   bool deepen_hand_;  ///< if the hand is pushed forward onto the object
-  int num_finger_placements_;  ///< number of finger placements to evaluate
+  int num_finger_placements_;  ///< the number of finger placements to evaluate
 
   HandGeometry hand_geometry_;  ///< the robot hand geometry
   std::vector<int> hand_axes_;  ///< the axes about which the hand frame is

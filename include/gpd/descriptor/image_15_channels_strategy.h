@@ -43,8 +43,26 @@
 namespace gpd {
 namespace descriptor {
 
+/**
+ *
+ * \brief Calculate 15-channels grasp image.
+ *
+ * The 15 channels contain height maps and surface normals of the points
+ * contained inside the robot hand's closing region from three different views
+ * like in the 12-channels image. The three additional channels contain the
+ * "shadow" of the points.
+ *
+ */
 class Image15ChannelsStrategy : public ImageStrategy {
  public:
+  /**
+   * \brief Create a strategy for calculating grasp images.
+   * \param image_params the grasp image parameters
+   * \param num_threads the number of CPU threads to be used
+   * \param num_orientations the number of robot hand orientations
+   * \param is_plotting if the images are visualized
+   * \return the strategy for calculating grasp images
+   */
   Image15ChannelsStrategy(const ImageGeometry& image_params, int num_threads,
                           int num_orientations, bool is_plotting)
       : ImageStrategy(image_params, num_threads, num_orientations,
@@ -57,6 +75,12 @@ class Image15ChannelsStrategy : public ImageStrategy {
     shadow_length_ = image_dims.maxCoeff();
   }
 
+  /**
+   * \brief Create grasp images given a list of grasp candidates.
+   * \param hand_set the grasp candidates
+   * \param nn_points the point neighborhoods used to calculate the images
+   * \return the grasp images
+   */
   std::vector<std::unique_ptr<cv::Mat>> createImages(
       const candidate::HandSet& hand_set,
       const util::PointList& nn_points) const;

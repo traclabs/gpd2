@@ -39,13 +39,12 @@
 namespace gpd {
 namespace util {
 
-/** EigenUtils namespace
+/**
  *
  * \brief Utility functions for the Eigen matrix library
  *
  * This namespace contains utility functions for the Eigen matrix library such
- * as slicing matrices and rounding
- * vectors.
+ * as slicing matrices and rounding vectors.
  *
  */
 namespace EigenUtils {

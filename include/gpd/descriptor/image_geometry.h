@@ -37,20 +37,43 @@
 namespace gpd {
 namespace descriptor {
 
-/** ImageGeometry class
+/**
  *
  * \brief Store grasp image geometry.
  *
- * This class stores parameters which define the geometry of a grasp image.
+ * Stores the parameters used to calculate a grasp image.
+ *
+ * Each grasp image is based on a bounding box that defines the closing region
+ * of the robot hand. The dimensions of the bounding box are: *outer_diameter*
+ * x *depth* x *height*. These parameters are analogous to those that define
+ * the robot hand geometry (see \class HandGeometry).
+ *
+ * \note The grasp image is assumed to be square in size (width = height).
  *
  */
 class ImageGeometry {
  public:
+  /**
+   * \brief Constructor.
+   */
   ImageGeometry();
 
+  /**
+   * \brief Constructor.
+   * \param outer_diameter the width of the bounding box
+   * \param depth the depth of the bounding box
+   * \param height the height of the bounding box
+   * \param size the size of the grasp image (width and height)
+   * \param num_channels the number of channels of the grasp image
+   */
   ImageGeometry(double outer_diameter, double depth, double height, int size,
                 int num_channels);
 
+  /**
+   * \brief Constructor that uses a given configuration file to read in the
+   * parameters of the grasp image.
+   * \param filepath the filepath to the configuration file
+   */
   ImageGeometry(const std::string& filepath);
 
   double outer_diameter_;  ///< the width of the volume

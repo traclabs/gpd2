@@ -55,12 +55,12 @@
 
 namespace gpd {
 
-/** GraspDetector class
+/**
  *
  * \brief Detect grasp poses in point clouds.
  *
- * This class detects grasps in a point cloud by first creating a large set of
- * grasp hypotheses, and then classifying each of them as a grasp or not.
+ * This class detects grasp poses in a point clouds by first creating a large
+ * set of grasp candidates, and then classifying each of them as a grasp or not.
  *
  */
 class GraspDetector {
@@ -109,38 +109,78 @@ class GraspDetector {
 
   /**
    * \brief Generate grasp candidates.
-   * \param cloud_cam the point cloud
+   * \param cloud the point cloud
    * \return the list of grasp candidates
    */
   std::vector<std::unique_ptr<candidate::HandSet>> generateGraspCandidates(
       const util::Cloud& cloud);
 
+  /**
+   * \brief Create grasp images and candidates for a given point cloud.
+   * \param cloud the point cloud
+   * \param[out] hands_out the grasp candidates
+   * \param[out] images_out the grasp images
+   * \return `false` if no grasp candidates are found, `true` otherwise
+   */
   bool createGraspImages(
       util::Cloud& cloud,
       std::vector<std::unique_ptr<candidate::Hand>>& hands_out,
       std::vector<std::unique_ptr<cv::Mat>>& images_out);
 
+  /**
+   * \brief Evaluate the ground truth for a given list of grasps.
+   * \param cloud_gt the point cloud (typically a mesh)
+   * \param hands the grasps
+   * \return the ground truth label for each grasp
+   */
   std::vector<int> evalGroundTruth(
       const util::Cloud& cloud_gt,
       std::vector<std::unique_ptr<candidate::Hand>>& hands);
 
+  /**
+   * \brief Creates grasp images and prunes grasps below a given score.
+   * \param cloud the point cloud
+   * \param hand_set_list the grasps
+   * \param min_score the score below which grasps are pruned
+   * \return the grasps above the score
+   */
   std::vector<std::unique_ptr<candidate::Hand>> pruneGraspCandidates(
       const util::Cloud& cloud,
       const std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
       double min_score);
 
+  /**
+   * \brief Select the k highest scoring grasps.
+   * \param hands the grasps
+   * \return the k highest scoring grasps
+   */
   std::vector<std::unique_ptr<candidate::Hand>> selectGrasps(
       std::vector<std::unique_ptr<candidate::Hand>>& hands) const;
 
+  /**
+   * \brief Compare the scores of two given grasps.
+   * \param hand1 the first grasp to be compared
+   * \param hand1 the second grasp to be compared
+   * \return `true` if \param hand1 has a larger score than \param hand2,
+   * `false` otherwise
+   */
   static bool isScoreGreater(const std::unique_ptr<candidate::Hand>& hand1,
                              const std::unique_ptr<candidate::Hand>& hand2) {
     return hand1->getScore() > hand2->getScore();
   }
 
+  /**
+   * \brief Return the hand search parameters.
+   * \return the hand search parameters
+   */
   const candidate::HandSearch::Parameters& getHandSearchParameters() {
     return candidates_generator_->getHandSearchParams();
   }
 
+  /**
+   * \brief Return the image geometry parameters.
+   * \return the image geometry parameters
+   */
   const descriptor::ImageGeometry& getImageGeometry() const {
     return image_generator_->getImageGeometry();
   }

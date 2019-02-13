@@ -17,11 +17,10 @@ namespace test {
 namespace {
 
 int DoMain(int argc, char* argv[]) {
-  if (argc < 5) {
+  if (argc < 4) {
     std::cout << "ERROR: Not enough arguments given!\n";
     std::cout << "Usage: rosrun gpd test_grasp_image INPUT_FILE SAMPLE_INDEX "
-                 "DRAW_GRASP_IMAGES LENET_PARAMS_DIR "
-              << "[IMAGE_CHANNELS] [HAND_AXES]\n";
+                 "DRAW_GRASP_IMAGES [IMAGE_CHANNELS] [HAND_AXES]\n";
     return -1;
   }
 
@@ -63,13 +62,15 @@ int DoMain(int argc, char* argv[]) {
 
   // Local hand search parameters
   hand_search_params.nn_radius_frames_ = 0.01;
-  hand_search_params.num_orientations_ = 4;
+  hand_search_params.num_orientations_ = 8;
+  hand_search_params.num_finger_placements_ = 10;
+  hand_search_params.deepen_hand_ = true;
   hand_search_params.num_samples_ = 1;
   hand_search_params.num_threads_ = 1;
 
   std::vector<int> hand_axes;
-  if (argc >= 7) {
-    for (int i = 6; i < argc; i++) {
+  if (argc >= 6) {
+    for (int i = 5; i < argc; i++) {
       hand_axes.push_back(boost::lexical_cast<int>(argv[i]));
     }
   } else {
@@ -101,12 +102,11 @@ int DoMain(int argc, char* argv[]) {
   descriptor::ImageGeometry image_geom;
   image_geom.depth_ = 0.06;
   image_geom.height_ = 0.02;
-  //  image_geom.height_ = 0.1;
   image_geom.outer_diameter_ = 0.12;
   image_geom.size_ = 60;
   image_geom.num_channels_ = 15;
-  if (argc >= 6) {
-    image_geom.num_channels_ = boost::lexical_cast<int>(argv[5]);
+  if (argc >= 5) {
+    image_geom.num_channels_ = boost::lexical_cast<int>(argv[4]);
   }
 
   // Calculate surface normals.

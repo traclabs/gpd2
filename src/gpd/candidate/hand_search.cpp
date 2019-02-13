@@ -8,10 +8,7 @@ const int HandSearch::ROTATION_AXIS_BINORMAL = 1;
 const int HandSearch::ROTATION_AXIS_CURVATURE_AXIS = 2;
 
 HandSearch::HandSearch(Parameters params)
-    : params_(params),
-      plots_samples_(false),
-      plots_local_axes_(false),
-      plots_camera_sources_(false) {
+    : params_(params), plots_local_axes_(false) {
   // Calculate radius for nearest neighbor search.
   const HandGeometry &hand_geom = params_.hand_geometry_;
   Eigen::Vector3d hand_dims;
@@ -23,31 +20,13 @@ HandSearch::HandSearch(Parameters params)
 }
 
 std::vector<std::unique_ptr<HandSet>> HandSearch::searchHands(
-    const util::Cloud &cloud_cam, bool plots_normals,
-    bool plots_samples) const {
+    const util::Cloud &cloud_cam) const {
   double t0_total = omp_get_wtime();
 
   // Create KdTree for neighborhood search.
   const PointCloudRGB::Ptr &cloud = cloud_cam.getCloudProcessed();
   pcl::KdTreeFLANN<pcl::PointXYZRGBA> kdtree;
   kdtree.setInputCloud(cloud);
-
-  // Plot normals and/or samples if desired.
-  if (plots_normals) {
-    std::cout << "Plotting normals ...\n";
-    plot_->plotNormals(cloud_cam.getNormals(), cloud_normals_);
-  }
-
-  if (plots_samples) {
-    if (cloud_cam.getSampleIndices().size() > 0) {
-      std::cout << "Plotting sample indices ...\n";
-      plot_->plotSamples(cloud_cam.getSampleIndices(),
-                         cloud_cam.getCloudProcessed());
-    } else if (cloud_cam.getSamples().cols() > 0) {
-      std::cout << "Plotting samples ...\n";
-      plot_->plotSamples(cloud_cam.getSamples(), cloud_cam.getCloudProcessed());
-    }
-  }
 
   // 1. Estimate local reference frames.
   std::cout << "Estimating local reference frames ...\n";
@@ -86,7 +65,7 @@ std::vector<int> HandSearch::reevaluateHypotheses(
     const util::Cloud &cloud_cam,
     std::vector<std::unique_ptr<candidate::Hand>> &grasps,
     bool plot_samples) const {
-  // create KdTree for neighborhood search
+  // Create KdTree for neighborhood search.
   const Eigen::MatrixXi &camera_source = cloud_cam.getCameraSource();
   const Eigen::Matrix3Xd &cloud_normals = cloud_cam.getNormals();
   const PointCloudRGB::Ptr &cloud = cloud_cam.getCloudProcessed();
@@ -112,8 +91,8 @@ std::vector<int> HandSearch::reevaluateHypotheses(
   std::vector<int> labels(grasps.size());
 
 #ifdef _OPENMP
-#pragma omp parallel for private(nn_indices, nn_dists, nn_points) \
-    num_threads(params_.num_threads_)
+#pragma omp parallel for private(nn_indices, nn_dists, \
+                                 nn_points) num_threads(params_.num_threads_)
 #endif
   for (int i = 0; i < grasps.size(); i++) {
     labels[i] = 0;
@@ -185,8 +164,8 @@ std::vector<std::unique_ptr<candidate::HandSet>> HandSearch::evalHands(
   util::PointList nn_points;
 
 #ifdef _OPENMP  // parallelization using OpenMP
-#pragma omp parallel for private(nn_indices, nn_dists, nn_points) \
-    num_threads(params_.num_threads_)
+#pragma omp parallel for private(nn_indices, nn_dists, \
+                                 nn_points) num_threads(params_.num_threads_)
 #endif
   for (std::size_t i = 0; i < frames.size(); i++) {
     pcl::PointXYZRGBA sample = eigenVectorToPcl(frames[i].getSample());

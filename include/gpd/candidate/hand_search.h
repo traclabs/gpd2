@@ -58,35 +58,32 @@ namespace candidate {
 
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGB;
 
-/** HandSearch class
+/**
  *
- * \brief Search for grasp hypotheses.
+ * \brief Search for grasp candidates.
  *
- * This class searches for grasp hypotheses in a point cloud by first
- * calculating a local reference frame for a small
- * point neighborhood, and then finding geometrically feasible grasp hypotheses
- * for a larger point neighborhood. It
- * can also estimate whether the grasp is antipodal from the normals of the
- * point neighborhood.
+ * This class searches for grasp candidates in a point cloud by first
+ * calculating a local reference frame (LRF) for a point neighborhood, and then
+ * finding geometrically feasible robot hand placements. Each feasible grasp
+ * candidate is checked for mechanical stability (antipodal grasp or not).
  *
  */
 class HandSearch {
  public:
+  /**
+  * \brief Parameters for the hand search.
+  */
   struct Parameters {
-    /** local reference frame estimation parameters */
-    double nn_radius_frames_;  ///< local reference frame radius for point
-                               /// neighborhood search
+    /** LRF estimation parameters */
+    double nn_radius_frames_;  ///< radius for point neighborhood search for LRF
 
     /** grasp candidate generation */
-    int num_threads_;  ///< the number of CPU threads to be used for the
-                       /// hypothesis generation
-    int num_samples_;  ///< the number of samples drawn from the point clouds;
-    Eigen::Matrix4d cam_tf_left_;   ///< pose of the left camera
-    Eigen::Matrix4d cam_tf_right_;  ///< pose of the right camera
-    int num_orientations_;          ///< number of hand orientations to evaluate
-    int num_finger_placements_;     ///< number of finger placements to evaluate
-    std::vector<int> hand_axes_;    ///< the rotation axis about which different
-                                    /// hand orientations are generated
+    int num_threads_;             ///< the number of CPU threads to be used
+    int num_samples_;             ///< the number of samples to be used
+    int num_orientations_;        ///< number of hand orientations to evaluate
+    int num_finger_placements_;   ///< number of finger placements to evaluate
+    std::vector<int> hand_axes_;  ///< the axes about which different hand
+                                  /// orientations are generated
     bool deepen_hand_;  ///< if the hand is pushed forward onto the object
 
     HandGeometry hand_geometry_;  ///< robot hand geometry
@@ -100,26 +97,28 @@ class HandSearch {
 
   /**
    * \brief Search robot hand configurations.
-   * \param cloud_cam the point cloud
-   * \param plots_normals if surface normals are visualized
-   * \param plots_samples if samples are visualized
+   * \param cloud the point cloud
    * \return list of grasp candidate sets
    */
   std::vector<std::unique_ptr<candidate::HandSet>> searchHands(
-      const util::Cloud& cloud_cam, bool plots_normals = false,
-      bool plots_samples = false) const;
+      const util::Cloud& cloud) const;
 
   /**
    * \brief Reevaluate a list of grasp candidates.
+   * \note Used to calculate ground truth.
    * \param cloud_cam the point cloud
    * \param grasps the list of grasp candidates
-   * \param plots_samples if samples are visualized
+   * \return the list of reevaluated grasp candidates
    */
   std::vector<int> reevaluateHypotheses(
       const util::Cloud& cloud_cam,
       std::vector<std::unique_ptr<candidate::Hand>>& grasps,
       bool plot_samples = false) const;
 
+  /**
+   * \brief Return the parameters for the hand search.
+   * \return params the hand search parameters
+   */
   const Parameters& getParams() const { return params_; }
 
   /**
@@ -177,24 +176,15 @@ class HandSearch {
 
   double nn_radius_;  ///< radius for nearest neighbors search
 
-  Eigen::Matrix3Xd cloud_normals_;  ///< a 3xn matrix containing the normals for
-                                    /// points in the point cloud
-  std::unique_ptr<util::Plot> plot_;  ///< plot object for visualization
+  std::unique_ptr<util::Plot> plot_;  ///< visualizer
 
   /** plotting parameters (optional, not read in from config file) **/
-  bool plots_samples_;  ///< are the samples drawn from the point cloud plotted?
-  bool plots_camera_sources_;  ///< is the camera source for each point in the
-                               /// point cloud plotted?
-  bool plots_local_axes_;      ///< are the local axes estimated for each point
-                               /// neighborhood plotted?
+  bool plots_local_axes_;  ///< if the LRFs are plotted
 
   /** constants for rotation axis */
-  static const int
-      ROTATION_AXIS_NORMAL;  ///< normal axis of local reference frame
-  static const int
-      ROTATION_AXIS_BINORMAL;  ///< binormal axis of local reference frame
-  static const int ROTATION_AXIS_CURVATURE_AXIS;  ///< curvature axis of local
-                                                  /// reference frame
+  static const int ROTATION_AXIS_NORMAL;          ///< normal axis of LRF
+  static const int ROTATION_AXIS_BINORMAL;        ///< binormal axis of LRF
+  static const int ROTATION_AXIS_CURVATURE_AXIS;  ///< curvature axis of LRF
 };
 
 }  // namespace candidate

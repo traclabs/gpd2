@@ -43,7 +43,7 @@
 namespace gpd {
 namespace net {
 
-/** Classifier class
+/**
  *
  * \brief Abstract base class for classifier that classifies grasp candidates as
  * viable grasps or not.
@@ -54,13 +54,11 @@ class Classifier {
   enum class Device : uint8_t { eCPU = 0, eGPU = 1, eVPU = 2, eFPGA = 3 };
 
   /**
-   * \brief Create Classifier per build option.
-   * - If "USE_OPENVINO", an OpenVINO classifier will be created
-   * - Otherwise a Caffe classifier will be created
-   * \param model_file the location of the file that describes the network model
-   * \param weights_file the location of the file that contains the network
-   * weights \param device the target device where the network computation
-   * executes
+   * \brief Create a classifier dependent on build options.
+   * \param model_file filepath to the network model
+   * \param weights_file filepath to the network parameters
+   * \param device target device on which the network is run
+   * \return the classifier
    */
   static std::shared_ptr<Classifier> create(const std::string& model_file,
                                             const std::string& weights_file,
@@ -75,6 +73,10 @@ class Classifier {
   virtual std::vector<float> classifyImages(
       const std::vector<std::unique_ptr<cv::Mat>>& image_list) = 0;
 
+  /**
+   * \brief Return the batch size.
+   * \return the batch size
+   */
   virtual int getBatchSize() const = 0;
 };
 

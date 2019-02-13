@@ -46,6 +46,9 @@
 namespace gpd {
 namespace candidate {
 
+/**
+ *\brief Label information
+ */
 struct Label {
   double score_{0.0};           ///< the score given by the classifier
   bool full_antipodal_{false};  ///< whether the grasp is antipodal
@@ -57,14 +60,16 @@ struct Label {
         half_antipodal_(half_antipodal) {}
 };
 
-///< 2-D bounding box of hand closing region with respect to hand frame
+/**
+ *\brief 2-D bounding box of hand closing region with respect to hand frame
+ */
 struct BoundingBox {
   double center_;
   double top_;
   double bottom_;
 };
 
-/** Hand class
+/**
  *
  * \brief Grasp represented as a robot hand pose
  *
@@ -147,8 +152,16 @@ class Hand {
    */
   bool isFullAntipodal() const { return label_.full_antipodal_; }
 
+  /**
+   * \brief Return the position of the grasp.
+   * \return the grasp position
+   */
   const Eigen::Vector3d& getPosition() const { return position_; }
 
+  /**
+   * \brief Return the orientation of the grasp.
+   * \return the grasp orientation (rotation matrix)
+   */
   const Eigen::Matrix3d& getOrientation() const { return orientation_; }
 
   /**
@@ -181,6 +194,10 @@ class Hand {
    */
   void setGraspWidth(double w) { grasp_width_ = w; }
 
+  /**
+   * \brief Set the position of the grasp.
+   * \param position the grasp position
+   */
   void setPosition(const Eigen::Vector3d& position) { position_ = position; }
 
   /**
@@ -247,8 +264,8 @@ class Hand {
    */
   std::string vectorToString(const Eigen::VectorXd& v) const;
 
-  Eigen::Vector3d position_;  ///< bottom center of robot hand
-  Eigen::Matrix3d orientation_;
+  Eigen::Vector3d position_;  ///< grasp position (bottom center of robot hand)
+  Eigen::Matrix3d orientation_;  ///< grasp orientation (rotation of robot hand)
 
   Eigen::Vector3d sample_;  ///< the sample at which the grasp was found
   double grasp_width_;      ///< the width of object enclosed by the fingers

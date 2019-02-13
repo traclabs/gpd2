@@ -65,12 +65,13 @@ typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGB;
 typedef pcl::PointCloud<pcl::PointNormal> PointCloudPointNormal;
 typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
 
-/** CloudCamera class
+/**
  *
- * \brief A point cloud with camera sources and surface normals
+ * \brief Multi-view point cloud
  *
- * This class stores a point cloud, surface normals, and which point is seen by
- * which camera. Camera orgins are also maintained.
+ * Stores and processes a point cloud that has been observed from one or
+ * multiple camera view points. The raw point cloud is stored in
+ * `cloud_original_` and the processed point cloud in `cloud_processed_`.
  *
  */
 class Cloud {
@@ -181,6 +182,9 @@ class Cloud {
   Cloud(const std::string& filename_left, const std::string& filename_right,
         const Eigen::Matrix3Xd& view_points);
 
+  /**
+   * \brief Remove statistical outliers from the point cloud.
+   */
   void removeStatisticalOutliers();
 
   /**
@@ -362,16 +366,16 @@ class Cloud {
  private:
   std::vector<std::vector<int>> convertCameraSourceMatrixToLists();
 
-  PointCloudRGB::Ptr cloud_processed_;  ///< the (processed) point cloud
-  PointCloudRGB::Ptr cloud_original_;   ///< the original point cloud
-  Eigen::MatrixXi camera_source_;  ///< binary matrix: (i,j) = 1 if point j is
-                                   /// seen by camera i
-  Eigen::Matrix3Xd normals_;       ///< surface normals for each point in cloud
-  std::vector<int> sample_indices_;  ///< indices into the cloud used
-                                     /// to sample grasp candidates
-  Eigen::Matrix3Xd
-      samples_;  ///< (x,y,z) samples used to sample grasp candidates
-  Eigen::Matrix3Xd view_points_;  ///< the viewpoints of the camera on the cloud
+  PointCloudRGB::Ptr cloud_processed_;
+  PointCloudRGB::Ptr cloud_original_;
+
+  // binary matrix: (i,j) = 1 if point j is seen by camera i, 0 otherwise
+  Eigen::MatrixXi camera_source_;
+  Eigen::Matrix3Xd normals_;
+  Eigen::Matrix3Xd view_points_;
+
+  std::vector<int> sample_indices_;
+  Eigen::Matrix3Xd samples_;
 };
 
 }  // namespace util

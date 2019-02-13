@@ -48,11 +48,11 @@ namespace candidate {
 
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGBA;
 
-/** FrameEstimator class
+/**
  *
- * \brief Estimate frames.
+ * \brief Estimate local reference frames.
  *
- * This class estimates local reference frames for point neighborhoods.
+ * This class estimates local reference frames (LRFs) for point neighborhoods.
  *
  */
 class FrameEstimator {

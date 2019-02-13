@@ -39,15 +39,14 @@
 namespace gpd {
 namespace candidate {
 
-/** FingerHand class
+/**
  *
  * \brief Calculate collision-free finger placements.
  *
  * This class calculates collision-free finger placements. The parameters are
- * the outer diameter, the width of the
- * fingers, and the length of the fingers of the robot hand. Also considers the
- * "bite" that the grasp must have. The
- * bite describes by how much the robot hand can be moved onto the object.
+ * the outer diameter, the width of the fingers, and the length of the fingers
+ * of the robot hand. Also considers the "bite" that the grasp must have, i.e.,
+ * by how much the robot hand can be moved onto the object.
  *
  */
 class FingerHand {

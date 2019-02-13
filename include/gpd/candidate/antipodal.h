@@ -45,7 +45,7 @@
 namespace gpd {
 namespace candidate {
 
-/** Antipodal class
+/**
  *
  * \brief Check if a grasp is antipodal.
  *
@@ -70,6 +70,7 @@ class Antipodal {
 
   /**
    * \brief Check if a grasp is antipodal.
+   * \note Deprecated method.
    * \param normals the set of surface normals associated with the grasp
    * \param thresh_half the threshold to consider the grasp half-antipodal
    * \param thresh_full the threshold to conisder the grasp full-antipodal

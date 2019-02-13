@@ -42,11 +42,11 @@
 namespace gpd {
 namespace net {
 
-/** ConvLayer class
+/**
  *
  * \brief Convolutional layer.
  *
- * This class is a convolutional layer for a neural network.
+ * A convolutional layer for a neural network for the `EigenClassifier`.
  *
  */
 class ConvLayer : public Layer {

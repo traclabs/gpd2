@@ -42,11 +42,12 @@
 namespace gpd {
 namespace net {
 
-/** DenseLayer class
+/**
  *
  * \brief Dense (fully connected) layer.
  *
- * This class is a dense (fully connected) layer for a neural network.
+ * A dense (fully connected) layer for a neural network for the
+ * `EigenClassifier`.
  *
  */
 class DenseLayer : public Layer {

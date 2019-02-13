@@ -41,13 +41,35 @@
 namespace gpd {
 namespace descriptor {
 
+/**
+ *
+ * \brief Calculate binary grasp image.
+ *
+ * The binary image represents the shape of what is contained inside the robot
+ * hand's closing region.
+ *
+ */
 class Image1ChannelsStrategy : public ImageStrategy {
  public:
+  /**
+  * \brief Create a strategy for calculating grasp images.
+  * \param image_params the grasp image parameters
+  * \param num_threads the number of CPU threads to be used
+  * \param num_orientations the number of robot hand orientations
+  * \param is_plotting if the images are visualized
+  * \return the strategy for calculating grasp images
+  */
   Image1ChannelsStrategy(const ImageGeometry& image_params, int num_threads,
                          int num_orientations, bool is_plotting)
       : ImageStrategy(image_params, num_threads, num_orientations,
                       is_plotting) {}
 
+  /**
+   * \brief Create grasp images given a list of grasp candidates.
+   * \param hand_set the grasp candidates
+   * \param nn_points the point neighborhoods used to calculate the images
+   * \return the grasp images
+   */
   std::vector<std::unique_ptr<cv::Mat>> createImages(
       const candidate::HandSet& hand_set,
       const util::PointList& nn_points) const;

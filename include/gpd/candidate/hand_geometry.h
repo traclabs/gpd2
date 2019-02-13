@@ -37,28 +37,45 @@
 namespace gpd {
 namespace candidate {
 
-/** HandGeometry class
+/**
  *
  * \brief Store robot hand geometry
  *
  * This class stores parameters which define the geometry of the robot hand.
+ * This geometry is used to calculate the grasp candidates.
  *
  */
 class HandGeometry {
  public:
+  /**
+   * \brief Constructor.
+   */
   HandGeometry();
 
+  /**
+   * \brief Constructor.
+   * \param finger_width the width of a robot finger
+   * \param outer_diameter the width of the robot hand (including fingers)
+   * \param hand_depth the hand depth (length of finger)
+   * \param hand_height the hand height: the hand extends plus/minus this
+   * along the hand axis
+   * \param init_bite the minimum object depth to be covered by the fingers
+   */
   HandGeometry(double finger_width, double outer_diameter, double hand_depth,
                double hand_height, double init_bite);
 
+  /**
+   * \brief Constructor that uses a given configuration file to read in the
+   * parameters of the robot hand.
+   * \param filepath the filepath to the configuration file
+   */
   HandGeometry(const std::string& filepath);
 
-  double finger_width_;    ///< the width of the robot hand fingers
-  double outer_diameter_;  ///< the maximum robot hand aperture
+  double finger_width_;    ///< the width of the robot fingers
+  double outer_diameter_;  ///< the width of the robot hand including fingers
   double depth_;           ///< the hand depth (length of fingers)
-  double
-      height_;  ///< the hand extends plus/minus this value along the hand axis
-  double init_bite_;  ///< the minimum object height
+  double height_;     ///< the hand extends plus/minus this along the hand axis
+  double init_bite_;  ///< the minimum object depth to be covered by the fingers
 };
 
 std::ostream& operator<<(std::ostream& stream,

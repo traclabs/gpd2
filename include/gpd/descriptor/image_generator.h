@@ -61,13 +61,12 @@ typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGBA;
 namespace gpd {
 namespace descriptor {
 
-/** ImageGenerator class
+/**
  *
- * \brief Create images for classification.
+ * \brief Create grasp images for classification.
  *
- * This class is used to create images for the input layer of a convolutional
- * neural network. Each image represents a grasp candidate. We call these
- * "grasp images".
+ * Creates images for the input layer of a convolutional neural network. Each
+ * image represents a grasp candidate. We call these "grasp images".
  *
  */
 class ImageGenerator {
@@ -96,6 +95,10 @@ class ImageGenerator {
       std::vector<std::unique_ptr<cv::Mat>>& images_out,
       std::vector<std::unique_ptr<candidate::Hand>>& hands_out) const;
 
+  /**
+   * \brief Return the parameters of the grasp image.
+   * \return the grasp image parameters
+   */
   const descriptor::ImageGeometry& getImageGeometry() const {
     return image_params_;
   }

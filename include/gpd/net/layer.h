@@ -39,12 +39,29 @@
 namespace gpd {
 namespace net {
 
+/**
+ *
+ * \brief Abstract base class for neural network layers in the custom framework.
+ *
+ */
 class Layer {
  public:
+  /**
+  * \brief Constructor.
+  */
   virtual ~Layer() {}
 
+  /**
+   * \brief Forward pass for the layer.
+   * \return output of forward pass
+   */
   virtual Eigen::MatrixXf forward(const std::vector<float>& x) const = 0;
 
+  /**
+   * \brief Set the parameters of the layer.
+   * \param weights the weights
+   * \param biases the biases
+   */
   void setWeightsAndBiases(const std::vector<float>& weights,
                            const std::vector<float>& biases) {
     weights_ = weights;

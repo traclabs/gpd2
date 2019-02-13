@@ -45,6 +45,14 @@
 namespace gpd {
 namespace net {
 
+/**
+ *
+ * \brief Classify grasp candidates as viable grasps or not with Eigen
+ *
+ * Classifies grasps as viable or not using a custom neural network framework
+ * based on the Eigen library.
+ *
+ */
 class EigenClassifier : public Classifier {
  public:
   /**

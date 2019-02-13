@@ -41,12 +41,12 @@
 
 namespace gpd {
 
-/** Clustering class
+/**
  *
  * \brief Group grasp candidates in clusters
  *
- * This class searches for clusters of grasp candidates. Grasps in the same
- * cluster are geometrically aligned.
+ * This class searches for clusters of grasps. Grasps in the same cluster are
+ * geometrically similar.
  *
  */
 class Clustering {
@@ -54,20 +54,30 @@ class Clustering {
   /**
    * \brief Constructor.
    * \param min_inliers the minimum number of grasps a cluster is required to
-   * have
+   * contain
    */
   Clustering(int min_inliers) : min_inliers_(min_inliers){};
 
   /**
-   * \brief Search for handles given a list of grasp hypotheses.
-   * \param hand_list the list of grasp hypotheses
+   * \brief Search for clusters given a list of grasps.
+   * \param hand_list the list of grasps
+   * \param remove_inliers if grasps already assigned to a cluster are ignored
+   * for the next cluster
    */
   std::vector<std::unique_ptr<candidate::Hand>> findClusters(
       const std::vector<std::unique_ptr<candidate::Hand>>& hand_list,
       bool remove_inliers = false);
 
+  /**
+   * \brief Return the minimum number of cluster inliers.
+   * \return the minimum number of cluster inliers
+   */
   int getMinInliers() const { return min_inliers_; }
 
+  /**
+   * \brief Set the minimum number of cluster inliers.
+   * \param min_inliers the minimum number of cluster inliers
+   */
   void setMinInliers(int min_inliers) { min_inliers_ = min_inliers; }
 
  private:

@@ -49,12 +49,12 @@
 namespace gpd {
 namespace net {
 
-/** OpenVinoClassifier class
+/**
  *
- * \brief Classify grasp candidates as viable grasps or not
+ * \brief Classify grasp candidates as viable grasps or not with OpenVINO
  *
- * This class classifies grasps as viable or not using a convolutional neural
- * network (CNN) in the OpenVINO framework.
+ * Classifies grasps as viable or not using a convolutional neural network
+ * (CNN) with the OpenVINO framework.
  *
  */
 class OpenVinoClassifier : public Classifier {
@@ -69,9 +69,18 @@ class OpenVinoClassifier : public Classifier {
                      Classifier::Device device,
                      int batch_size);
 
+  /**
+   * \brief Classify grasp candidates as viable grasps or not.
+   * \param image_list the list of grasp images
+   * \return the classified grasp candidates
+   */
   std::vector<float> classifyImages(
       const std::vector<std::unique_ptr<cv::Mat>>& image_list);
 
+  /**
+   * \brief Return the batch size.
+   * \return the batch size
+   */
   int getBatchSize() const;
 
  private:

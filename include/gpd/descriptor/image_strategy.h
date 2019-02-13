@@ -46,12 +46,36 @@ typedef std::pair<Eigen::Matrix3Xd, Eigen::Matrix3Xd> Matrix3XdPair;
 
 namespace gpd {
 namespace descriptor {
+
+/**
+ *
+ * \brief Abstract base class for calculating grasp images/descriptors.
+ *
+ * Also offers methods to calculate various images.
+ *
+ */
 class ImageStrategy {
  public:
+  /**
+   * \brief Create a strategy for calculating grasp images.
+   * \param image_params the grasp image parameters
+   * \param num_threads the number of CPU threads to be used
+   * \param num_orientations the number of robot hand orientations
+   * \param is_plotting if the images are visualized
+   * \return the strategy for calculating grasp images
+   */
   static std::unique_ptr<ImageStrategy> makeImageStrategy(
       const ImageGeometry& image_params, int num_threads, int num_orientations,
       bool is_plotting);
 
+  /**
+   * \brief Constructor.
+   * \param image_params the grasp image parameters
+   * \param num_threads the number of CPU threads to be used
+   * \param num_orientations the number of robot hand orientations
+   * \param is_plotting if the images are visualized
+   * \return the strategy for calculating grasp images
+   */
   ImageStrategy(const ImageGeometry& image_params, int num_threads,
                 int num_orientations, bool is_plotting)
       : image_params_(image_params),
@@ -61,10 +85,20 @@ class ImageStrategy {
 
   virtual ~ImageStrategy() {}
 
+  /**
+   * \brief Create grasp images given a list of grasp candidates.
+   * \param hand_set the grasp candidates
+   * \param nn_points the point neighborhoods used to calculate the images
+   * \return the grasp images
+   */
   virtual std::vector<std::unique_ptr<cv::Mat>> createImages(
       const candidate::HandSet& hand_set,
       const util::PointList& nn_points) const = 0;
 
+  /**
+   * \brief Return the grasp image parameters.
+   * \return the grasp image parameters
+   */
   const ImageGeometry& getImageParameters() const { return image_params_; }
 
  protected:

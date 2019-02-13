@@ -49,12 +49,12 @@
 namespace gpd {
 namespace net {
 
-/** CaffeClassifier class
+/**
  *
- * \brief Classify grasp candidates as viable grasps or not
+ * \brief Classify grasp candidates as viable grasps or not with Caffe
  *
- * This class classifies grasps as viable or not using a convolutional neural
- * network (CNN) in the Caffe framework.
+ * Classifies grasps as viable or not using a convolutional neural network (CNN)
+ *  with the Caffe framework.
  *
  */
 class CaffeClassifier : public Classifier {
@@ -77,12 +77,15 @@ class CaffeClassifier : public Classifier {
   std::vector<float> classifyImages(
       const std::vector<std::unique_ptr<cv::Mat>>& image_list);
 
+  /**
+   * \brief Return the batch size.
+   * \return the batch size
+   */
   int getBatchSize() const { return input_layer_->batch_size(); }
 
  private:
-  boost::shared_ptr<caffe::Net<float>> net_;  ///< the network
-  boost::shared_ptr<caffe::MemoryDataLayer<float>>
-      input_layer_;  ///< the input layer of the network
+  boost::shared_ptr<caffe::Net<float>> net_;
+  boost::shared_ptr<caffe::MemoryDataLayer<float>> input_layer_;
 };
 
 }  // namespace net

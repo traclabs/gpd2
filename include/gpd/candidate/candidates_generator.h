@@ -53,18 +53,18 @@
 namespace gpd {
 namespace candidate {
 
-/** CandidatesGenerator class
+/**
  *
  * \brief Generate grasp candidates.
  *
- * This class generates grasp candidates by searching for possible robot hand
+ * This class generates grasp candidates by searching for feasible robot hand
  * placements in a point cloud.
  *
  */
 class CandidatesGenerator {
  public:
   /**
-   * Parameters for the candidates generator.
+   * \brief Parameters for the candidates generator.
    */
   struct Parameters {
     bool remove_statistical_outliers_;  ///< if statistical outliers are removed
@@ -120,6 +120,10 @@ class CandidatesGenerator {
    */
   void setNumSamples(int num_samples) { params_.num_samples_ = num_samples; }
 
+  /**
+   * \brief Return the hand search parameters.
+   * \return the hand search parameters
+   */
   const HandSearch::Parameters& getHandSearchParams() const {
     return hand_search_->getParams();
   }
