@@ -111,7 +111,7 @@ class HandSet {
   /**
    * Constructor.
    */
-  HandSet();
+  //  HandSet();
 
   /**
    * \brief Constructor.
@@ -123,7 +123,7 @@ class HandSet {
    */
   HandSet(const HandGeometry& hand_geometry, const Eigen::VectorXd& angles,
           const std::vector<int>& hand_axes, int num_finger_placements,
-          bool deepen_hand);
+          bool deepen_hand, Antipodal& antipodal);
 
   /**
    * \brief Calculate a set of grasp candidates given a local reference frame.
@@ -266,7 +266,7 @@ class HandSet {
   /**
    * \brief Calculate the intersection of two shadows.
    * \param set1 the first shadow
-   * \param set2 the second shadow
+ * \param set2 the second shadow
    * \return the intersection
    */
   Vector3iSet intersection(const Vector3iSet& set1,
@@ -294,6 +294,8 @@ class HandSet {
   HandGeometry hand_geometry_;  ///< the robot hand geometry
   std::vector<int> hand_axes_;  ///< the axes about which the hand frame is
                                 /// rotated to evaluate different orientations
+
+  Antipodal& antipodal_;
 
   static int seed_;  ///< seed for the random generator in fastrand()
 

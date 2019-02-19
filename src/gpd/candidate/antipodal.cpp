@@ -7,21 +7,13 @@ const int Antipodal::NO_GRASP = 0;    // normals point not toward any finger
 const int Antipodal::HALF_GRASP = 1;  // normals point towards one finger
 const int Antipodal::FULL_GRASP = 2;  // normals point towards both fingers
 
-int Antipodal::evaluateGrasp(const util::PointList &point_list,
+int Antipodal::evaluateGrasp(const util::PointList& point_list,
                              double extremal_thresh, int lateral_axis,
                              int forward_axis, int vertical_axis) const {
-  double friction_coeff = 20.0;  // angle of friction cone in degrees
-  int viable_thresh =
-      6;  // number of viable points required on each side to be antipodal
-
-  //  double friction_coeff = 5.0; // angle of friction cone in degrees
-  //  int viable_thresh = 12; // number of viable points required on each side
-  //  to be antipodal
-
   int result = NO_GRASP;
 
-  const Eigen::Matrix3Xd &pts = point_list.getPoints();
-  const Eigen::Matrix3Xd &normals = point_list.getNormals();
+  const Eigen::Matrix3Xd& pts = point_list.getPoints();
+  const Eigen::Matrix3Xd& normals = point_list.getNormals();
 
   // Select points that are extremal and have their surface normal within the
   // friction cone of the closing direction.
@@ -33,16 +25,16 @@ int Antipodal::evaluateGrasp(const util::PointList &point_list,
     l << 0.0, -1.0, 0.0;
     r << 0.0, 1.0, 0.0;
   }
-  double cos_friction_coeff = cos(friction_coeff * M_PI / 180.0);
+  double cos_friction_coeff_ = cos(friction_coeff_ * M_PI / 180.0);
   double min_x = pts.row(lateral_axis).minCoeff() + extremal_thresh;
   double max_x = pts.row(lateral_axis).maxCoeff() - extremal_thresh;
   std::vector<int> left_idx_viable, right_idx_viable;
 
   for (int i = 0; i < pts.cols(); i++) {
     bool is_within_left_close =
-        (l.transpose() * normals.col(i)) > cos_friction_coeff;
+        (l.transpose() * normals.col(i)) > cos_friction_coeff_;
     bool is_within_right_close =
-        (r.transpose() * normals.col(i)) > cos_friction_coeff;
+        (r.transpose() * normals.col(i)) > cos_friction_coeff_;
     bool is_left_extremal = pts(lateral_axis, i) < min_x;
     bool is_right_extremal = pts(lateral_axis, i) > max_x;
 
@@ -95,7 +87,7 @@ int Antipodal::evaluateGrasp(const util::PointList &point_list,
         num_viable_right++;
     }
 
-    if (num_viable_left >= viable_thresh && num_viable_right >= viable_thresh) {
+    if (num_viable_left >= min_viable_ && num_viable_right >= min_viable_) {
       result = FULL_GRASP;
     }
   }
@@ -103,7 +95,7 @@ int Antipodal::evaluateGrasp(const util::PointList &point_list,
   return result;
 }
 
-int Antipodal::evaluateGrasp(const Eigen::Matrix3Xd &normals,
+int Antipodal::evaluateGrasp(const Eigen::Matrix3Xd& normals,
                              double thresh_half, double thresh_full) const {
   int num_thresh = 6;
   int grasp = 0;

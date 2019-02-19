@@ -61,12 +61,14 @@ int DoMain(int argc, char* argv[]) {
   hand_search_params.hand_geometry_ = hand_geom;
 
   // Local hand search parameters
+  hand_search_params.num_samples_ = 1;
+  hand_search_params.num_threads_ = 1;
   hand_search_params.nn_radius_frames_ = 0.01;
   hand_search_params.num_orientations_ = 8;
   hand_search_params.num_finger_placements_ = 10;
   hand_search_params.deepen_hand_ = true;
-  hand_search_params.num_samples_ = 1;
-  hand_search_params.num_threads_ = 1;
+  hand_search_params.friction_coeff_ = 20.0;
+  hand_search_params.min_viable_ = 6;
 
   std::vector<int> hand_axes;
   if (argc >= 6) {

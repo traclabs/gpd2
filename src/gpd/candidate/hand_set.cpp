@@ -11,23 +11,24 @@ const bool HandSet::MEASURE_TIME = false;
 
 int HandSet::seed_ = 0;
 
-HandSet::HandSet() {
-  sample_.setZero();
-  hands_.resize(0);
-  is_valid_.resize(0);
-  angles_.resize(0);
-  deepen_hand_ = true;
-}
+// HandSet::HandSet() {
+//  sample_.setZero();
+//  hands_.resize(0);
+//  is_valid_.resize(0);
+//  angles_.resize(0);
+//  deepen_hand_ = true;
+//}
 
 HandSet::HandSet(const HandGeometry &hand_geometry,
                  const Eigen::VectorXd &angles,
                  const std::vector<int> &hand_axes, int num_finger_placements,
-                 bool deepen_hand)
+                 bool deepen_hand, Antipodal &antipodal)
     : hand_geometry_(hand_geometry),
       angles_(angles),
       hand_axes_(hand_axes),
       num_finger_placements_(num_finger_placements),
-      deepen_hand_(deepen_hand) {
+      deepen_hand_(deepen_hand),
+      antipodal_(antipodal) {
   sample_.setZero();
   hands_.resize(0);
   is_valid_.resize(0);
@@ -289,10 +290,9 @@ Hand HandSet::createHypothesis(const Eigen::Vector3d &sample,
 
 void HandSet::labelHypothesis(const util::PointList &point_list,
                               const FingerHand &finger_hand, Hand &hand) const {
-  Antipodal antipodal;
   int label =
-      antipodal.evaluateGrasp(point_list, 0.003, finger_hand.getLateralAxis(),
-                              finger_hand.getForwardAxis(), 2);
+      antipodal_.evaluateGrasp(point_list, 0.003, finger_hand.getLateralAxis(),
+                               finger_hand.getForwardAxis(), 2);
   hand.setHalfAntipodal(label == Antipodal::HALF_GRASP ||
                         label == Antipodal::FULL_GRASP);
   hand.setFullAntipodal(label == Antipodal::FULL_GRASP);

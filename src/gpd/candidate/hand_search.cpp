@@ -15,6 +15,8 @@ HandSearch::HandSearch(Parameters params)
   hand_dims << hand_geom.outer_diameter_ - hand_geom.finger_width_,
       hand_geom.depth_, hand_geom.height_ / 2.0;
   nn_radius_ = hand_dims.maxCoeff();
+  antipodal_ =
+      std::make_unique<Antipodal>(params.friction_coeff_, params.min_viable_);
   plot_ = std::make_unique<util::Plot>(params_.hand_axes_.size(),
                                        params_.num_orientations_);
 }
@@ -171,7 +173,7 @@ std::vector<std::unique_ptr<candidate::HandSet>> HandSearch::evalHands(
     pcl::PointXYZRGBA sample = eigenVectorToPcl(frames[i].getSample());
     hand_set_list[i] = std::make_unique<HandSet>(
         params_.hand_geometry_, angles, params_.hand_axes_,
-        params_.num_finger_placements_, params_.deepen_hand_);
+        params_.num_finger_placements_, params_.deepen_hand_, *antipodal_);
 
     if (kdtree.radiusSearch(sample, nn_radius_, nn_indices, nn_dists) > 0) {
       nn_points = point_list.slice(nn_indices);
@@ -218,8 +220,7 @@ int HandSearch::labelHypothesis(const util::PointList &point_list,
   util::PointList point_list_learning = point_list.slice(indices_learning);
 
   // evaluate if the grasp is antipodal
-  Antipodal antipodal;
-  int antipodal_result = antipodal.evaluateGrasp(
+  int antipodal_result = antipodal_->evaluateGrasp(
       point_list_learning, 0.003, finger_hand.getLateralAxis(),
       finger_hand.getForwardAxis(), 2);
 

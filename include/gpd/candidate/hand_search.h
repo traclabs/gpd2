@@ -86,6 +86,10 @@ class HandSearch {
                                   /// orientations are generated
     bool deepen_hand_;  ///< if the hand is pushed forward onto the object
 
+    /** antipodal grasp check */
+    double friction_coeff_;  ///< angle of friction cone in degrees
+    int min_viable_;  ///< minimum number of points required to be antipodal
+
     HandGeometry hand_geometry_;  ///< robot hand geometry
   };
 
@@ -176,7 +180,8 @@ class HandSearch {
 
   double nn_radius_;  ///< radius for nearest neighbors search
 
-  std::unique_ptr<util::Plot> plot_;  ///< visualizer
+  std::unique_ptr<Antipodal> antipodal_;
+  std::unique_ptr<util::Plot> plot_;
 
   /** plotting parameters (optional, not read in from config file) **/
   bool plots_local_axes_;  ///< if the LRFs are plotted
