@@ -212,8 +212,8 @@ void DataGenerator::generateData() {
   int num_objects = objects.size();
 
   // debugging
-  // num_objects = 5;
-  // num_views_per_object_ = 10;
+  // num_objects = 1;
+  // num_views_per_object_ = 20;
 
   std::vector<int> positives_list, negatives_list;
   std::vector<Instance> train_data, test_data;

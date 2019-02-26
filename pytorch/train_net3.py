@@ -117,7 +117,7 @@ def eval(model, test_loader, device):
 with h5py.File(sys.argv[1], 'r') as db:
     num_train = len(db['images'])
 print('Have', num_train, 'total training examples')
-num_epochs = 20
+num_epochs = 10
 max_in_memory = 200000
 repeats = 1
 early_stop_loss = 0.01
