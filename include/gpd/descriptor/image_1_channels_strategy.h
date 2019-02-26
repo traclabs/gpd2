@@ -52,13 +52,13 @@ namespace descriptor {
 class Image1ChannelsStrategy : public ImageStrategy {
  public:
   /**
-  * \brief Create a strategy for calculating grasp images.
-  * \param image_params the grasp image parameters
-  * \param num_threads the number of CPU threads to be used
-  * \param num_orientations the number of robot hand orientations
-  * \param is_plotting if the images are visualized
-  * \return the strategy for calculating grasp images
-  */
+   * \brief Create a strategy for calculating grasp images.
+   * \param image_params the grasp image parameters
+   * \param num_threads the number of CPU threads to be used
+   * \param num_orientations the number of robot hand orientations
+   * \param is_plotting if the images are visualized
+   * \return the strategy for calculating grasp images
+   */
   Image1ChannelsStrategy(const ImageGeometry& image_params, int num_threads,
                          int num_orientations, bool is_plotting)
       : ImageStrategy(image_params, num_threads, num_orientations,

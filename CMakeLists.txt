@@ -131,6 +131,7 @@ add_library(${PROJECT_NAME}_image_generator src/${PROJECT_NAME}/descriptor/image
 add_executable(${PROJECT_NAME}_cem_detect_grasps src/cem_detect_grasps.cpp)
 add_executable(${PROJECT_NAME}_detect_grasps src/detect_grasps.cpp)
 add_executable(${PROJECT_NAME}_generate_candidates src/generate_candidates.cpp)
+add_executable(${PROJECT_NAME}_label_grasps src/label_grasps.cpp)
 add_executable(${PROJECT_NAME}_test_grasp_image src/tests/test_grasp_image.cpp)
 # add_executable(${PROJECT_NAME}_test_conv_layer src/tests/test_conv_layer.cpp)
 # add_executable(${PROJECT_NAME}_test_hdf5 src/tests/test_hdf5.cpp)
@@ -251,6 +252,11 @@ target_link_libraries(${PROJECT_NAME}_detect_grasps
   ${PROJECT_NAME}_config_file
 ${PCL_LIBRARIES})
 
+target_link_libraries(${PROJECT_NAME}_label_grasps
+  ${PROJECT_NAME}_grasp_detector
+  ${PROJECT_NAME}_config_file
+${PCL_LIBRARIES})
+
 target_link_libraries(${PROJECT_NAME}_cem_detect_grasps
   ${PROJECT_NAME}_sequential_importance_sampling
   ${PROJECT_NAME}_config_file
@@ -269,6 +275,9 @@ set_target_properties(${PROJECT_NAME}_cem_detect_grasps
 
 set_target_properties(${PROJECT_NAME}_detect_grasps
   PROPERTIES OUTPUT_NAME detect_grasps PREFIX "")
+
+set_target_properties(${PROJECT_NAME}_label_grasps
+PROPERTIES OUTPUT_NAME label_grasps PREFIX "")
 
 set_target_properties(${PROJECT_NAME}_grasp_detector
 PROPERTIES OUTPUT_NAME gpd)

@@ -125,6 +125,16 @@ class Plot {
       const PointCloudRGBA::Ptr& cloud, const std::string& str,
       const candidate::HandGeometry& geometry, bool use_same_color = true);
 
+  void plotAntipodalHands(
+      const std::vector<std::unique_ptr<candidate::Hand>>& hand_list,
+      const PointCloudRGBA::Ptr& cloud, const std::string& str,
+      const candidate::HandGeometry& geometry);
+
+  void plotValidHands(
+      const std::vector<std::unique_ptr<candidate::Hand>>& hand_list,
+      const PointCloudRGBA::Ptr& cloud, const PointCloudRGBA::Ptr& mesh,
+      const std::string& str, const candidate::HandGeometry& geometry);
+
   /**
    * \brief Plot a list of grasps with 3D cubes.
    * \param hand_list the list of grasps

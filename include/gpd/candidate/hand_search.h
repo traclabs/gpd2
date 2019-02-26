@@ -71,8 +71,8 @@ typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGB;
 class HandSearch {
  public:
   /**
-  * \brief Parameters for the hand search.
-  */
+   * \brief Parameters for the hand search.
+   */
   struct Parameters {
     /** LRF estimation parameters */
     double nn_radius_frames_;  ///< radius for point neighborhood search for LRF

@@ -170,6 +170,66 @@ void Plot::plotFingers3D(
   runViewer(viewer);
 }
 
+void Plot::plotAntipodalHands(
+    const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+    const PointCloudRGBA::Ptr &cloud, const std::string &str,
+    const candidate::HandGeometry &geometry) {
+  PCLVisualizer viewer = createViewer(str);
+
+  Eigen::Vector3d antipodal_color;
+  Eigen::Vector3d non_antipodal_color;
+  antipodal_color << 0.0, 0.7, 0.0;
+  non_antipodal_color << 0.7, 0.0, 0.0;
+
+  for (int i = 0; i < hand_list.size(); i++) {
+    Eigen::Vector3d color =
+        hand_list[i]->isFullAntipodal() ? antipodal_color : non_antipodal_color;
+    plotHand3D(viewer, *hand_list[i], geometry, i, color);
+  }
+
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> rgb(
+      cloud);
+  viewer->addPointCloud<pcl::PointXYZRGBA>(cloud, rgb, "cloud");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
+
+  runViewer(viewer);
+}
+
+void Plot::plotValidHands(
+    const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+    const PointCloudRGBA::Ptr &cloud, const PointCloudRGBA::Ptr &mesh,
+    const std::string &str, const candidate::HandGeometry &geometry) {
+  PCLVisualizer viewer = createViewer(str);
+
+  Eigen::Vector3d antipodal_color;
+  Eigen::Vector3d non_antipodal_color;
+  antipodal_color << 0.0, 0.7, 0.0;
+  non_antipodal_color << 0.7, 0.0, 0.0;
+
+  for (int i = 0; i < hand_list.size(); i++) {
+    Eigen::Vector3d color =
+        hand_list[i]->isFullAntipodal() ? antipodal_color : non_antipodal_color;
+    plotHand3D(viewer, *hand_list[i], geometry, i, color);
+  }
+
+  viewer->addPointCloud<pcl::PointXYZRGBA>(mesh, "mesh");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 0.0, 1.0, "mesh");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "mesh");
+
+  viewer->addPointCloud<pcl::PointXYZRGBA>(cloud, "cloud");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.0, 0.0, "cloud");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_OPACITY, 0.6, "cloud");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
+
+  runViewer(viewer);
+}
+
 void Plot::plotFingers3D(const std::vector<candidate::HandSet> &hand_set_list,
                          const PointCloudRGBA::Ptr &cloud, std::string str,
                          double outer_diameter, double finger_width,

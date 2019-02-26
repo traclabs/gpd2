@@ -266,7 +266,7 @@ class HandSet {
   /**
    * \brief Calculate the intersection of two shadows.
    * \param set1 the first shadow
- * \param set2 the second shadow
+   * \param set2 the second shadow
    * \return the intersection
    */
   Vector3iSet intersection(const Vector3iSet& set1,

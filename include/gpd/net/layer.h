@@ -47,8 +47,8 @@ namespace net {
 class Layer {
  public:
   /**
-  * \brief Constructor.
-  */
+   * \brief Constructor.
+   */
   virtual ~Layer() {}
 
   /**
