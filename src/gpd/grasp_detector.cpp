@@ -228,6 +228,9 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
   double t0_filter = omp_get_wtime();
   std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_filtered =
       filterGraspsWorkspace(hand_set_list, workspace_grasps_);
+  if (hand_set_list_filtered.size() == 0) {
+    return hands_out;
+  }
   if (plot_filtered_candidates_) {
     plotter_->plotFingers3D(hand_set_list_filtered, cloud.getCloudOriginal(),
                             "Filtered Grasps (Aperture, Workspace)", hand_geom);
@@ -241,6 +244,9 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
     }
   }
   double t_filter = omp_get_wtime() - t0_filter;
+  if (hand_set_list_filtered.size() == 0) {
+    return hands_out;
+  }
 
   // 3. Create grasp descriptors (images).
   double t0_images = omp_get_wtime();
