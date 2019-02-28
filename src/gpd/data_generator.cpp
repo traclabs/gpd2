@@ -212,7 +212,7 @@ void DataGenerator::generateData() {
   int num_objects = objects.size();
 
   // debugging
-  num_objects = 1;
+  // num_objects = 1;
   // num_views_per_object_ = 20;
 
   std::vector<int> positives_list, negatives_list;
@@ -686,8 +686,6 @@ void DataGenerator::printMatrix15(const cv::Mat &mat) {
         int idx[3] = {j, k, l};
         if (mat.at<uchar>(idx) > 0)
           printf("%d,%d,%d: %d\n", j, k, l, (int)mat.at<uchar>(idx));
-        //          std::cout << i << ", " << j << ", " << k << ", l" << ": " <<
-        //          (int) mat.at<uchar>(idx) << " \n";
       }
     }
   }
