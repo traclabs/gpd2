@@ -149,8 +149,9 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9) # not tested
 # optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005) # not tested
 
-# optimizer = optim.Adam(net.parameters(), lr=0.00001, weight_decay=0.005) # works well
-optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
+#optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
+#optimizer = optim.Adam(net.parameters(), lr=0.00001, weight_decay=0.001) # works well
+optimizer = optim.Adam(net.parameters(), lr=0.000001, weight_decay=0.001) # works well
 
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.96)
 
