@@ -78,7 +78,7 @@ int DoMain(int argc, char *argv[]) {
   cloud.filterWorkspace(workspace);
   cloud.voxelizeCloud(VOXEL_SIZE);
   cloud.calculateNormals(num_threads);
-  cloud.setNormals(cloud.getNormals() * (-1.0)); // TODO: do not do this!
+  cloud.setNormals(cloud.getNormals() * (-1.0));  // TODO: do not do this!
   if (sample_above_plane) {
     cloud.sampleAbovePlane();
   }

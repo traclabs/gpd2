@@ -212,8 +212,8 @@ void DataGenerator::generateData() {
   int num_objects = objects.size();
 
   // debugging
-  // num_objects = 5;
-  // num_views_per_object_ = 10;
+  // num_objects = 1;
+  // num_views_per_object_ = 20;
 
   std::vector<int> positives_list, negatives_list;
   std::vector<Instance> train_data, test_data;
@@ -398,7 +398,6 @@ void DataGenerator::createDatasetsHDF5(const std::string &filepath,
 
   int n_dims_labels = 2;
   int dsdims_labels[n_dims_labels] = {num_data, 1};
-  // int dsdims_labels[n_dims_labels] = {cv::hdf::HDF5::H5_UNLIMITED, 1};
   int chunks_labels[n_dims_labels] = {chunk_size_, dsdims_labels[1]};
   printf("Creating dataset <labels>: %d x %d\n", dsdims_labels[0],
          dsdims_labels[1]);
@@ -406,17 +405,13 @@ void DataGenerator::createDatasetsHDF5(const std::string &filepath,
                  chunks_labels);
 
   const descriptor::ImageGeometry &image_geom = detector_->getImageGeometry();
-  int n_dims_images = 3;
+  int n_dims_images = 4;
   int dsdims_images[n_dims_images] = {num_data, image_geom.size_,
-                                      image_geom.size_};
-  // int dsdims_images[n_dims_images] = {cv::hdf::HDF5::H5_UNLIMITED,
-  //                                     image_geom.size_, image_geom.size_};
-  printf("Creating dataset <images>: %d x %d x %d ...\n", dsdims_images[0],
-         dsdims_images[1], dsdims_images[2]);
+                                      image_geom.size_, image_geom.num_channels_};
   int chunks_images[n_dims_images] = {chunk_size_, dsdims_images[1],
-                                      dsdims_images[2]};
-  h5io->dscreate(n_dims_images, dsdims_images, CV_8UC(image_geom.num_channels_),
-                 IMAGES_DS_NAME, 4, chunks_images);
+                                      dsdims_images[2], dsdims_images[3]};
+  h5io->dscreate(n_dims_images, dsdims_images, CV_8UC1, IMAGES_DS_NAME,
+      n_dims_images, chunks_images);
 
   h5io->close();
 }
@@ -569,49 +564,40 @@ int DataGenerator::insertIntoHDF5(const std::string &file_path,
   cv::Ptr<cv::hdf::HDF5> h5io = cv::hdf::open(file_path);
   printf("  Opened HDF5 file\n");
 
-  int n_dims = 3;
-  int dsdims_images[n_dims] = {static_cast<int>(dataset.size()),
-                               dataset[0].image_->rows,
-                               dataset[0].image_->cols};
-  printf("  %d, %d, %d ...\n", dsdims_images[0], dsdims_images[1],
-         dsdims_images[2]);
-  cv::Mat images(n_dims, dsdims_images, CV_8UC(dataset[0].image_->channels()),
-                 cv::Scalar(0.0));
+  const int num = static_cast<int>(dataset.size());
+  const int rows = dataset[0].image_->rows;
+  const int cols = dataset[0].image_->cols;
+  const int channels = dataset[0].image_->channels();
+
   cv::Mat labels(dataset.size(), 1, CV_8UC1, cv::Scalar(0.0));
-  int dims_image[n_dims] = {dataset[0].image_->rows, dataset[0].image_->cols,
-                            dataset[0].image_->channels()};
 
   for (int i = 0; i < dataset.size(); i++) {
     labels.at<uchar>(i) = (uchar)dataset[i].label_;
   }
 
-  std::vector<cv::Range> ranges;
-  ranges.push_back(cv::Range(0, 1));
-  ranges.push_back(cv::Range::all());
-  ranges.push_back(cv::Range::all());
+  const int dims_images = 4;
+  int dsdims_images[dims_images] = {num, rows, cols, channels};
+  cv::Mat images(dims_images, dsdims_images, CV_8UC1, cv::Scalar(0.0));
+  const int dims_image = 3;
+  int dsdims_image[dims_image] = {rows, cols, channels};
+
   for (int i = 0; i < dataset.size(); i++) {
     if (!dataset[i].image_) {
       printf("FATAL ERROR! %d is nullptr\n", i);
       char c;
       std::cin >> c;
     }
-    copyMatrix(*dataset[i].image_, images, i, dims_image);
-    // cv::Mat m;
-    // ranges[0] = cv::Range(i, i + 1);
-    // dataset[i].image_->copyTo(m);
-    // images(ranges) = m;
-    // copyMatrix
-    // double min, max;
-    // cv::minMaxLoc(m, &min, &max);
-    // printf("    MIN: %3.4f, MAX: %3.4f\n", min, max);
+    copyMatrix(*dataset[i].image_, images, i, dsdims_image);
   }
 
   printf("  Inserting into images dataset ...\n");
-  int offsets_images[n_dims] = {offset, 0, 0};
+  const int dims_offset_images = 4;
+  int offsets_images[dims_offset_images] = {offset, 0, 0, 0};
   h5io->dsinsert(images, IMAGES_DS_NAME, offsets_images);
 
   printf("  Inserting into labels dataset ...\n");
-  int offsets_labels[2] = {offset, 0};
+  const int dims_offset_labels = 2;
+  int offsets_labels[dims_offset_labels] = {offset, 0};
   h5io->dsinsert(labels, LABELS_DS_NAME, offsets_labels);
 
   h5io->close();
@@ -700,21 +686,22 @@ void DataGenerator::printMatrix15(const cv::Mat &mat) {
         int idx[3] = {j, k, l};
         if (mat.at<uchar>(idx) > 0)
           printf("%d,%d,%d: %d\n", j, k, l, (int)mat.at<uchar>(idx));
-        //          std::cout << i << ", " << j << ", " << k << ", l" << ": " <<
-        //          (int) mat.at<uchar>(idx) << " \n";
       }
     }
   }
 }
 
+// src: multi-channels image; dst: multi-dimensional matrix
 void DataGenerator::copyMatrix(const cv::Mat &src, cv::Mat &dst, int idx_in,
                                int *dims_img) {
-  for (int j = 0; j < dims_img[0]; j++) {
-    for (int k = 0; k < dims_img[1]; k++) {
-      for (int l = 0; l < dims_img[2]; l++) {
-        int idx_src[3] = {j, k, l};
+  const int rows = dims_img[0];
+  const int cols = dims_img[1];
+  const int channels = dims_img[2];
+  for (int j = 0; j < rows; j++) {
+    for (int k = 0; k < cols; k++) {
+      for (int l = 0; l < channels; l++) {
         int idx_dst[4] = {idx_in, j, k, l};
-        dst.at<uchar>(idx_dst) = src.at<uchar>(idx_src);
+        dst.at<uchar>(idx_dst) = src.ptr<uchar>(j)[k*channels + l];
       }
     }
   }

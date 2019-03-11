@@ -21,8 +21,8 @@ class H5Dataset(torchdata.Dataset):
         print("Loaded data")
 
     def __getitem__(self, index):
-        image = self.data[index,:,:].to(torch.float32)
-        # ptorch uses NCHW format
+        image = self.data[index,:,:].to(torch.float32) * 1/256.0
+        # Pytorch uses NCHW format
         image = image.reshape((image.shape[2], image.shape[0], image.shape[1]))
         target = self.target[index,:][0]
         return (image, target)
@@ -117,10 +117,10 @@ def eval(model, test_loader, device):
 with h5py.File(sys.argv[1], 'r') as db:
     num_train = len(db['images'])
 print('Have', num_train, 'total training examples')
-num_epochs = 20
-max_in_memory = 200000
-repeats = 1
-early_stop_loss = 0.01
+num_epochs = 4
+max_in_memory = 300000
+repeats = 3
+early_stop_loss = 0.0000001
 start_idx = 0
 end_idx = max_in_memory
 iter_per_epoch = int(np.ceil(num_train / float(max_in_memory)))
@@ -146,23 +146,12 @@ net.to(device)
 
 # Define the loss function and optimizer.
 criterion = nn.CrossEntropyLoss()
-# optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9)
-# optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-# optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay=0.01)
-# optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay=0.05)
-# optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9, weight_decay=0.1)
-# optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.9, weight_decay=0.01)
-# optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.9, weight_decay=0.05)
-# optimizer = optim.SGD(net.parameters(), lr=0.00001, momentum=0.9, weight_decay=0.05)
-# optimizer = optim.SGD(net.parameters(), lr=0.000001, momentum=0.9, weight_decay=0.01)
+# optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9) # not tested
+# optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005) # not tested
 
-#optimizer = optim.Adam(net.parameters())
-#optimizer = optim.Adam(net.parameters(), lr=0.0005, weight_decay=0.0005) # does not work too well
-#optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.0005) # kind of good
-optimizer = optim.Adam(net.parameters(), lr=0.0001, weight_decay=0.0005) # works well
-#optimizer = optim.Adam(net.parameters(), lr=0.00005, weight_decay=0.0005) # ?
-#optimizer = optim.Adam(net.parameters(), lr=0.00001, weight_decay=0.0005)
-#optimizer = optim.Adam(net.parameters(), lr=0.000001, weight_decay=0.0005) // LR is too low
+#optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
+#optimizer = optim.Adam(net.parameters(), lr=0.00001, weight_decay=0.001) # works well
+optimizer = optim.Adam(net.parameters(), lr=0.000001, weight_decay=0.001) # works well
 
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.96)
 
@@ -188,6 +177,8 @@ for epoch in range(num_epochs):
     for j in range(iter_per_epoch):
         print('iter: %d/%d' % (j + 1, iter_per_epoch))
         print('Loading data block [%d, %d] ...' % (indices[j], indices[j + 1]))
+        dset = []
+        train_loader = []
         dset = H5Dataset(sys.argv[1], indices[j], indices[j + 1])
         #train_loader = torchdata.DataLoader(dset, batch_size=64, shuffle=True, num_workers=2)
         train_loader = torchdata.DataLoader(dset, batch_size=64, shuffle=True)
@@ -202,15 +193,21 @@ for epoch in range(num_epochs):
 
                 # print statistics
                 running_loss += loss.item()
-                if i % 100 == 99: # print every 10 mini-batches
+                if i % 1000 == 999:
                     print('epoch: %d, batch: %5d, loss: %.5f' %
-                          (epoch + 1, i + 1, running_loss / 100))
+                          (epoch + 1, i + 1, running_loss / 1000))
                     losses.append(running_loss)
-                    if running_loss / 100 < early_stop_loss:
+                    if running_loss / 1000 < early_stop_loss:
                         print('reached loss threshold for early stopping: %.5f', early_stop_loss)
                         early_stop = True
                         break
                     running_loss = 0.0
+            # Evaluate the network on the test dataset.
+            accuracy = eval(net, test_loader, device)
+            accuracies.append(accuracy)
+            model_path = 'model_' + str(accuracy) + '.pwf'
+            torch.save(net.state_dict(), model_path)
+            net.train()
             if early_stop:
                 break
         if early_stop:
@@ -221,6 +218,8 @@ for epoch in range(num_epochs):
     # Evaluate the network on the test dataset.
     accuracy = eval(net, test_loader, device)
     accuracies.append(accuracy)
+    model_path = 'model_' + str(accuracy) + '.pwf'
+    torch.save(net.state_dict(), model_path)
 
 print('Finished Training')
 

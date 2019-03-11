@@ -59,29 +59,12 @@ int DoMain(int argc, char *argv[]) {
               << "\n";
   }
 
-  // Read parameters from configuration file.
-  const double VOXEL_SIZE = 0.003;
-  util::ConfigFile config_file(config_filename);
-  config_file.ExtractKeys();
-  std::vector<double> workspace =
-      config_file.getValueOfKeyAsStdVectorDouble("workspace", "-1 1 -1 1 -1 1");
-  int num_threads = config_file.getValueOfKey<int>("num_threads", 1);
-  int num_samples = config_file.getValueOfKey<int>("num_samples", 100);
-  bool sample_above_plane =
-      config_file.getValueOfKey<int>("sample_above_plane", 1);
-  printf("num_threads: %d, num_samples: %d\n", num_threads, num_samples);
+  GraspDetector detector(config_filename);
 
   // Prepare the point cloud.
-  cloud.filterWorkspace(workspace);
-  cloud.voxelizeCloud(VOXEL_SIZE);
-  cloud.calculateNormals(num_threads);
-  if (sample_above_plane) {
-    cloud.sampleAbovePlane();
-  }
-  cloud.subsample(num_samples);
+  detector.preprocessPointCloud(cloud);
 
   // Detect grasp poses.
-  GraspDetector detector(config_filename);
   detector.detectGrasps(cloud);
 
   return 0;

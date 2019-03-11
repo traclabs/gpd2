@@ -12,14 +12,12 @@ CandidatesGenerator::CandidatesGenerator(
 }
 
 void CandidatesGenerator::preprocessPointCloud(util::Cloud &cloud) {
-  const double VOXEL_SIZE = 0.003;
-
   printf("Processing cloud with %zu points.\n",
          cloud.getCloudOriginal()->size());
 
   cloud.filterWorkspace(params_.workspace_);
   if (params_.voxelize_) {
-    cloud.voxelizeCloud(VOXEL_SIZE);
+    cloud.voxelizeCloud(params_.voxel_size_);
   }
   cloud.calculateNormals(params_.num_threads_);
   if (params_.sample_above_plane_) {

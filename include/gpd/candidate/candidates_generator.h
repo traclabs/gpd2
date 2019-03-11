@@ -71,6 +71,7 @@ class CandidatesGenerator {
                                         /// from the point cloud
     bool sample_above_plane_;  ///< if samples are drawn above the support plane
     bool voxelize_;            ///< if the point cloud gets voxelized
+    double voxel_size_;        ///< voxel size
     int num_samples_;  ///< the number of samples to be used in the search
     int num_threads_;  ///< the number of CPU threads to be used in the search
     std::vector<double> workspace_;  ///< the robot's workspace
