@@ -3,16 +3,16 @@
 namespace gpd {
 namespace net {
 
-CaffeClassifier::CaffeClassifier(const std::string& model_file,
-                                 const std::string& weights_file,
+CaffeClassifier::CaffeClassifier(const std::string &model_file,
+                                 const std::string &weights_file,
                                  Classifier::Device device, int batch_size) {
   // Initialize Caffe.
   switch (device) {
-    case Classifier::Device::eGPU:
-      caffe::Caffe::set_mode(caffe::Caffe::GPU);
-      break;
-    default:
-      caffe::Caffe::set_mode(caffe::Caffe::CPU);
+  case Classifier::Device::eGPU:
+    caffe::Caffe::set_mode(caffe::Caffe::GPU);
+    break;
+  default:
+    caffe::Caffe::set_mode(caffe::Caffe::CPU);
   }
 
   // Load pretrained network.
@@ -25,7 +25,7 @@ CaffeClassifier::CaffeClassifier(const std::string& model_file,
 }
 
 std::vector<float> CaffeClassifier::classifyImages(
-    const std::vector<std::unique_ptr<cv::Mat>>& image_list) {
+    const std::vector<std::unique_ptr<cv::Mat>> &image_list) {
   int batch_size = input_layer_->batch_size();
   int num_iterations = (int)ceil(image_list.size() / (double)batch_size);
   float loss = 0.0;
@@ -63,7 +63,7 @@ std::vector<float> CaffeClassifier::classifyImages(
 
     // Classify the batch.
     input_layer_->AddMatVector(sub_image_list, label_list);
-    std::vector<caffe::Blob<float>*> results = net_->Forward(&loss);
+    std::vector<caffe::Blob<float> *> results = net_->Forward(&loss);
     std::vector<float> out(results[0]->cpu_data(),
                            results[0]->cpu_data() + results[0]->count());
 
@@ -75,5 +75,5 @@ std::vector<float> CaffeClassifier::classifyImages(
   return predictions;
 }
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd

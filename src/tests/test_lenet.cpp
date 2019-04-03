@@ -6,7 +6,7 @@ namespace gpd {
 namespace test {
 namespace {
 
-int DoMain(int argc, char* argv[]) {
+int DoMain(int argc, char *argv[]) {
   // Test with input from file.
   net::Lenet network(
       1, "/home/atenpas/catkin_ws/src/gpd_no_ros/lenet/3channels/params/", 60,
@@ -18,8 +18,8 @@ int DoMain(int argc, char* argv[]) {
   return 0;
 }
 
-}  // namespace
-}  // namespace test
-}  // namespace gpd
+} // namespace
+} // namespace test
+} // namespace gpd
 
-int main(int argc, char* argv[]) { return gpd::test::DoMain(argc, argv); }
+int main(int argc, char *argv[]) { return gpd::test::DoMain(argc, argv); }

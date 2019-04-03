@@ -2,7 +2,7 @@
 
 namespace gpd {
 
-GraspDetector::GraspDetector(const std::string& config_filename) {
+GraspDetector::GraspDetector(const std::string &config_filename) {
   Eigen::initParallel();
 
   // Read parameters from configuration file.
@@ -182,12 +182,12 @@ GraspDetector::GraspDetector(const std::string& config_filename) {
                                           hand_search_params.num_orientations_);
 }
 
-std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
-    const util::Cloud& cloud) {
+std::vector<std::unique_ptr<candidate::Hand>>
+GraspDetector::detectGrasps(const util::Cloud &cloud) {
   double t0_total = omp_get_wtime();
   std::vector<std::unique_ptr<candidate::Hand>> hands_out;
 
-  const candidate::HandGeometry& hand_geom =
+  const candidate::HandGeometry &hand_geom =
       candidates_generator_->getHandSearchParams().hand_geometry_;
 
   // Check if the point cloud is empty.
@@ -320,23 +320,23 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
   return clusters;
 }
 
-void GraspDetector::preprocessPointCloud(util::Cloud& cloud) {
+void GraspDetector::preprocessPointCloud(util::Cloud &cloud) {
   candidates_generator_->preprocessPointCloud(cloud);
 }
 
 std::vector<std::unique_ptr<candidate::HandSet>>
 GraspDetector::filterGraspsWorkspace(
-    std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
-    const std::vector<double>& workspace) const {
+    std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
+    const std::vector<double> &workspace) const {
   int remaining = 0;
   std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_out;
   printf("Filtering grasps outside of workspace ...\n");
 
-  const candidate::HandGeometry& hand_geometry =
+  const candidate::HandGeometry &hand_geometry =
       candidates_generator_->getHandSearchParams().hand_geometry_;
 
   for (int i = 0; i < hand_set_list.size(); i++) {
-    const std::vector<std::unique_ptr<candidate::Hand>>& hands =
+    const std::vector<std::unique_ptr<candidate::Hand>> &hands =
         hand_set_list[i]->getHands();
     Eigen::Array<bool, 1, Eigen::Dynamic> is_valid =
         hand_set_list[i]->getIsValid();
@@ -391,12 +391,12 @@ GraspDetector::filterGraspsWorkspace(
 }
 
 std::vector<std::unique_ptr<candidate::HandSet>>
-GraspDetector::generateGraspCandidates(const util::Cloud& cloud) {
+GraspDetector::generateGraspCandidates(const util::Cloud &cloud) {
   return candidates_generator_->generateGraspCandidateSets(cloud);
 }
 
 std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::selectGrasps(
-    std::vector<std::unique_ptr<candidate::Hand>>& hands) const {
+    std::vector<std::unique_ptr<candidate::Hand>> &hands) const {
   printf("Selecting the %d highest scoring grasps ...\n", num_selected_);
 
   int middle = std::min((int)hands.size(), num_selected_);
@@ -414,13 +414,13 @@ std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::selectGrasps(
 
 std::vector<std::unique_ptr<candidate::HandSet>>
 GraspDetector::filterGraspsDirection(
-    std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
-    const Eigen::Vector3d& direction, const double thresh_rad) {
+    std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
+    const Eigen::Vector3d &direction, const double thresh_rad) {
   std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_out;
   int remaining = 0;
 
   for (int i = 0; i < hand_set_list.size(); i++) {
-    const std::vector<std::unique_ptr<candidate::Hand>>& hands =
+    const std::vector<std::unique_ptr<candidate::Hand>> &hands =
         hand_set_list[i]->getHands();
     Eigen::Array<bool, 1, Eigen::Dynamic> is_valid =
         hand_set_list[i]->getIsValid();
@@ -449,9 +449,9 @@ GraspDetector::filterGraspsDirection(
 }
 
 bool GraspDetector::createGraspImages(
-    util::Cloud& cloud,
-    std::vector<std::unique_ptr<candidate::Hand>>& hands_out,
-    std::vector<std::unique_ptr<cv::Mat>>& images_out) {
+    util::Cloud &cloud,
+    std::vector<std::unique_ptr<candidate::Hand>> &hands_out,
+    std::vector<std::unique_ptr<cv::Mat>> &images_out) {
   // Check if the point cloud is empty.
   if (cloud.getCloudOriginal()->size() == 0) {
     printf("ERROR: Point cloud is empty!");
@@ -485,7 +485,7 @@ bool GraspDetector::createGraspImages(
     return false;
   }
 
-  const candidate::HandGeometry& hand_geom =
+  const candidate::HandGeometry &hand_geom =
       candidates_generator_->getHandSearchParams().hand_geometry_;
 
   // 2. Filter the candidates.
@@ -514,15 +514,15 @@ bool GraspDetector::createGraspImages(
 }
 
 std::vector<int> GraspDetector::evalGroundTruth(
-    const util::Cloud& cloud_gt,
-    std::vector<std::unique_ptr<candidate::Hand>>& hands) {
+    const util::Cloud &cloud_gt,
+    std::vector<std::unique_ptr<candidate::Hand>> &hands) {
   return candidates_generator_->reevaluateHypotheses(cloud_gt, hands);
 }
 
 std::vector<std::unique_ptr<candidate::Hand>>
 GraspDetector::pruneGraspCandidates(
-    const util::Cloud& cloud,
-    const std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
+    const util::Cloud &cloud,
+    const std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
     double min_score) {
   // 1. Create grasp descriptors (images).
   std::vector<std::unique_ptr<candidate::Hand>> hands;
@@ -544,8 +544,8 @@ GraspDetector::pruneGraspCandidates(
   return hands_out;
 }
 
-void GraspDetector::printStdVector(const std::vector<int>& v,
-                                   const std::string& name) const {
+void GraspDetector::printStdVector(const std::vector<int> &v,
+                                   const std::string &name) const {
   printf("%s: ", name.c_str());
   for (int i = 0; i < v.size(); i++) {
     printf("%d ", v[i]);
@@ -553,8 +553,8 @@ void GraspDetector::printStdVector(const std::vector<int>& v,
   printf("\n");
 }
 
-void GraspDetector::printStdVector(const std::vector<double>& v,
-                                   const std::string& name) const {
+void GraspDetector::printStdVector(const std::vector<double> &v,
+                                   const std::string &name) const {
   printf("%s: ", name.c_str());
   for (int i = 0; i < v.size(); i++) {
     printf("%3.2f ", v[i]);
@@ -562,4 +562,4 @@ void GraspDetector::printStdVector(const std::vector<double>& v,
   printf("\n");
 }
 
-}  // namespace gpd
+} // namespace gpd

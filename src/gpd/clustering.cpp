@@ -3,7 +3,7 @@
 namespace gpd {
 
 std::vector<std::unique_ptr<candidate::Hand>> Clustering::findClusters(
-    const std::vector<std::unique_ptr<candidate::Hand>>& hand_list,
+    const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
     bool remove_inliers) {
   // const double AXIS_ALIGN_ANGLE_THRESH = 15.0 * M_PI/180.0;
   const double AXIS_ALIGN_ANGLE_THRESH = 12.0 * M_PI / 180.0;
@@ -33,7 +33,8 @@ std::vector<std::unique_ptr<candidate::Hand>> Clustering::findClusters(
     double standard_deviation = 0.0;
 
     for (int j = 0; j < hand_list.size(); j++) {
-      if (i == j || (remove_inliers && has_used[j])) continue;
+      if (i == j || (remove_inliers && has_used[j]))
+        continue;
 
       // Which hands have an axis within <AXIS_ALIGN_ANGLE_THRESH> of this one?
       double axis_aligned =
@@ -104,4 +105,4 @@ std::vector<std::unique_ptr<candidate::Hand>> Clustering::findClusters(
   return hands_out;
 }
 
-}  // namespace gpd
+} // namespace gpd

@@ -58,15 +58,15 @@ namespace net {
  *
  */
 class CaffeClassifier : public Classifier {
- public:
+public:
   /**
    * \brief Constructor.
    * \param model_file the location of the file that describes the network model
    * \param weights_file the location of the file that contains the network
    * weights
    */
-  CaffeClassifier(const std::string& model_file,
-                  const std::string& weights_file, Classifier::Device device,
+  CaffeClassifier(const std::string &model_file,
+                  const std::string &weights_file, Classifier::Device device,
                   int batch_size);
 
   /**
@@ -74,8 +74,8 @@ class CaffeClassifier : public Classifier {
    * \param image_list the list of grasp images
    * \return the classified grasp candidates
    */
-  std::vector<float> classifyImages(
-      const std::vector<std::unique_ptr<cv::Mat>>& image_list);
+  std::vector<float>
+  classifyImages(const std::vector<std::unique_ptr<cv::Mat>> &image_list);
 
   /**
    * \brief Return the batch size.
@@ -83,12 +83,12 @@ class CaffeClassifier : public Classifier {
    */
   int getBatchSize() const { return input_layer_->batch_size(); }
 
- private:
+private:
   boost::shared_ptr<caffe::Net<float>> net_;
   boost::shared_ptr<caffe::MemoryDataLayer<float>> input_layer_;
 };
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd
 
 #endif /* CAFFE_CLASSIFIER_H_ */

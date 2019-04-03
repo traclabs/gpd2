@@ -56,7 +56,7 @@ typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGBA;
  *
  */
 class FrameEstimator {
- public:
+public:
   /**
    * \brief Constructor.
    * \param num_threads the number of CPU threads to be used
@@ -72,9 +72,10 @@ class FrameEstimator {
    * \param kdtree the kdtree used for faster neighborhood search
    * \return the list of local reference frames
    */
-  std::vector<LocalFrame> calculateLocalFrames(
-      const util::Cloud& cloud_cam, const std::vector<int>& indices,
-      double radius, const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree) const;
+  std::vector<LocalFrame>
+  calculateLocalFrames(const util::Cloud &cloud_cam,
+                       const std::vector<int> &indices, double radius,
+                       const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const;
 
   /**
    * \brief Calculate local reference frames given a list of (x,y,z) samples.
@@ -84,9 +85,10 @@ class FrameEstimator {
    * \param kdtree the kdtree used for faster neighborhood search
    * \return the list of local reference frames
    */
-  std::vector<LocalFrame> calculateLocalFrames(
-      const util::Cloud& cloud_cam, const Eigen::Matrix3Xd& samples,
-      double radius, const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree) const;
+  std::vector<LocalFrame>
+  calculateLocalFrames(const util::Cloud &cloud_cam,
+                       const Eigen::Matrix3Xd &samples, double radius,
+                       const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const;
 
   /**
    * \brief Calculate a local reference frame given a list of surface normals.
@@ -96,23 +98,24 @@ class FrameEstimator {
    * \param kdtree the kdtree used for faster neighborhood search
    * \return the local reference frame
    */
-  std::unique_ptr<LocalFrame> calculateFrame(
-      const Eigen::Matrix3Xd& normals, const Eigen::Vector3d& sample,
-      double radius, const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree) const;
+  std::unique_ptr<LocalFrame>
+  calculateFrame(const Eigen::Matrix3Xd &normals, const Eigen::Vector3d &sample,
+                 double radius,
+                 const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const;
 
- private:
+private:
   /**
    * \brief Convert an Eigen::Vector3d object to a pcl::PointXYZRGBA.
    * \param v the Eigen vector
    * \reutrn the pcl point
    */
-  pcl::PointXYZRGBA eigenVectorToPcl(const Eigen::Vector3d& v) const;
+  pcl::PointXYZRGBA eigenVectorToPcl(const Eigen::Vector3d &v) const;
 
-  int num_threads_;  ///< number of CPU threads to be used for calculating local
-                     /// reference frames
+  int num_threads_; ///< number of CPU threads to be used for calculating local
+                    /// reference frames
 };
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd
 
 #endif /* FRAME_ESTIMATOR_H */

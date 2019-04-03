@@ -50,7 +50,7 @@ namespace net {
  *
  */
 class Classifier {
- public:
+public:
   enum class Device : uint8_t { eCPU = 0, eGPU = 1, eVPU = 2, eFPGA = 3 };
 
   /**
@@ -60,8 +60,8 @@ class Classifier {
    * \param device target device on which the network is run
    * \return the classifier
    */
-  static std::shared_ptr<Classifier> create(const std::string& model_file,
-                                            const std::string& weights_file,
+  static std::shared_ptr<Classifier> create(const std::string &model_file,
+                                            const std::string &weights_file,
                                             Device device = Device::eCPU,
                                             int batch_size = 1);
 
@@ -70,8 +70,8 @@ class Classifier {
    * \param image_list the list of grasp images
    * \return the classified grasp candidates
    */
-  virtual std::vector<float> classifyImages(
-      const std::vector<std::unique_ptr<cv::Mat>>& image_list) = 0;
+  virtual std::vector<float>
+  classifyImages(const std::vector<std::unique_ptr<cv::Mat>> &image_list) = 0;
 
   /**
    * \brief Return the batch size.
@@ -80,7 +80,7 @@ class Classifier {
   virtual int getBatchSize() const = 0;
 };
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd
 
 #endif /* CLASSIFIER_H_ */

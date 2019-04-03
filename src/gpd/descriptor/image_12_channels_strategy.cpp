@@ -3,10 +3,10 @@
 namespace gpd {
 namespace descriptor {
 
-std::vector<std::unique_ptr<cv::Mat>> Image12ChannelsStrategy::createImages(
-    const candidate::HandSet& hand_set,
-    const util::PointList& nn_points) const {
-  const std::vector<std::unique_ptr<candidate::Hand>>& hands =
+std::vector<std::unique_ptr<cv::Mat>>
+Image12ChannelsStrategy::createImages(const candidate::HandSet &hand_set,
+                                      const util::PointList &nn_points) const {
+  const std::vector<std::unique_ptr<candidate::Hand>> &hands =
       hand_set.getHands();
   std::vector<std::unique_ptr<cv::Mat>> images(hands.size());
 
@@ -22,9 +22,9 @@ std::vector<std::unique_ptr<cv::Mat>> Image12ChannelsStrategy::createImages(
   return images;
 }
 
-void Image12ChannelsStrategy::createImage(const util::PointList& point_list,
-                                          const candidate::Hand& hand,
-                                          cv::Mat& image) const {
+void Image12ChannelsStrategy::createImage(const util::PointList &point_list,
+                                          const candidate::Hand &hand,
+                                          cv::Mat &image) const {
   // 1. Transform points and normals in neighborhood into the unit image.
   Matrix3XdPair points_normals = transformToUnitImage(point_list, hand);
 
@@ -32,8 +32,9 @@ void Image12ChannelsStrategy::createImage(const util::PointList& point_list,
   image = calculateImage(points_normals.first, points_normals.second);
 }
 
-cv::Mat Image12ChannelsStrategy::calculateImage(
-    const Eigen::Matrix3Xd& points, const Eigen::Matrix3Xd& normals) const {
+cv::Mat
+Image12ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
+                                        const Eigen::Matrix3Xd &normals) const {
   double t = omp_get_wtime();
   const int kNumProjections = 3;
 
@@ -66,7 +67,7 @@ cv::Mat Image12ChannelsStrategy::calculateImage(
 }
 
 std::vector<cv::Mat> Image12ChannelsStrategy::calculateChannels(
-    const Eigen::Matrix3Xd& points, const Eigen::Matrix3Xd& normals) const {
+    const Eigen::Matrix3Xd &points, const Eigen::Matrix3Xd &normals) const {
   std::vector<cv::Mat> channels(4);
 
   Eigen::VectorXi cell_indices = findCellIndices(points);
@@ -82,10 +83,10 @@ std::vector<cv::Mat> Image12ChannelsStrategy::calculateChannels(
   return channels;
 }
 
-void Image12ChannelsStrategy::showImage(const cv::Mat& image) const {
+void Image12ChannelsStrategy::showImage(const cv::Mat &image) const {
   int border = 5;
-  int n = 3;  // number of images in each row
-  int m = 2;  // number of images in each column
+  int n = 3; // number of images in each row
+  int m = 2; // number of images in each column
   int image_size = image_params_.size_;
   int height = n * (image_size + border) + border;
   int width = m * (image_size + border) + border;
@@ -115,5 +116,5 @@ void Image12ChannelsStrategy::showImage(const cv::Mat& image) const {
   cv::waitKey(0);
 }
 
-}  // namespace descriptor
-}  // namespace gpd
+} // namespace descriptor
+} // namespace gpd

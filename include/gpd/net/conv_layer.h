@@ -50,7 +50,7 @@ namespace net {
  *
  */
 class ConvLayer : public Layer {
- public:
+public:
   /**
    * \brief Constructor.
    * \param width input width
@@ -68,11 +68,11 @@ class ConvLayer : public Layer {
    * \param x input
    * \return output of forward pass
    */
-  Eigen::MatrixXf forward(const std::vector<float>& x) const;
+  Eigen::MatrixXf forward(const std::vector<float> &x) const;
 
- private:
+private:
   typedef Eigen::Map<const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic,
-                                         Eigen::RowMajor> >
+                                         Eigen::RowMajor>>
       RowMajorMatrixMap;
 
   /**
@@ -82,8 +82,8 @@ class ConvLayer : public Layer {
    * \param X input matrix
    * \return output of forward pass
    */
-  Eigen::MatrixXf forward(const Eigen::MatrixXf& W, const Eigen::VectorXf& b,
-                          const Eigen::MatrixXf& X) const;
+  Eigen::MatrixXf forward(const Eigen::MatrixXf &W, const Eigen::VectorXf &b,
+                          const Eigen::MatrixXf &X) const;
 
   bool is_a_ge_zero_and_a_lt_b(int a, int b) const;
 
@@ -102,21 +102,21 @@ class ConvLayer : public Layer {
    * \param stride_w stride width
    * \param[out] data_col the array
    */
-  void imageToColumns(const float* data_im, const int channels,
+  void imageToColumns(const float *data_im, const int channels,
                       const int height, const int width, const int num_kernels,
                       const int kernel_h, const int kernel_w,
                       const int stride_h, const int stride_w,
-                      float* data_col) const;
+                      float *data_col) const;
 
-  int w1, h1, d1;  // size of input volume: w1 x h1 x d1
-  int w2, h2, d2;  // size of output volume: w2 x h2 x d2
-  int k, f, s, p;  // number of filters, their spatial extent, stride, amount of
-                   // zero padding
-  int W_row_r, W_row_c;  // number of rows and columns in matrix W_row
-  int X_col_r, X_col_c;  // number of rows and columns in matrix X_col
+  int w1, h1, d1; // size of input volume: w1 x h1 x d1
+  int w2, h2, d2; // size of output volume: w2 x h2 x d2
+  int k, f, s, p; // number of filters, their spatial extent, stride, amount of
+                  // zero padding
+  int W_row_r, W_row_c; // number of rows and columns in matrix W_row
+  int X_col_r, X_col_c; // number of rows and columns in matrix X_col
 };
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd
 
 #endif /* CONV_LAYER_H */

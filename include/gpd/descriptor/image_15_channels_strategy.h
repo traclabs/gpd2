@@ -54,7 +54,7 @@ namespace descriptor {
  *
  */
 class Image15ChannelsStrategy : public ImageStrategy {
- public:
+public:
   /**
    * \brief Create a strategy for calculating grasp images.
    * \param image_params the grasp image parameters
@@ -63,7 +63,7 @@ class Image15ChannelsStrategy : public ImageStrategy {
    * \param is_plotting if the images are visualized
    * \return the strategy for calculating grasp images
    */
-  Image15ChannelsStrategy(const ImageGeometry& image_params, int num_threads,
+  Image15ChannelsStrategy(const ImageGeometry &image_params, int num_threads,
                           int num_orientations, bool is_plotting)
       : ImageStrategy(image_params, num_threads, num_orientations,
                       is_plotting) {
@@ -81,30 +81,30 @@ class Image15ChannelsStrategy : public ImageStrategy {
    * \param nn_points the point neighborhoods used to calculate the images
    * \return the grasp images
    */
-  std::vector<std::unique_ptr<cv::Mat>> createImages(
-      const candidate::HandSet& hand_set,
-      const util::PointList& nn_points) const;
+  std::vector<std::unique_ptr<cv::Mat>>
+  createImages(const candidate::HandSet &hand_set,
+               const util::PointList &nn_points) const;
 
- protected:
-  void createImage(const util::PointList& point_list,
-                   const candidate::Hand& hand, const Eigen::Matrix3Xd& shadow,
-                   cv::Mat& image) const;
+protected:
+  void createImage(const util::PointList &point_list,
+                   const candidate::Hand &hand, const Eigen::Matrix3Xd &shadow,
+                   cv::Mat &image) const;
 
- private:
-  cv::Mat calculateImage(const Eigen::Matrix3Xd& points,
-                         const Eigen::Matrix3Xd& normals,
-                         const Eigen::Matrix3Xd& shadow) const;
+private:
+  cv::Mat calculateImage(const Eigen::Matrix3Xd &points,
+                         const Eigen::Matrix3Xd &normals,
+                         const Eigen::Matrix3Xd &shadow) const;
 
-  std::vector<cv::Mat> calculateChannels(const Eigen::Matrix3Xd& points,
-                                         const Eigen::Matrix3Xd& normals,
-                                         const Eigen::Matrix3Xd& shadow) const;
+  std::vector<cv::Mat> calculateChannels(const Eigen::Matrix3Xd &points,
+                                         const Eigen::Matrix3Xd &normals,
+                                         const Eigen::Matrix3Xd &shadow) const;
 
-  void showImage(const cv::Mat& image) const;
+  void showImage(const cv::Mat &image) const;
 
   double shadow_length_;
 };
 
-}  // namespace descriptor
-}  // namespace gpd
+} // namespace descriptor
+} // namespace gpd
 
 #endif /* IMAGE_15_CHANNELS_STRATEGY_H_ */

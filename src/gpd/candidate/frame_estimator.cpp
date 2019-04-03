@@ -10,7 +10,7 @@ std::vector<LocalFrame> FrameEstimator::calculateLocalFrames(
   std::vector<std::unique_ptr<LocalFrame>> frames;
   frames.resize(indices.size());
 
-#ifdef _OPENMP  // parallelization using OpenMP
+#ifdef _OPENMP // parallelization using OpenMP
 #pragma omp parallel for num_threads(num_threads_)
 #endif
   for (int i = 0; i < indices.size(); i++) {
@@ -41,7 +41,7 @@ std::vector<LocalFrame> FrameEstimator::calculateLocalFrames(
   std::vector<std::unique_ptr<LocalFrame>> frames;
   frames.resize(samples.cols());
 
-#ifdef _OPENMP  // parallelization using OpenMP
+#ifdef _OPENMP // parallelization using OpenMP
 #pragma omp parallel for num_threads(num_threads_)
 #endif
   for (int i = 0; i < samples.cols(); i++) {
@@ -85,8 +85,8 @@ std::unique_ptr<LocalFrame> FrameEstimator::calculateFrame(
   return frame;
 }
 
-pcl::PointXYZRGBA FrameEstimator::eigenVectorToPcl(
-    const Eigen::Vector3d &v) const {
+pcl::PointXYZRGBA
+FrameEstimator::eigenVectorToPcl(const Eigen::Vector3d &v) const {
   pcl::PointXYZRGBA p;
   p.x = v(0);
   p.y = v(1);
@@ -94,5 +94,5 @@ pcl::PointXYZRGBA FrameEstimator::eigenVectorToPcl(
   return p;
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

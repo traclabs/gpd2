@@ -3,22 +3,20 @@
 namespace gpd {
 namespace descriptor {
 
-ImageGenerator::ImageGenerator(const descriptor::ImageGeometry& image_geometry,
+ImageGenerator::ImageGenerator(const descriptor::ImageGeometry &image_geometry,
                                int num_threads, int num_orientations,
                                bool is_plotting, bool remove_plane)
-    : image_params_(image_geometry),
-      num_threads_(num_threads),
-      num_orientations_(num_orientations),
-      remove_plane_(remove_plane) {
+    : image_params_(image_geometry), num_threads_(num_threads),
+      num_orientations_(num_orientations), remove_plane_(remove_plane) {
   image_strategy_ = descriptor::ImageStrategy::makeImageStrategy(
       image_geometry, num_threads_, num_orientations_, is_plotting);
 }
 
 void ImageGenerator::createImages(
-    const util::Cloud& cloud_cam,
-    const std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
-    std::vector<std::unique_ptr<cv::Mat>>& images_out,
-    std::vector<std::unique_ptr<candidate::Hand>>& hands_out) const {
+    const util::Cloud &cloud_cam,
+    const std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
+    std::vector<std::unique_ptr<cv::Mat>> &images_out,
+    std::vector<std::unique_ptr<candidate::Hand>> &hands_out) const {
   double t0 = omp_get_wtime();
 
   Eigen::Matrix3Xd points =
@@ -51,7 +49,7 @@ void ImageGenerator::createImages(
 
   double t_slice = omp_get_wtime();
 
-#ifdef _OPENMP  // parallelization using OpenMP
+#ifdef _OPENMP // parallelization using OpenMP
 #pragma omp parallel for private(nn_indices, nn_dists) num_threads(num_threads_)
 #endif
   for (int i = 0; i < hand_set_list.size(); i++) {
@@ -70,17 +68,17 @@ void ImageGenerator::createImages(
 }
 
 void ImageGenerator::createImageList(
-    const std::vector<std::unique_ptr<candidate::HandSet>>& hand_set_list,
-    const std::vector<util::PointList>& nn_points_list,
-    std::vector<std::unique_ptr<cv::Mat>>& images_out,
-    std::vector<std::unique_ptr<candidate::Hand>>& hands_out) const {
+    const std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
+    const std::vector<util::PointList> &nn_points_list,
+    std::vector<std::unique_ptr<cv::Mat>> &images_out,
+    std::vector<std::unique_ptr<candidate::Hand>> &hands_out) const {
   double t0_images = omp_get_wtime();
 
   int m = hand_set_list[0]->getHands().size();
   int n = hand_set_list.size() * m;
   std::vector<std::vector<std::unique_ptr<cv::Mat>>> images_list(n);
 
-#ifdef _OPENMP  // parallelization using OpenMP
+#ifdef _OPENMP // parallelization using OpenMP
 #pragma omp parallel for num_threads(num_threads_)
 #endif
   for (int i = 0; i < hand_set_list.size(); i++) {
@@ -98,8 +96,8 @@ void ImageGenerator::createImageList(
   }
 }
 
-void ImageGenerator::removePlane(const util::Cloud& cloud_cam,
-                                 util::PointList& point_list) const {
+void ImageGenerator::removePlane(const util::Cloud &cloud_cam,
+                                 util::PointList &point_list) const {
   pcl::SACSegmentation<pcl::PointXYZRGBA> seg;
   pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
   pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
@@ -128,5 +126,5 @@ void ImageGenerator::removePlane(const util::Cloud& cloud_cam,
   }
 }
 
-}  // namespace descriptor
-}  // namespace gpd
+} // namespace descriptor
+} // namespace gpd

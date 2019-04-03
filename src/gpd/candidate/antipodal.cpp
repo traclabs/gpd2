@@ -3,17 +3,17 @@
 namespace gpd {
 namespace candidate {
 
-const int Antipodal::NO_GRASP = 0;    // normals point not toward any finger
-const int Antipodal::HALF_GRASP = 1;  // normals point towards one finger
-const int Antipodal::FULL_GRASP = 2;  // normals point towards both fingers
+const int Antipodal::NO_GRASP = 0;   // normals point not toward any finger
+const int Antipodal::HALF_GRASP = 1; // normals point towards one finger
+const int Antipodal::FULL_GRASP = 2; // normals point towards both fingers
 
-int Antipodal::evaluateGrasp(const util::PointList& point_list,
+int Antipodal::evaluateGrasp(const util::PointList &point_list,
                              double extremal_thresh, int lateral_axis,
                              int forward_axis, int vertical_axis) const {
   int result = NO_GRASP;
 
-  const Eigen::Matrix3Xd& pts = point_list.getPoints();
-  const Eigen::Matrix3Xd& normals = point_list.getNormals();
+  const Eigen::Matrix3Xd &pts = point_list.getPoints();
+  const Eigen::Matrix3Xd &normals = point_list.getNormals();
 
   // Select points that are extremal and have their surface normal within the
   // friction cone of the closing direction.
@@ -38,7 +38,8 @@ int Antipodal::evaluateGrasp(const util::PointList& point_list,
     bool is_left_extremal = pts(lateral_axis, i) < min_x;
     bool is_right_extremal = pts(lateral_axis, i) > max_x;
 
-    if (is_within_left_close && is_left_extremal) left_idx_viable.push_back(i);
+    if (is_within_left_close && is_left_extremal)
+      left_idx_viable.push_back(i);
     if (is_within_right_close && is_right_extremal)
       right_idx_viable.push_back(i);
   }
@@ -95,7 +96,7 @@ int Antipodal::evaluateGrasp(const util::PointList& point_list,
   return result;
 }
 
-int Antipodal::evaluateGrasp(const Eigen::Matrix3Xd& normals,
+int Antipodal::evaluateGrasp(const Eigen::Matrix3Xd &normals,
                              double thresh_half, double thresh_full) const {
   int num_thresh = 6;
   int grasp = 0;
@@ -158,5 +159,5 @@ int Antipodal::evaluateGrasp(const Eigen::Matrix3Xd& normals,
   return NO_GRASP;
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

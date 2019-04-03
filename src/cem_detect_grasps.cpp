@@ -87,9 +87,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-}  // namespace detect_grasps
-}  // namespace apps
-}  // namespace gpd
+} // namespace detect_grasps
+} // namespace apps
+} // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::detect_grasps::DoMain(argc, argv);

@@ -31,5 +31,5 @@ Eigen::Vector3i EigenUtils::floorVector(const Eigen::Vector3f &a) {
   return b;
 }
 
-}  // namespace util
-}  // namespace gpd
+} // namespace util
+} // namespace gpd

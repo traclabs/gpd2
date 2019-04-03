@@ -32,10 +32,10 @@
 #ifndef CLOUD_H_
 #define CLOUD_H_
 
-#include <math.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <math.h>
 #include <vector>
 
 #include <Eigen/Dense>
@@ -47,10 +47,10 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <pcl/search/kdtree.h>
 #include <pcl/search/impl/kdtree.hpp>
+#include <pcl/search/kdtree.h>
 
-#if defined(USE_PCL_GPU)  // switch include ordering if compilation fails
+#if defined(USE_PCL_GPU) // switch include ordering if compilation fails
 #include <pcl/gpu/containers/device_array.hpp>
 #include <pcl/gpu/features/features.hpp>
 #endif
@@ -75,7 +75,7 @@ typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
  *
  */
 class Cloud {
- public:
+public:
   /**
    * \brief Comparator for checking uniqueness of two 3D-vectors.
    */
@@ -87,7 +87,7 @@ class Cloud {
      * \return true if they differ in at least one element, false if all
      * elements are equal
      */
-    bool operator()(const Eigen::Vector3i& a, const Eigen::Vector3i& b) {
+    bool operator()(const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
       for (int i = 0; i < a.size(); i++) {
         if (a(i) != b(i)) {
           return a(i) < b(i);
@@ -109,7 +109,7 @@ class Cloud {
      * \return true if they differ in at least one of the first three elements,
      * false otherwise
      */
-    bool operator()(const Eigen::Vector4i& a, const Eigen::Vector4i& b) {
+    bool operator()(const Eigen::Vector4i &a, const Eigen::Vector4i &b) {
       for (int i = 0; i < a.size() - 1; i++) {
         if (a(i) != b(i)) {
           return true;
@@ -132,8 +132,8 @@ class Cloud {
    * x n)
    * \param view_points the origins of the cameras (size: 3 x k)
    */
-  Cloud(const PointCloudRGB::Ptr& cloud, const Eigen::MatrixXi& camera_source,
-        const Eigen::Matrix3Xd& view_points);
+  Cloud(const PointCloudRGB::Ptr &cloud, const Eigen::MatrixXi &camera_source,
+        const Eigen::Matrix3Xd &view_points);
 
   /**
    * \brief Constructor.
@@ -142,9 +142,9 @@ class Cloud {
    * x n)
    * \param view_points the origins of the cameras (size: 3 x k)
    */
-  Cloud(const PointCloudPointNormal::Ptr& cloud,
-        const Eigen::MatrixXi& camera_source,
-        const Eigen::Matrix3Xd& view_points);
+  Cloud(const PointCloudPointNormal::Ptr &cloud,
+        const Eigen::MatrixXi &camera_source,
+        const Eigen::Matrix3Xd &view_points);
 
   /**
    * \brief Constructor for a two camera setup (left and right camera).
@@ -152,8 +152,8 @@ class Cloud {
    * \param size_left_cloud the size of the point cloud from the left camera
    * \param view_points the origins of the cameras (size: 3 x k)
    */
-  Cloud(const PointCloudRGB::Ptr& cloud, int size_left_cloud,
-        const Eigen::Matrix3Xd& view_points);
+  Cloud(const PointCloudRGB::Ptr &cloud, int size_left_cloud,
+        const Eigen::Matrix3Xd &view_points);
 
   /**
    * \brief Constructor for a two cameras setup (left and right camera).
@@ -161,15 +161,15 @@ class Cloud {
    * \param size_left_cloud the size of the point cloud from the left camera
    * \param view_points the origins of the cameras (size: 3 x k)
    */
-  Cloud(const PointCloudPointNormal::Ptr& cloud, int size_left_cloud,
-        const Eigen::Matrix3Xd& view_points);
+  Cloud(const PointCloudPointNormal::Ptr &cloud, int size_left_cloud,
+        const Eigen::Matrix3Xd &view_points);
 
   /**
    * \brief Constructor for point cloud files (*.pcd).
    * \param filename the location of the point cloud file
    * \param view_points the origins of the cameras (size: 3 x k)
    */
-  Cloud(const std::string& filename, const Eigen::Matrix3Xd& view_points);
+  Cloud(const std::string &filename, const Eigen::Matrix3Xd &view_points);
 
   /**
    * \brief Constructor for point cloud files (*.pcd) from a two cameras setup.
@@ -179,8 +179,8 @@ class Cloud {
    * camera
    * \param view_points the origins of the cameras (size: 3 x k)
    */
-  Cloud(const std::string& filename_left, const std::string& filename_right,
-        const Eigen::Matrix3Xd& view_points);
+  Cloud(const std::string &filename_left, const std::string &filename_right,
+        const Eigen::Matrix3Xd &view_points);
 
   /**
    * \brief Remove statistical outliers from the point cloud.
@@ -193,14 +193,14 @@ class Cloud {
    * \param[in] workspace a 6-D vector containing the workspace limits: [minX,
    * maxX, minY, maxY, minZ, maxZ]
    */
-  void filterWorkspace(const std::vector<double>& workspace);
+  void filterWorkspace(const std::vector<double> &workspace);
 
   /**
    * \brief Filter out samples that lie outside the workspace dimensions.
    * \param[in] workspace a 6-D vector containing the workspace limits: [minX,
    * maxX, minY, maxY, minZ, maxZ]
    */
-  void filterSamples(const std::vector<double>& workspace);
+  void filterSamples(const std::vector<double> &workspace);
 
   /**
    * \brief Voxelize the point cloud and keep track of the camera source for
@@ -274,27 +274,27 @@ class Cloud {
    * \brief Set surface normals from a file.
    * \param[in] filename the location of the file
    */
-  void setNormalsFromFile(const std::string& filename);
+  void setNormalsFromFile(const std::string &filename);
 
   /**
    * \brief Write surface normals to a file.
    * \param filename the location of the file
    * \param normals the surface normals
    */
-  void writeNormalsToFile(const std::string& filename,
-                          const Eigen::Matrix3Xd& normals);
+  void writeNormalsToFile(const std::string &filename,
+                          const Eigen::Matrix3Xd &normals);
 
   /**
    * \brief Return the camera source matrix.
    * \return the camera source matrix (k x n)
    */
-  const Eigen::MatrixXi& getCameraSource() const { return camera_source_; }
+  const Eigen::MatrixXi &getCameraSource() const { return camera_source_; }
 
   /**
    * \brief Return the preprocessed point cloud.
    * \return the point cloud
    */
-  const PointCloudRGB::Ptr& getCloudProcessed() const {
+  const PointCloudRGB::Ptr &getCloudProcessed() const {
     return cloud_processed_;
   }
 
@@ -302,31 +302,31 @@ class Cloud {
    * \brief Return the original point cloud.
    * \return the point cloud
    */
-  const PointCloudRGB::Ptr& getCloudOriginal() const { return cloud_original_; }
+  const PointCloudRGB::Ptr &getCloudOriginal() const { return cloud_original_; }
 
   /**
    * \brief Return the original point cloud.
    * \return the point cloud
    */
-  const std::vector<int>& getSampleIndices() const { return sample_indices_; }
+  const std::vector<int> &getSampleIndices() const { return sample_indices_; }
 
   /**
    * \brief Return the surface normals.
    * \return the surface normals (size: 3 x n)
    */
-  const Eigen::Matrix3Xd& getNormals() const { return normals_; }
+  const Eigen::Matrix3Xd &getNormals() const { return normals_; }
 
   /**
    * \brief Return the samples.
    * \return the samples (size: 3 x n)
    */
-  const Eigen::Matrix3Xd& getSamples() const { return samples_; }
+  const Eigen::Matrix3Xd &getSamples() const { return samples_; }
 
   /**
    * \brief Return the sample indices.
    * \return the sample indices (size: n)
    */
-  void setSampleIndices(const std::vector<int>& sampleIndices) {
+  void setSampleIndices(const std::vector<int> &sampleIndices) {
     sample_indices_ = sampleIndices;
   }
 
@@ -334,25 +334,25 @@ class Cloud {
    * \brief Set the samples.
    * \return the samples (size: 3 x n)
    */
-  void setSamples(const Eigen::Matrix3Xd& samples);
+  void setSamples(const Eigen::Matrix3Xd &samples);
 
   /**
    * \brief Set the surface normals.
    * \return the surface normals (size: 3 x n)
    */
-  void setNormals(const Eigen::Matrix3Xd& normals) { normals_ = normals; }
+  void setNormals(const Eigen::Matrix3Xd &normals) { normals_ = normals; }
 
   /**
    * \brief Get the view points of the cameras.
    * \return the origins of the cameras (size: 3 x k)
    */
-  const Eigen::Matrix3Xd& getViewPoints() const { return view_points_; }
+  const Eigen::Matrix3Xd &getViewPoints() const { return view_points_; }
 
   /**
    * \brief Set the camera view points.
    * \return the origins of the cameras (size: 3 x k)
    */
-  void setViewPoints(const Eigen::Matrix3Xd& view_points) {
+  void setViewPoints(const Eigen::Matrix3Xd &view_points) {
     view_points_ = view_points;
   }
 
@@ -361,9 +361,9 @@ class Cloud {
    * \param filename the location of the file
    * \return the point cloud
    */
-  PointCloudRGB::Ptr loadPointCloudFromFile(const std::string& filename) const;
+  PointCloudRGB::Ptr loadPointCloudFromFile(const std::string &filename) const;
 
- private:
+private:
   std::vector<std::vector<int>> convertCameraSourceMatrixToLists();
 
   PointCloudRGB::Ptr cloud_processed_;
@@ -378,7 +378,7 @@ class Cloud {
   Eigen::Matrix3Xd samples_;
 };
 
-}  // namespace util
-}  // namespace gpd
+} // namespace util
+} // namespace gpd
 
 #endif /* CLOUD_H_ */

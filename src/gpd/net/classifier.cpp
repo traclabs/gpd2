@@ -43,8 +43,8 @@
 namespace gpd {
 namespace net {
 
-std::shared_ptr<Classifier> Classifier::create(const std::string& model_file,
-                                               const std::string& weights_file,
+std::shared_ptr<Classifier> Classifier::create(const std::string &model_file,
+                                               const std::string &weights_file,
                                                Classifier::Device device,
                                                int batch_size) {
 #if defined(USE_OPENVINO)
@@ -61,5 +61,5 @@ std::shared_ptr<Classifier> Classifier::create(const std::string& model_file,
 #endif
 }
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd

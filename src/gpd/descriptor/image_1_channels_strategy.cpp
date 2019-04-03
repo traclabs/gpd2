@@ -3,10 +3,10 @@
 namespace gpd {
 namespace descriptor {
 
-std::vector<std::unique_ptr<cv::Mat>> Image1ChannelsStrategy::createImages(
-    const candidate::HandSet& hand_set,
-    const util::PointList& nn_points) const {
-  const std::vector<std::unique_ptr<candidate::Hand>>& hands =
+std::vector<std::unique_ptr<cv::Mat>>
+Image1ChannelsStrategy::createImages(const candidate::HandSet &hand_set,
+                                     const util::PointList &nn_points) const {
+  const std::vector<std::unique_ptr<candidate::Hand>> &hands =
       hand_set.getHands();
   std::vector<std::unique_ptr<cv::Mat>> images(hands.size());
 
@@ -22,9 +22,9 @@ std::vector<std::unique_ptr<cv::Mat>> Image1ChannelsStrategy::createImages(
   return images;
 }
 
-void Image1ChannelsStrategy::createImage(const util::PointList& point_list,
-                                         const candidate::Hand& hand,
-                                         cv::Mat& image) const {
+void Image1ChannelsStrategy::createImage(const util::PointList &point_list,
+                                         const candidate::Hand &hand,
+                                         cv::Mat &image) const {
   // 1. Transform points and normals in neighborhood into the unit image.
   const Eigen::Matrix3Xd points = point_list.getPoints();
   const Eigen::Matrix3d rot = hand.getFrame().transpose();
@@ -47,5 +47,5 @@ void Image1ChannelsStrategy::createImage(const util::PointList& point_list,
   }
 }
 
-}  // namespace descriptor
-}  // namespace gpd
+} // namespace descriptor
+} // namespace gpd

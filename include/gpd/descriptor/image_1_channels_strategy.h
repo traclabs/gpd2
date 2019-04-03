@@ -50,7 +50,7 @@ namespace descriptor {
  *
  */
 class Image1ChannelsStrategy : public ImageStrategy {
- public:
+public:
   /**
    * \brief Create a strategy for calculating grasp images.
    * \param image_params the grasp image parameters
@@ -59,7 +59,7 @@ class Image1ChannelsStrategy : public ImageStrategy {
    * \param is_plotting if the images are visualized
    * \return the strategy for calculating grasp images
    */
-  Image1ChannelsStrategy(const ImageGeometry& image_params, int num_threads,
+  Image1ChannelsStrategy(const ImageGeometry &image_params, int num_threads,
                          int num_orientations, bool is_plotting)
       : ImageStrategy(image_params, num_threads, num_orientations,
                       is_plotting) {}
@@ -70,16 +70,16 @@ class Image1ChannelsStrategy : public ImageStrategy {
    * \param nn_points the point neighborhoods used to calculate the images
    * \return the grasp images
    */
-  std::vector<std::unique_ptr<cv::Mat>> createImages(
-      const candidate::HandSet& hand_set,
-      const util::PointList& nn_points) const;
+  std::vector<std::unique_ptr<cv::Mat>>
+  createImages(const candidate::HandSet &hand_set,
+               const util::PointList &nn_points) const;
 
- protected:
-  void createImage(const util::PointList& point_list,
-                   const candidate::Hand& hand, cv::Mat& image) const;
+protected:
+  void createImage(const util::PointList &point_list,
+                   const candidate::Hand &hand, cv::Mat &image) const;
 };
 
-}  // namespace descriptor
-}  // namespace gpd
+} // namespace descriptor
+} // namespace gpd
 
 #endif /* IMAGE_1_CHANNELS_STRATEGY_H_ */

@@ -40,11 +40,18 @@ int DoMain(int argc, char *argv[]) {
     return (-1);
   }
 
-  // View point from which the camera sees the point cloud.
-  Eigen::Matrix3Xd view_points(3, 1);
-  view_points.setZero();
+  // Read parameters from configuration file.
+  util::ConfigFile config_file(config_filename);
+  config_file.ExtractKeys();
 
-  // Load point cloud from file
+  // Set the camera position. Assumes a single camera view.
+  std::vector<double> camera_position =
+      config_file.getValueOfKeyAsStdVectorDouble("camera_position",
+                                                 "0.0 0.0 0.0");
+  Eigen::Matrix3Xd view_points(3, 1);
+  view_points << camera_position[0], camera_position[1], camera_position[2];
+
+  // Load point cloud from file.
   util::Cloud cloud(pcd_filename, view_points);
   if (cloud.getCloudOriginal()->size() == 0) {
     std::cout << "Error: Input point cloud is empty or does not exist!\n";
@@ -70,9 +77,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-}  // namespace detect_grasps
-}  // namespace apps
-}  // namespace gpd
+} // namespace detect_grasps
+} // namespace apps
+} // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::detect_grasps::DoMain(argc, argv);

@@ -721,5 +721,5 @@ void Plot::setPointColor(const candidate::Hand &hand, pcl::PointXYZRGBA &p) {
   }
 }
 
-}  // namespace util
-}  // namespace gpd
+} // namespace util
+} // namespace gpd

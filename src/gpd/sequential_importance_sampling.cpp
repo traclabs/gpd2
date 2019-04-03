@@ -7,7 +7,7 @@ const int SUM_OF_GAUSSIANS = 0;
 const int MAX_OF_GAUSSIANS = 1;
 
 SequentialImportanceSampling::SequentialImportanceSampling(
-    const std::string& config_filename) {
+    const std::string &config_filename) {
   // Read parameters from configuration file.
   util::ConfigFile config_file(config_filename);
   config_file.ExtractKeys();
@@ -50,7 +50,7 @@ SequentialImportanceSampling::SequentialImportanceSampling(
 }
 
 std::vector<std::unique_ptr<candidate::Hand>>
-SequentialImportanceSampling::detectGrasps(util::Cloud& cloud) {
+SequentialImportanceSampling::detectGrasps(util::Cloud &cloud) {
   if (cloud.getCloudOriginal()->size() == 0) {
     printf("Error: Point cloud is empty!");
     std::vector<std::unique_ptr<candidate::Hand>> grasps(0);
@@ -59,7 +59,7 @@ SequentialImportanceSampling::detectGrasps(util::Cloud& cloud) {
 
   double t0 = omp_get_wtime();
 
-  const candidate::HandGeometry& hand_geom =
+  const candidate::HandGeometry &hand_geom =
       grasp_detector_->getHandSearchParameters().hand_geometry_;
 
   util::Plot plotter(
@@ -105,7 +105,7 @@ SequentialImportanceSampling::detectGrasps(util::Cloud& cloud) {
   diag_sigma.diagonal() << sigma, sigma, sigma;
   Eigen::Matrix3d inv_sigma = diag_sigma.inverse();
   double term = 1.0 / sqrt(pow(2.0 * M_PI, 3.0) * pow(sigma, 3.0));
-  boost::mt19937* rng = new boost::mt19937();
+  boost::mt19937 *rng = new boost::mt19937();
   rng->seed(time(NULL));
   boost::normal_distribution<> distribution(0.0, 1.0);
   boost::variate_generator<boost::mt19937, boost::normal_distribution<>>
@@ -191,9 +191,9 @@ SequentialImportanceSampling::detectGrasps(util::Cloud& cloud) {
 }
 
 void SequentialImportanceSampling::drawSamplesFromSumOfGaussians(
-    const std::vector<std::unique_ptr<candidate::HandSet>>& hand_sets,
-    Gaussian& generator, double sigma, int num_gauss_samples,
-    Eigen::Matrix3Xd& samples_out) {
+    const std::vector<std::unique_ptr<candidate::HandSet>> &hand_sets,
+    Gaussian &generator, double sigma, int num_gauss_samples,
+    Eigen::Matrix3Xd &samples_out) {
   for (std::size_t j = 0; j < num_gauss_samples; j++) {
     int idx = rand() % hand_sets.size();
     Eigen::Vector3d rand_vec;
@@ -203,9 +203,9 @@ void SequentialImportanceSampling::drawSamplesFromSumOfGaussians(
 }
 
 void SequentialImportanceSampling::drawSamplesFromMaxOfGaussians(
-    const std::vector<std::unique_ptr<candidate::HandSet>>& hand_sets,
-    Gaussian& generator, double sigma, int num_gauss_samples,
-    Eigen::Matrix3Xd& samples_out, double term) {
+    const std::vector<std::unique_ptr<candidate::HandSet>> &hand_sets,
+    Gaussian &generator, double sigma, int num_gauss_samples,
+    Eigen::Matrix3Xd &samples_out, double term) {
   int j = 0;
 
   // Draw samples using rejection sampling.
@@ -236,8 +236,8 @@ void SequentialImportanceSampling::drawSamplesFromMaxOfGaussians(
 }
 
 void SequentialImportanceSampling::drawUniformSamples(
-    const util::Cloud& cloud, int num_samples, int start_idx,
-    Eigen::Matrix3Xd& samples) {
+    const util::Cloud &cloud, int num_samples, int start_idx,
+    Eigen::Matrix3Xd &samples) {
   int i = 0;
   while (i < num_samples) {
     int idx;
@@ -268,4 +268,4 @@ void SequentialImportanceSampling::drawUniformSamples(
   }
 }
 
-}  // namespace gpd
+} // namespace gpd

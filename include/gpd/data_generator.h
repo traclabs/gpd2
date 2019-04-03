@@ -66,12 +66,12 @@ struct Instance {
 };
 
 class DataGenerator {
- public:
+public:
   /**
    * \brief Constructor.
    * \param node ROS node handle
    */
-  DataGenerator(const std::string& config_filename);
+  DataGenerator(const std::string &config_filename);
 
   void generateDataBigbird();
 
@@ -81,12 +81,12 @@ class DataGenerator {
    */
   void generateData();
 
-  util::Cloud createMultiViewCloud(const std::string& object, int camera,
+  util::Cloud createMultiViewCloud(const std::string &object, int camera,
                                    const std::vector<int> angles,
                                    int reference_camera) const;
 
- private:
-  void createDatasetsHDF5(const std::string& filepath, int num_data);
+private:
+  void createDatasetsHDF5(const std::string &filepath, int num_data);
 
   /**
    * \brief Load a point cloud and surface normals given ROS launch parameters.
@@ -94,27 +94,27 @@ class DataGenerator {
    * \param normals_file_path location of the surface normals file
    * \return the point cloud with surface normals
    */
-  util::Cloud loadMesh(const std::string& mesh_file_path,
-                       const std::string& normals_file_path);
+  util::Cloud loadMesh(const std::string &mesh_file_path,
+                       const std::string &normals_file_path);
 
   /**
    * \brief Load all point cloud files from a folder.
    * \param cloud_folder location of the folder
    * \return list of point cloud files
    */
-  std::vector<boost::filesystem::path> loadPointCloudFiles(
-      const std::string& cloud_folder);
+  std::vector<boost::filesystem::path>
+  loadPointCloudFiles(const std::string &cloud_folder);
 
   /**
    * \brief Load object names from a file.
    * \param objects_file_location location of the file
    * \return list of object names
    */
-  std::vector<std::string> loadObjectNames(
-      const std::string& objects_file_location);
+  std::vector<std::string>
+  loadObjectNames(const std::string &objects_file_location);
 
-  void splitInstances(const std::vector<int>& labels,
-                      std::vector<int>& positives, std::vector<int>& negatives);
+  void splitInstances(const std::vector<int> &labels,
+                      std::vector<int> &positives, std::vector<int> &negatives);
 
   /**
    * \brief Balance the number of positive and negative examples.
@@ -125,10 +125,10 @@ class DataGenerator {
    * \param[out] negatives_out negative examples after balancing
    */
   void balanceInstances(int max_grasps_per_view,
-                        const std::vector<int>& positives_in,
-                        const std::vector<int>& negatives_in,
-                        std::vector<int>& positives_out,
-                        std::vector<int>& negatives_out);
+                        const std::vector<int> &positives_in,
+                        const std::vector<int> &negatives_in,
+                        std::vector<int> &positives_out,
+                        std::vector<int> &negatives_out);
 
   /**
    * \brief Add examples to the dataset.
@@ -138,37 +138,37 @@ class DataGenerator {
    * \param negatives indices of negative/non-viable grasps
    * \param dataset the dataset that the examples are added to
    */
-  void addInstances(const std::vector<std::unique_ptr<candidate::Hand>>& grasps,
-                    std::vector<std::unique_ptr<cv::Mat>>& images,
-                    const std::vector<int>& positives,
-                    const std::vector<int>& negatives,
-                    std::vector<Instance>& dataset);
+  void addInstances(const std::vector<std::unique_ptr<candidate::Hand>> &grasps,
+                    std::vector<std::unique_ptr<cv::Mat>> &images,
+                    const std::vector<int> &positives,
+                    const std::vector<int> &negatives,
+                    std::vector<Instance> &dataset);
 
-  int insertIntoHDF5(const std::string& file_path,
-                     const std::vector<Instance>& dataset, int offset);
+  int insertIntoHDF5(const std::string &file_path,
+                     const std::vector<Instance> &dataset, int offset);
 
   /**
    * \brief Store the dataset as an HDF5 file.
    * \param dataset the dataset
    * \param file_location location where the LMDB is stored
    */
-  void storeHDF5(const std::vector<Instance>& dataset,
-                 const std::string& file_location);
+  void storeHDF5(const std::vector<Instance> &dataset,
+                 const std::string &file_location);
 
-  void printMatrix(const cv::Mat& mat);
+  void printMatrix(const cv::Mat &mat);
 
-  void printMatrix15(const cv::Mat& mat);
+  void printMatrix15(const cv::Mat &mat);
 
-  void copyMatrix(const cv::Mat& src, cv::Mat& dst, int idx_in, int* dims_img);
+  void copyMatrix(const cv::Mat &src, cv::Mat &dst, int idx_in, int *dims_img);
 
-  Eigen::Matrix4f calculateTransform(const std::string& object, int camera,
+  Eigen::Matrix4f calculateTransform(const std::string &object, int camera,
                                      int angle, int reference_camera) const;
 
-  Eigen::Matrix4f readPoseFromHDF5(const std::string& hdf5_filename,
-                                   const std::string& dsname) const;
+  Eigen::Matrix4f readPoseFromHDF5(const std::string &hdf5_filename,
+                                   const std::string &dsname) const;
 
   std::unique_ptr<GraspDetector>
-      detector_;  ///< object to generate grasp candidates and images
+      detector_; ///< object to generate grasp candidates and images
 
   std::string data_root_;
   std::string objects_file_location_;
@@ -186,6 +186,6 @@ class DataGenerator {
   static const std::string LABELS_DS_NAME;
 };
 
-}  // namespace gpd
+} // namespace gpd
 
 #endif /* GENERATOR_H_ */

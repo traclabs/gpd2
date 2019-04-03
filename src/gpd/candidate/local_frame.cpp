@@ -16,7 +16,7 @@ void LocalFrame::findAverageNormalAxis(const Eigen::MatrixXd &normals) {
   // axis).
   Eigen::Matrix3d M = normals * normals.transpose();
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigen_solver(
-      M);  // M is adjoint (M is equal to its transpose)
+      M); // M is adjoint (M is equal to its transpose)
   Eigen::Vector3d eigen_values = eigen_solver.eigenvalues().real();
   Eigen::Matrix3d eigen_vectors = eigen_solver.eigenvectors().real();
   int min_index;
@@ -40,5 +40,5 @@ void LocalFrame::findAverageNormalAxis(const Eigen::MatrixXd &normals) {
   binormal_ = curvature_axis_.cross(normal_);
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

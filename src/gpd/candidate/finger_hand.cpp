@@ -5,9 +5,7 @@ namespace candidate {
 
 FingerHand::FingerHand(double finger_width, double hand_outer_diameter,
                        double hand_depth, int num_placements)
-    : finger_width_(finger_width),
-      hand_depth_(hand_depth),
-      lateral_axis_(-1),
+    : finger_width_(finger_width), hand_depth_(hand_depth), lateral_axis_(-1),
       forward_axis_(-1) {
   // Calculate the finger spacing.
   Eigen::VectorXd fs_half;
@@ -107,9 +105,9 @@ int FingerHand::chooseMiddleHand() {
 int FingerHand::deepenHand(const Eigen::Matrix3Xd &points, double min_depth,
                            double max_depth) {
   // Choose middle hand.
-  int hand_eroded_idx = chooseMiddleHand();  // middle index
+  int hand_eroded_idx = chooseMiddleHand(); // middle index
   int opposite_idx =
-      fingers_.size() / 2 + hand_eroded_idx;  // opposite finger index
+      fingers_.size() / 2 + hand_eroded_idx; // opposite finger index
 
   // Attempt to deepen hand (move as far onto the object as possible without
   // collision).
@@ -138,8 +136,9 @@ int FingerHand::deepenHand(const Eigen::Matrix3Xd &points, double min_depth,
   return hand_eroded_idx;
 }
 
-std::vector<int> FingerHand::computePointsInClosingRegion(
-    const Eigen::Matrix3Xd &points, int idx) {
+std::vector<int>
+FingerHand::computePointsInClosingRegion(const Eigen::Matrix3Xd &points,
+                                         int idx) {
   // Find feasible finger placement.
   if (idx == -1) {
     for (int i = 0; i < hand_.cols(); i++) {
@@ -183,5 +182,5 @@ bool FingerHand::isGapFree(const Eigen::Matrix3Xd &points,
   return true;
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

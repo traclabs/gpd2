@@ -3,8 +3,8 @@
 namespace gpd {
 namespace net {
 
-EigenClassifier::EigenClassifier(const std::string& model_file,
-                                 const std::string& weights_file,
+EigenClassifier::EigenClassifier(const std::string &model_file,
+                                 const std::string &weights_file,
                                  Classifier::Device device, int batch_size)
     : num_threads_(4) {
   double start = omp_get_wtime();
@@ -25,7 +25,7 @@ EigenClassifier::EigenClassifier(const std::string& model_file,
   dense2_ = std::make_unique<DenseLayer>(2);
 
   // Set weights and biases.
-  const std::string& params_dir = weights_file;
+  const std::string &params_dir = weights_file;
   std::vector<float> w_vec =
       readBinaryFileIntoVector(params_dir + "conv1_weights.bin");
   std::vector<float> b_vec =
@@ -57,11 +57,11 @@ EigenClassifier::EigenClassifier(const std::string& model_file,
 }
 
 std::vector<float> EigenClassifier::classifyImages(
-    const std::vector<std::unique_ptr<cv::Mat>>& image_list) {
+    const std::vector<std::unique_ptr<cv::Mat>> &image_list) {
   std::vector<float> predictions;
   predictions.resize(image_list.size());
 
-#ifdef _OPENMP  // parallelization using OpenMP
+#ifdef _OPENMP // parallelization using OpenMP
 #pragma omp parallel for num_threads(num_threads_)
 #endif
   for (int i = 0; i < image_list.size(); i++) {
@@ -78,7 +78,7 @@ std::vector<float> EigenClassifier::classifyImages(
   return predictions;
 }
 
-std::vector<float> EigenClassifier::forward(const std::vector<float>& x) {
+std::vector<float> EigenClassifier::forward(const std::vector<float> &x) {
   //  double start = omp_get_wtime();
 
   // 1st conv layer
@@ -127,17 +127,17 @@ std::vector<float> EigenClassifier::forward(const std::vector<float>& x) {
   return y;
 }
 
-std::vector<float> EigenClassifier::imageToArray(const cv::Mat& img) const {
+std::vector<float> EigenClassifier::imageToArray(const cv::Mat &img) const {
   std::vector<float> x;
   x.resize(img.channels() * img.rows * img.cols);
   int k = 0;
 
   for (int channel = 0; channel < img.channels(); channel++) {
     for (int row = 0; row < img.rows; row++) {
-      const uchar* ptr = img.ptr(row);
+      const uchar *ptr = img.ptr(row);
 
       for (int col = 0; col < img.cols; col++) {
-        const uchar* uc_pixel = ptr;
+        const uchar *uc_pixel = ptr;
         x[k] = uc_pixel[channel];
         ptr += 15;
         k++;
@@ -148,7 +148,7 @@ std::vector<float> EigenClassifier::imageToArray(const cv::Mat& img) const {
   return x;
 }
 
-Eigen::MatrixXf EigenClassifier::poolForward(const Eigen::MatrixXf& X,
+Eigen::MatrixXf EigenClassifier::poolForward(const Eigen::MatrixXf &X,
                                              int filter_size,
                                              int stride) const {
   int depth = X.rows();
@@ -182,8 +182,8 @@ Eigen::MatrixXf EigenClassifier::poolForward(const Eigen::MatrixXf& X,
   return M;
 }
 
-std::vector<float> EigenClassifier::readBinaryFileIntoVector(
-    const std::string& location) {
+std::vector<float>
+EigenClassifier::readBinaryFileIntoVector(const std::string &location) {
   std::vector<float> vals;
 
   std::ifstream file(location.c_str(), std::ios::binary | std::ios::in);
@@ -194,7 +194,7 @@ std::vector<float> EigenClassifier::readBinaryFileIntoVector(
   }
 
   float x;
-  while (file.read(reinterpret_cast<char*>(&x), sizeof(float))) {
+  while (file.read(reinterpret_cast<char *>(&x), sizeof(float))) {
     vals.push_back(x);
   }
 
@@ -203,5 +203,5 @@ std::vector<float> EigenClassifier::readBinaryFileIntoVector(
   return vals;
 }
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd

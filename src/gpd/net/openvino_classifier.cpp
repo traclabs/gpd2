@@ -12,8 +12,8 @@ std::map<Classifier::Device, InferenceEngine::TargetDevice>
         {Classifier::Device::eVPU, TargetDevice::eMYRIAD},
         {Classifier::Device::eFPGA, TargetDevice::eFPGA}};
 
-OpenVinoClassifier::OpenVinoClassifier(const std::string& model_file,
-                                       const std::string& weights_file,
+OpenVinoClassifier::OpenVinoClassifier(const std::string &model_file,
+                                       const std::string &weights_file,
                                        Classifier::Device device,
                                        int batch_size) {
   InferenceEngine::PluginDispatcher dispatcher({"../../../lib/intel64", ""});
@@ -37,11 +37,11 @@ OpenVinoClassifier::OpenVinoClassifier(const std::string& model_file,
 }
 
 std::vector<float> OpenVinoClassifier::classifyImages(
-    const std::vector<std::unique_ptr<cv::Mat>>& image_list) {
+    const std::vector<std::unique_ptr<cv::Mat>> &image_list) {
   std::vector<float> predictions(0);
   InputsDataMap input_info = network_.getInputsInfo();
 
-  for (const auto& item : input_info) {
+  for (const auto &item : input_info) {
     Blob::Ptr input = infer_request_.GetBlob(item.first);
     SizeVector dims = input->getTensorDesc().getDims();
     size_t channels = dims[1];
@@ -49,7 +49,7 @@ std::vector<float> OpenVinoClassifier::classifyImages(
     size_t cols = dims[3];
     size_t image_size = rows * cols;
     auto data =
-        input->buffer().as<PrecisionTrait<Precision::FP32>::value_type*>();
+        input->buffer().as<PrecisionTrait<Precision::FP32>::value_type *>();
     int num_iter = (int)ceil(image_list.size() / (double)getBatchSize());
 
     for (size_t i = 0; i < num_iter; i++) {
@@ -85,7 +85,7 @@ std::vector<float> OpenVinoClassifier::classifyImages(
 
       auto output_data =
           output_blob_->buffer()
-              .as<PrecisionTrait<Precision::FP32>::value_type*>();
+              .as<PrecisionTrait<Precision::FP32>::value_type *>();
       const int resultsCnt = output_blob_->size() / getBatchSize();
 
       for (int j = 0; j < n; j++) {
@@ -99,5 +99,5 @@ std::vector<float> OpenVinoClassifier::classifyImages(
 
 int OpenVinoClassifier::getBatchSize() const { return network_.getBatchSize(); }
 
-}  // namespace net
-}  // namespace gpd
+} // namespace net
+} // namespace gpd
