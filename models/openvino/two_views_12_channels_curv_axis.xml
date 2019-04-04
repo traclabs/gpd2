@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<net batch="1" name="model_lr0.0001_wd0.0005_ep20_acc86.120" version="2">
+<net batch="1" name="curvAxis12Channels" version="2">
 	<layers>
 		<layer id="0" name="0" precision="FP32" type="Input">
 			<output>

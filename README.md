@@ -104,12 +104,18 @@ of samples as large as possible.
 ![rviz screenshot](readme/views.png "Single View and Two Views")
 
 You can use this package with a single or with two depth sensors. The package
-comes with CAFFE model files for both options. You can find these files in
-*gpd/caffe/15channels*. For a single sensor, use
+comes with CAFFE model files for both. You can find these files in
+*models/caffe/15channels*. For a single sensor, use
 *single_view_15_channels.caffemodel* and for two depth sensors, use
 *two_views_15_channels_[angle]*. The *[angle]* is the angle between the two
 sensor views, as illustrated in the picture below. In the two-views setting, you
 want to register the two point clouds together before sending them to GPD.
+
+Providing the camera position to the configuration file (*.cfg) is important,
+as it enables PCL to estimate the correct normals direction (which is to point
+toward the camera). Alternatively, using the
+[ROS wrapper](https://github.com/atenpas/gpd2_ros/), multiple camera positions
+can be provided.
 
 ![rviz screenshot](readme/view_angle.png "Angle Between Sensor Views")
 
