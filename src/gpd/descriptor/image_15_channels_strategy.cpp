@@ -59,8 +59,8 @@ Image15ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
 
   for (size_t i = 0; i < kNumProjections; i++) {
     if (i > 0) {
-      points_proj.row(swap_indices[i][0]).swap(points.row(swap_indices[i][1]));
-      shadow_proj.row(swap_indices[i][0]).swap(shadow.row(swap_indices[i][1]));
+      points_proj.row(swap_indices[i][0]).swap(points_proj.row(swap_indices[i][1]));
+      shadow_proj.row(swap_indices[i][0]).swap(shadow_proj.row(swap_indices[i][1]));
     }
     std::vector<cv::Mat> channels_i =
         calculateChannels(points_proj, normals, shadow_proj);

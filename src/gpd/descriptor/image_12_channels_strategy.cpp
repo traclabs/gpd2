@@ -42,11 +42,13 @@ Image12ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
 
   Eigen::Matrix3Xd points_proj = points;
   int swap_indices[3][2] = {{-1, -1}, {0, 2}, {1, 2}};
+  // int swap_indices[3][2] = {{-1, -1}, {0, 2}, {0, 1}};
 
   for (size_t i = 0; i < kNumProjections; i++) {
     if (i > 0) {
-      points_proj.row(swap_indices[i][0]).swap(points.row(swap_indices[i][1]));
+      points_proj.row(swap_indices[i][0]).swap(points_proj.row(swap_indices[i][1]));
     }
+
     std::vector<cv::Mat> channels_i = calculateChannels(points_proj, normals);
     for (size_t j = 0; j < channels_i.size(); j++) {
       channels[i * 4 + j] = channels_i[j];
