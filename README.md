@@ -88,7 +88,7 @@ Below is a visualization of the convention that GPD uses for the grasp pose (pos
 <a name="parameters"></a>
 ## 4) Parameters
 
-Brief explanations of parameters are given in *cfg/params.cfg*.
+Brief explanations of parameters are given in *cfg/eigen_params.cfg*.
 
 The two parameters that you typically want to play with to improve on the
 number of grasps found are *workspace* and *num_samples*. The first defines the
