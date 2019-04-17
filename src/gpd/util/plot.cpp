@@ -3,6 +3,94 @@
 namespace gpd {
 namespace util {
 
+void Plot::plotHandGeometry(const candidate::Hand &hand,
+                            const PointCloudRGBA::Ptr &cloud,
+                            const candidate::HandGeometry &hand_geom,
+                            const descriptor::ImageGeometry &image_geom) {
+  Eigen::Vector3d vol_rgb(0.0, 0.8, 0.0);
+  Eigen::Vector3d hand_rgb(0.0, 0.5, 0.5);
+  PCLVisualizer viewer = createViewer("Hand Geometry");
+  plotHand3D(viewer, hand, hand_geom, 0, hand_rgb);
+  Eigen::Vector3d vol_pos =
+      hand.getPosition() + 0.5 * image_geom.depth_ * hand.getApproach();
+  Eigen::Quaterniond vol_quat(hand.getFrame());
+  plotCube(viewer, vol_pos, vol_quat, image_geom.depth_,
+           image_geom.outer_diameter_ - 2 * hand_geom.finger_width_,
+           2.0 * image_geom.height_, "volume", vol_rgb);
+
+  Eigen::Vector3d dimensions(hand_geom.depth_, hand_geom.outer_diameter_,
+                             2.0 * hand_geom.height_);
+  Eigen::Matrix3d colors;
+  colors << 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0;
+  Eigen::Vector3d center = hand.getPosition() -
+                           hand_geom.height_ * hand.getAxis() -
+                           0.5 * hand_geom.outer_diameter_ * hand.getBinormal();
+  std::vector<std::string> labels;
+  labels.push_back("hand_depth");
+  labels.push_back("hand_outer_diameter");
+  labels.push_back("hand_height");
+  addDimensions(center, hand.getOrientation(), dimensions, colors, labels,
+                viewer);
+
+  Eigen::Vector3d p = center + 2.0 * hand_geom.height_ * hand.getAxis();
+  Eigen::Vector3d q = p + hand_geom.finger_width_ * hand.getBinormal();
+  addDoubleArrow(p, q, "finger_width", Eigen::Vector3d(0.0, 1.0, 1.0), viewer);
+
+  dimensions << hand_geom.depth_, -hand_geom.outer_diameter_,
+      2.0 * hand_geom.height_;
+  colors *= 0.6;
+  center = hand.getPosition() - hand_geom.height_ * hand.getAxis() +
+           0.5 * hand_geom.outer_diameter_ * hand.getBinormal();
+  labels.resize(0);
+  labels.push_back("volume_depth");
+  labels.push_back("volume_width");
+  labels.push_back("volume_height");
+  addDimensions(center, hand.getOrientation(), dimensions, colors, labels,
+                viewer);
+
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> rgb(
+      cloud);
+  viewer->addPointCloud<pcl::PointXYZRGBA>(cloud, rgb, "cloud");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
+
+  runViewer(viewer);
+}
+
+void Plot::addDimensions(const Eigen::Vector3d &center,
+                         const Eigen::Matrix3d &rot,
+                         const Eigen::Vector3d &dimensions,
+                         const Eigen::Matrix3d &colors,
+                         const std::vector<std::string> &labels,
+                         PCLVisualizer &viewer) {
+  bool is_label_at_start[3] = {false, true, false};
+  for (size_t i = 0; i < 3; i++) {
+    Eigen::Vector3d p = center;
+    Eigen::Vector3d q = p + dimensions(i) * rot.col(i);
+    addDoubleArrow(p, q, labels[i], colors.row(i), viewer,
+                   is_label_at_start[i]);
+  }
+}
+
+void Plot::addDoubleArrow(const Eigen::Vector3d &start,
+                          const Eigen::Vector3d &end, const std::string &label,
+                          const Eigen::Vector3d &rgb, PCLVisualizer &viewer,
+                          bool is_label_at_start) {
+  pcl::PointXYZRGB p;
+  pcl::PointXYZRGB q;
+  p.getVector3fMap() = start.cast<float>();
+  q.getVector3fMap() = end.cast<float>();
+  viewer->addArrow(p, q, rgb[0], rgb[1], rgb[2], false,
+                   label + std::to_string(0));
+  viewer->addArrow(q, p, rgb[0], rgb[1], rgb[2], false,
+                   label + std::to_string(1));
+  if (is_label_at_start) {
+    viewer->addText3D(label, p, 0.008, rgb[0], rgb[1], rgb[2]);
+  } else {
+    viewer->addText3D(label, q, 0.008, rgb[0], rgb[1], rgb[2]);
+  }
+}
+
 void Plot::plotVolumes3D(
     const std::vector<std::unique_ptr<candidate::HandSet>> &hand_set_list,
     const PointCloudRGBA::Ptr &cloud, std::string str, double outer_diameter,
@@ -34,7 +122,7 @@ void Plot::plotVolumes3D(
       Eigen::Vector3d vol_pos = hands[j]->getPosition() +
                                 0.5 * volume_depth * hands[j]->getApproach();
       Eigen::Quaterniond vol_quat(hands[i]->getFrame());
-      std::string num = boost::lexical_cast<std::string>(idx);
+      std::string num = std::to_string(idx);
       plotCube(viewer, vol_pos, vol_quat, volume_depth, volume_width,
                volume_height, "volume_" + num, vol_rgb);
     }
@@ -70,7 +158,7 @@ void Plot::plotVolumes3D(
     Eigen::Vector3d vol_pos = hand_list[i]->getPosition() +
                               0.5 * volume_depth * hand_list[i]->getApproach();
     Eigen::Quaterniond vol_quat(hand_list[i]->getFrame());
-    std::string num = boost::lexical_cast<std::string>(i);
+    std::string num = std::to_string(i);
     plotCube(viewer, vol_pos, vol_quat, volume_depth, volume_width,
              volume_height, "volume_" + num, vol_rgb);
   }
@@ -317,7 +405,7 @@ void Plot::plotHand3D(PCLVisualizer &viewer, const candidate::Hand &hand,
   Eigen::Vector3d approach_center = base_center - 0.04 * hand.getApproach();
 
   const Eigen::Quaterniond quat(hand.getFrame());
-  const std::string num = boost::lexical_cast<std::string>(idx);
+  const std::string num = std::to_string(idx);
 
   plotCube(viewer, left_center, quat, hand_depth, finger_width, hand_height,
            "left_finger_" + num, rgb);
@@ -414,7 +502,7 @@ void Plot::plotSamples(const PointCloudRGBA::Ptr &samples_cloud,
   runViewer(viewer);
 }
 
-void Plot::plotNormals(const Cloud &cloud_cam) {
+void Plot::plotNormals(const Cloud &cloud_cam, bool draw_camera_cone) {
   const int num_clouds = cloud_cam.getViewPoints().cols();
   std::vector<PointCloudPointNormal::Ptr> clouds;
   clouds.resize(num_clouds);
@@ -449,8 +537,8 @@ void Plot::plotNormals(const Cloud &cloud_cam) {
   PCLVisualizer viewer = createViewer("Normals");
   viewer->setBackgroundColor(0.1, 0.1, 0.1);
   for (int i = 0; i < num_clouds; i++) {
-    std::string cloud_name = "cloud_" + boost::lexical_cast<std::string>(i);
-    std::string normals_name = "normals_" + boost::lexical_cast<std::string>(i);
+    std::string cloud_name = "cloud_" + std::to_string(i);
+    std::string normals_name = "normals_" + std::to_string(i);
     int color_id = i % 6;
     viewer->addPointCloud<pcl::PointNormal>(clouds[i], cloud_name);
     viewer->addPointCloudNormals<pcl::PointNormal>(clouds[i], 1, 0.01,
@@ -463,26 +551,28 @@ void Plot::plotNormals(const Cloud &cloud_cam) {
         normal_colors[color_id][1], normal_colors[color_id][2], normals_name);
 
     // draw camera position as a cube
-    const Eigen::Vector3d &cam_pos = cloud_cam.getViewPoints().col(i);
-    Eigen::Vector4f centroid_4d;
-    pcl::compute3DCentroid(*clouds[i], centroid_4d);
-    Eigen::Vector3d centroid;
-    centroid << centroid_4d(0), centroid_4d(1), centroid_4d(2);
-    Eigen::Vector3d cone_dir = centroid - cam_pos;
-    cone_dir.normalize();
-    pcl::ModelCoefficients coeffs;
-    coeffs.values.push_back(cam_pos(0));
-    coeffs.values.push_back(cam_pos(1));
-    coeffs.values.push_back(cam_pos(2));
-    coeffs.values.push_back(cone_dir(0));
-    coeffs.values.push_back(cone_dir(1));
-    coeffs.values.push_back(cone_dir(2));
-    coeffs.values.push_back(20.0);
-    std::string cone_name = "cam" + boost::lexical_cast<std::string>(i);
-    viewer->addCone(coeffs, cone_name, 0);
-    viewer->setShapeRenderingProperties(
-        pcl::visualization::PCL_VISUALIZER_COLOR, normal_colors[color_id][0],
-        normal_colors[color_id][1], normal_colors[color_id][2], cone_name);
+    if (draw_camera_cone) {
+      const Eigen::Vector3d &cam_pos = cloud_cam.getViewPoints().col(i);
+      Eigen::Vector4f centroid_4d;
+      pcl::compute3DCentroid(*clouds[i], centroid_4d);
+      Eigen::Vector3d centroid;
+      centroid << centroid_4d(0), centroid_4d(1), centroid_4d(2);
+      Eigen::Vector3d cone_dir = centroid - cam_pos;
+      cone_dir.normalize();
+      pcl::ModelCoefficients coeffs;
+      coeffs.values.push_back(cam_pos(0));
+      coeffs.values.push_back(cam_pos(1));
+      coeffs.values.push_back(cam_pos(2));
+      coeffs.values.push_back(cone_dir(0));
+      coeffs.values.push_back(cone_dir(1));
+      coeffs.values.push_back(cone_dir(2));
+      coeffs.values.push_back(20.0);
+      std::string cone_name = "cam" + std::to_string(i);
+      viewer->addCone(coeffs, cone_name, 0);
+      viewer->setShapeRenderingProperties(
+          pcl::visualization::PCL_VISUALIZER_COLOR, normal_colors[color_id][0],
+          normal_colors[color_id][1], normal_colors[color_id][2], cone_name);
+    }
   }
 
   runViewer(viewer);
@@ -597,7 +687,7 @@ void Plot::plotLocalAxes(const std::vector<candidate::LocalFrame> &frames,
     r.x = p.x + 0.02 * frame.getNormal()(0);
     r.y = p.y + 0.02 * frame.getNormal()(1);
     r.z = p.z + 0.02 * frame.getNormal()(2);
-    const std::string str_id = boost::lexical_cast<std::string>(i);
+    const std::string str_id = std::to_string(i);
     viewer->addLine<pcl::PointXYZ>(p, q, 0, 0, 255, "curvature_axis_" + str_id);
     viewer->addLine<pcl::PointXYZ>(p, r, 255, 0, 0, "normal_axis_" + str_id);
   }
@@ -707,19 +797,5 @@ pcl::PointXYZRGBA Plot::eigenVector3dToPointXYZRGBA(const Eigen::Vector3d &v) {
   return p;
 }
 
-void Plot::setPointColor(const candidate::Hand &hand, pcl::PointXYZRGBA &p) {
-  p.a = 128;
-
-  if (hand.isFullAntipodal()) {
-    p.r = 0;
-    p.g = 255;
-    p.b = 0;
-  } else {
-    p.r = 255;
-    p.g = 0;
-    p.b = 0;
-  }
-}
-
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd

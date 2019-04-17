@@ -66,7 +66,7 @@ struct Instance {
 };
 
 class DataGenerator {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param node ROS node handle
@@ -85,7 +85,7 @@ public:
                                    const std::vector<int> angles,
                                    int reference_camera) const;
 
-private:
+ private:
   void createDatasetsHDF5(const std::string &filepath, int num_data);
 
   /**
@@ -102,16 +102,16 @@ private:
    * \param cloud_folder location of the folder
    * \return list of point cloud files
    */
-  std::vector<boost::filesystem::path>
-  loadPointCloudFiles(const std::string &cloud_folder);
+  std::vector<boost::filesystem::path> loadPointCloudFiles(
+      const std::string &cloud_folder);
 
   /**
    * \brief Load object names from a file.
    * \param objects_file_location location of the file
    * \return list of object names
    */
-  std::vector<std::string>
-  loadObjectNames(const std::string &objects_file_location);
+  std::vector<std::string> loadObjectNames(
+      const std::string &objects_file_location);
 
   void splitInstances(const std::vector<int> &labels,
                       std::vector<int> &positives, std::vector<int> &negatives);
@@ -168,7 +168,7 @@ private:
                                    const std::string &dsname) const;
 
   std::unique_ptr<GraspDetector>
-      detector_; ///< object to generate grasp candidates and images
+      detector_;  ///< object to generate grasp candidates and images
 
   std::string data_root_;
   std::string objects_file_location_;
@@ -186,6 +186,6 @@ private:
   static const std::string LABELS_DS_NAME;
 };
 
-} // namespace gpd
+}  // namespace gpd
 
 #endif /* GENERATOR_H_ */

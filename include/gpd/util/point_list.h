@@ -55,7 +55,7 @@ namespace util {
  *
  */
 class PointList {
-public:
+ public:
   /**
    * \brief Default constructor.
    */
@@ -71,7 +71,9 @@ public:
   PointList(const Eigen::Matrix3Xd &points, const Eigen::Matrix3Xd &normals,
             const Eigen::MatrixXi &cam_source,
             const Eigen::Matrix3Xd &view_points)
-      : points_(points), normals_(normals), cam_source_(cam_source),
+      : points_(points),
+        normals_(normals),
+        cam_source_(cam_source),
         view_points_(view_points) {}
 
   /**
@@ -174,14 +176,14 @@ public:
   // https://eigen.tuxfamily.org/dox/group__TopicStructHavingEigenMembers.html.
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-private:
+ private:
   Eigen::Matrix3Xd points_;
   Eigen::Matrix3Xd normals_;
-  Eigen::MatrixXi cam_source_; // camera source (k x n matrix of 1s and 0s)
+  Eigen::MatrixXi cam_source_;  // camera source (k x n matrix of 1s and 0s)
   Eigen::Matrix3Xd view_points_;
 };
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd
 
 #endif /* POINT_LIST_H_ */

@@ -63,7 +63,8 @@
 // The hash and equality functions below are necessary for boost's unordered
 // set.
 namespace boost {
-template <> struct hash<Eigen::Vector3i> {
+template <>
+struct hash<Eigen::Vector3i> {
   inline size_t operator()(Eigen::Vector3i const &v) const {
     std::size_t seed = 0;
 
@@ -74,7 +75,7 @@ template <> struct hash<Eigen::Vector3i> {
     return seed;
   }
 };
-} // namespace boost
+}  // namespace boost
 
 namespace gpd {
 namespace candidate {
@@ -106,7 +107,7 @@ typedef boost::unordered_set<Eigen::Vector3i, boost::hash<Eigen::Vector3i>,
  *
  */
 class HandSet {
-public:
+ public:
   /**
    * Constructor.
    */
@@ -205,7 +206,7 @@ public:
    */
   void setIsValidWithIndex(int idx, bool val) { is_valid_[idx] = val; }
 
-private:
+ private:
   /**
    * \brief Calculate a single shadow.
    * \param[in] points the list of points for which the shadow is calculated
@@ -259,9 +260,8 @@ private:
    * \param voxel_grid_size the size of the voxel grid
    * \return the shadow points
    */
-  Eigen::Matrix3Xd
-  shadowVoxelsToPoints(const std::vector<Eigen::Vector3i> &voxels,
-                       double voxel_grid_size) const;
+  Eigen::Matrix3Xd shadowVoxelsToPoints(
+      const std::vector<Eigen::Vector3i> &voxels, double voxel_grid_size) const;
 
   /**
    * \brief Calculate the intersection of two shadows.
@@ -280,31 +280,31 @@ private:
    */
   inline int fastrand() const;
 
-  Eigen::Vector3d sample_; ///< the center of the point neighborhood
-  Eigen::Matrix3d frame_;  ///< the local reference frame
+  Eigen::Vector3d sample_;  ///< the center of the point neighborhood
+  Eigen::Matrix3d frame_;   ///< the local reference frame
   std::vector<std::unique_ptr<Hand>>
-      hands_; ///< the grasp candidates contained in this set
+      hands_;  ///< the grasp candidates contained in this set
   Eigen::Array<bool, 1, Eigen::Dynamic>
-      is_valid_; ///< indicates for each grasp candidate if it is valid or not
+      is_valid_;  ///< indicates for each grasp candidate if it is valid or not
   Eigen::VectorXd
-      angles_;       ///< the hand orientations to consider in the local search
-  bool deepen_hand_; ///< if the hand is pushed forward onto the object
-  int num_finger_placements_; ///< the number of finger placements to evaluate
+      angles_;        ///< the hand orientations to consider in the local search
+  bool deepen_hand_;  ///< if the hand is pushed forward onto the object
+  int num_finger_placements_;  ///< the number of finger placements to evaluate
 
-  HandGeometry hand_geometry_; ///< the robot hand geometry
-  std::vector<int> hand_axes_; ///< the axes about which the hand frame is
-                               /// rotated to evaluate different orientations
+  HandGeometry hand_geometry_;  ///< the robot hand geometry
+  std::vector<int> hand_axes_;  ///< the axes about which the hand frame is
+                                /// rotated to evaluate different orientations
 
   Antipodal &antipodal_;
 
-  static int seed_; ///< seed for the random generator in fastrand()
+  static int seed_;  ///< seed for the random generator in fastrand()
 
-  static const Eigen::Vector3d AXES[3]; ///< standard rotation axes
+  static const Eigen::Vector3d AXES[3];  ///< standard rotation axes
 
-  static const bool MEASURE_TIME; ///< if runtime is measured
+  static const bool MEASURE_TIME;  ///< if runtime is measured
 };
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd
 
 #endif /* HAND_SET_H_ */

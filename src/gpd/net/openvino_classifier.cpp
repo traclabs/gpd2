@@ -99,5 +99,5 @@ std::vector<float> OpenVinoClassifier::classifyImages(
 
 int OpenVinoClassifier::getBatchSize() const { return network_.getBatchSize(); }
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd

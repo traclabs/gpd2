@@ -8,10 +8,9 @@
 namespace gpd {
 namespace descriptor {
 
-std::unique_ptr<ImageStrategy>
-ImageStrategy::makeImageStrategy(const ImageGeometry &image_params,
-                                 int num_threads, int num_orientations,
-                                 bool is_plotting) {
+std::unique_ptr<ImageStrategy> ImageStrategy::makeImageStrategy(
+    const ImageGeometry &image_params, int num_threads, int num_orientations,
+    bool is_plotting) {
   std::unique_ptr<ImageStrategy> strategy;
   if (image_params.num_channels_ == 1) {
     strategy = std::make_unique<Image1ChannelsStrategy>(
@@ -30,9 +29,8 @@ ImageStrategy::makeImageStrategy(const ImageGeometry &image_params,
   return strategy;
 }
 
-Matrix3XdPair
-ImageStrategy::transformToUnitImage(const util::PointList &point_list,
-                                    const candidate::Hand &hand) const {
+Matrix3XdPair ImageStrategy::transformToUnitImage(
+    const util::PointList &point_list, const candidate::Hand &hand) const {
   // 1. Transform points and normals in neighborhood into the hand frame.
   const Eigen::Matrix3Xd rotation = hand.getFrame().transpose();
   const Eigen::Vector3d &sample = hand.getSample();
@@ -52,9 +50,8 @@ ImageStrategy::transformToUnitImage(const util::PointList &point_list,
   return points_normals;
 }
 
-std::vector<int>
-ImageStrategy::findPointsInUnitImage(const candidate::Hand &hand,
-                                     const Eigen::Matrix3Xd &points) const {
+std::vector<int> ImageStrategy::findPointsInUnitImage(
+    const candidate::Hand &hand, const Eigen::Matrix3Xd &points) const {
   std::vector<int> indices;
   const double half_outer_diameter = image_params_.outer_diameter_ / 2.0;
 
@@ -92,8 +89,8 @@ Eigen::Matrix3Xd ImageStrategy::transformPointsToUnitImage(
   return points_out;
 }
 
-Eigen::VectorXi
-ImageStrategy::findCellIndices(const Eigen::Matrix3Xd &points) const {
+Eigen::VectorXi ImageStrategy::findCellIndices(
+    const Eigen::Matrix3Xd &points) const {
   double cellsize = 1.0 / (double)image_params_.size_;
   const Eigen::VectorXi vertical_cells =
       (floorVector(points.row(0) / cellsize)).cwiseMin(image_params_.size_ - 1);
@@ -104,8 +101,8 @@ ImageStrategy::findCellIndices(const Eigen::Matrix3Xd &points) const {
   return cell_indices;
 }
 
-cv::Mat
-ImageStrategy::createBinaryImage(const Eigen::VectorXi &cell_indices) const {
+cv::Mat ImageStrategy::createBinaryImage(
+    const Eigen::VectorXi &cell_indices) const {
   cv::Mat image(image_params_.size_, image_params_.size_, CV_8UC1,
                 cv::Scalar(0));
 
@@ -124,9 +121,9 @@ ImageStrategy::createBinaryImage(const Eigen::VectorXi &cell_indices) const {
   return image;
 }
 
-cv::Mat
-ImageStrategy::createNormalsImage(const Eigen::Matrix3Xd &normals,
-                                  const Eigen::VectorXi &cell_indices) const {
+cv::Mat ImageStrategy::createNormalsImage(
+    const Eigen::Matrix3Xd &normals,
+    const Eigen::VectorXi &cell_indices) const {
   cv::Mat image(image_params_.size_, image_params_.size_, CV_32FC3,
                 cv::Scalar(0.0));
 
@@ -158,9 +155,8 @@ ImageStrategy::createNormalsImage(const Eigen::Matrix3Xd &normals,
   return image;
 }
 
-cv::Mat
-ImageStrategy::createDepthImage(const Eigen::Matrix3Xd &points,
-                                const Eigen::VectorXi &cell_indices) const {
+cv::Mat ImageStrategy::createDepthImage(
+    const Eigen::Matrix3Xd &points, const Eigen::VectorXi &cell_indices) const {
   cv::Mat image(image_params_.size_, image_params_.size_, CV_32FC1,
                 cv::Scalar(0.0));
   float avgs[image_params_.size_ * image_params_.size_] = {0};
@@ -194,9 +190,8 @@ ImageStrategy::createDepthImage(const Eigen::Matrix3Xd &points,
   return image;
 }
 
-cv::Mat
-ImageStrategy::createShadowImage(const Eigen::Matrix3Xd &points,
-                                 const Eigen::VectorXi &cell_indices) const {
+cv::Mat ImageStrategy::createShadowImage(
+    const Eigen::Matrix3Xd &points, const Eigen::VectorXi &cell_indices) const {
   // Calculate average depth image.
   cv::Mat image(image_params_.size_, image_params_.size_, CV_32FC1,
                 cv::Scalar(0.0));
@@ -247,5 +242,5 @@ Eigen::VectorXi ImageStrategy::floorVector(const Eigen::VectorXd &a) const {
   return b;
 }
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd

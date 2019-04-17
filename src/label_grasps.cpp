@@ -78,7 +78,7 @@ int DoMain(int argc, char *argv[]) {
   cloud.filterWorkspace(workspace);
   cloud.voxelizeCloud(VOXEL_SIZE);
   cloud.calculateNormals(num_threads);
-  cloud.setNormals(cloud.getNormals() * (-1.0)); // TODO: do not do this!
+  cloud.setNormals(cloud.getNormals() * (-1.0));  // TODO: do not do this!
   if (sample_above_plane) {
     cloud.sampleAbovePlane();
   }
@@ -121,9 +121,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-} // namespace detect_grasps
-} // namespace apps
-} // namespace gpd
+}  // namespace detect_grasps
+}  // namespace apps
+}  // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::detect_grasps::DoMain(argc, argv);

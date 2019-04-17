@@ -85,5 +85,5 @@ std::string Hand::vectorToString(const Eigen::VectorXd &v) const {
   return s;
 }
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd

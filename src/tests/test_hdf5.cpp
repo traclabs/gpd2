@@ -7,7 +7,7 @@ static void write_root_group_single_channel() {
   std::cout << "write_root_group_single_channel\n";
   String filename = "root_group_single_channel.h5";
   String dataset_name =
-      "/single"; // Note that it is a child of the root group /
+      "/single";  // Note that it is a child of the root group /
   // prepare data
   Mat data;
   data = (cv::Mat_<float>(2, 3) << 0, 1, 2, 3, 4, 5, 6);
@@ -32,8 +32,7 @@ static void write_single_channel() {
   data = (cv::Mat_<float>(2, 3) << 0, 1, 2, 3, 4, 5);
   Ptr<hdf::HDF5> h5io = hdf::open(filename);
   // first we need to create the parent group
-  if (!h5io->hlexists(parent_name))
-    h5io->grcreate(parent_name);
+  if (!h5io->hlexists(parent_name)) h5io->grcreate(parent_name);
   // create the dataset if it not exists
   if (!h5io->hlexists(dataset_name))
     h5io->dscreate(data.rows, data.cols, data.type(), dataset_name);
@@ -64,8 +63,7 @@ static void write_multiple_channels() {
     ((int *)data.data)[i] = (int)i;
   Ptr<hdf::HDF5> h5io = hdf::open(filename);
   // first we need to create the parent group
-  if (!h5io->hlexists(parent_name))
-    h5io->grcreate(parent_name);
+  if (!h5io->hlexists(parent_name)) h5io->grcreate(parent_name);
   // create the dataset if it not exists
   if (!h5io->hlexists(dataset_name))
     h5io->dscreate(data.rows, data.cols, data.type(), dataset_name);

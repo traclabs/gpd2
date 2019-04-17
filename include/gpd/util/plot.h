@@ -37,6 +37,7 @@
 #include <gpd/candidate/hand.h>
 #include <gpd/candidate/hand_set.h>
 #include <gpd/candidate/local_frame.h>
+#include <gpd/descriptor/image_geometry.h>
 #include <gpd/util/cloud.h>
 
 namespace gpd {
@@ -56,7 +57,7 @@ typedef boost::shared_ptr<pcl::visualization::PCLVisualizer> PCLVisualizer;
  *
  */
 class Plot {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param num_axes the number of orientation axes
@@ -64,6 +65,11 @@ public:
    */
   Plot(int num_axes, int num_orientations)
       : num_axes_(num_axes), num_orientations_(num_orientations) {}
+
+  void plotHandGeometry(const candidate::Hand &hand,
+                        const PointCloudRGBA::Ptr &cloud,
+                        const candidate::HandGeometry &hand_geom,
+                        const descriptor::ImageGeometry &image_geom);
 
   /**
    * \brief Plot a list of hand sets and their associated volumes.
@@ -120,22 +126,20 @@ public:
                      bool draw_all = false, int num_axes = 1,
                      int num_orientations = 8);
 
-  void
-  plotFingers3D(const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
-                const PointCloudRGBA::Ptr &cloud, const std::string &str,
-                const candidate::HandGeometry &geometry,
-                bool use_same_color = true);
+  void plotFingers3D(
+      const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+      const PointCloudRGBA::Ptr &cloud, const std::string &str,
+      const candidate::HandGeometry &geometry, bool use_same_color = true);
 
   void plotAntipodalHands(
       const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
       const PointCloudRGBA::Ptr &cloud, const std::string &str,
       const candidate::HandGeometry &geometry);
 
-  void
-  plotValidHands(const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
-                 const PointCloudRGBA::Ptr &cloud,
-                 const PointCloudRGBA::Ptr &mesh, const std::string &str,
-                 const candidate::HandGeometry &geometry);
+  void plotValidHands(
+      const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+      const PointCloudRGBA::Ptr &cloud, const PointCloudRGBA::Ptr &mesh,
+      const std::string &str, const candidate::HandGeometry &geometry);
 
   /**
    * \brief Plot a list of grasps with 3D cubes.
@@ -177,7 +181,7 @@ public:
   void plotSamples(const PointCloudRGBA::Ptr &samples_cloud,
                    const PointCloudRGBA::Ptr &cloud);
 
-  void plotNormals(const util::Cloud &cloud_cam);
+  void plotNormals(const util::Cloud &cloud_cam, bool draw_camera_cone = false);
 
   void plotNormals(const PointCloudRGBA::Ptr &cloud,
                    const PointCloudRGBA::Ptr &cloud_samples,
@@ -224,7 +228,17 @@ public:
   void plotCloud(const PointCloudRGBA::Ptr &cloud_rgb,
                  const std::string &title);
 
-private:
+ private:
+  void addDimensions(const Eigen::Vector3d &center, const Eigen::Matrix3d &rot,
+                     const Eigen::Vector3d &dimensions,
+                     const Eigen::Matrix3d &colors,
+                     const std::vector<std::string> &labels,
+                     PCLVisualizer &viewer);
+
+  void addDoubleArrow(const Eigen::Vector3d &start, const Eigen::Vector3d &end,
+                      const std::string &label, const Eigen::Vector3d &rgb,
+                      PCLVisualizer &viewer, bool is_label_at_start = false);
+
   void plotHand3D(PCLVisualizer &viewer, const candidate::Hand &hand,
                   const candidate::HandGeometry &geometry, int idx,
                   const Eigen::Vector3d &rgb);
@@ -278,13 +292,6 @@ private:
   pcl::PointXYZRGBA eigenVector3dToPointXYZRGBA(const Eigen::Vector3d &v);
 
   /**
-   * \brief Set the color of a point.
-   * \param hand the grasp that the point belongs to
-   * \param p the point for which the color is set
-   */
-  void setPointColor(const candidate::Hand &hand, pcl::PointXYZRGBA &p);
-
-  /**
    * \brief Add a point cloud with normals to a PCL visualizer.
    * \param viewer the PCL visualizer that the cloud is added to
    * \param cloud the cloud to be added
@@ -320,7 +327,7 @@ private:
   int num_axes_;
 };
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd
 
 #endif /* PLOT_H */

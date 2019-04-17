@@ -3,9 +3,9 @@
 namespace gpd {
 namespace descriptor {
 
-std::vector<std::unique_ptr<cv::Mat>>
-Image15ChannelsStrategy::createImages(const candidate::HandSet &hand_set,
-                                      const util::PointList &nn_points) const {
+std::vector<std::unique_ptr<cv::Mat>> Image15ChannelsStrategy::createImages(
+    const candidate::HandSet &hand_set,
+    const util::PointList &nn_points) const {
   const std::vector<std::unique_ptr<candidate::Hand>> &hands =
       hand_set.getHands();
   std::vector<std::unique_ptr<cv::Mat>> images(hands.size());
@@ -44,10 +44,9 @@ void Image15ChannelsStrategy::createImage(const util::PointList &point_list,
                          cropped_shadow_points);
 }
 
-cv::Mat
-Image15ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
-                                        const Eigen::Matrix3Xd &normals,
-                                        const Eigen::Matrix3Xd &shadow) const {
+cv::Mat Image15ChannelsStrategy::calculateImage(
+    const Eigen::Matrix3Xd &points, const Eigen::Matrix3Xd &normals,
+    const Eigen::Matrix3Xd &shadow) const {
   double t = omp_get_wtime();
   const int kNumProjections = 3;
 
@@ -59,8 +58,10 @@ Image15ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
 
   for (size_t i = 0; i < kNumProjections; i++) {
     if (i > 0) {
-      points_proj.row(swap_indices[i][0]).swap(points_proj.row(swap_indices[i][1]));
-      shadow_proj.row(swap_indices[i][0]).swap(shadow_proj.row(swap_indices[i][1]));
+      points_proj.row(swap_indices[i][0])
+          .swap(points_proj.row(swap_indices[i][1]));
+      shadow_proj.row(swap_indices[i][0])
+          .swap(shadow_proj.row(swap_indices[i][1]));
     }
     std::vector<cv::Mat> channels_i =
         calculateChannels(points_proj, normals, shadow_proj);
@@ -139,5 +140,5 @@ void Image15ChannelsStrategy::showImage(const cv::Mat &image) const {
   cv::waitKey(0);
 }
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd

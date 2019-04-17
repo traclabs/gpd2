@@ -19,8 +19,10 @@ Cloud::Cloud()
 Cloud::Cloud(const PointCloudRGB::Ptr &cloud,
              const Eigen::MatrixXi &camera_source,
              const Eigen::Matrix3Xd &view_points)
-    : cloud_processed_(new PointCloudRGB), cloud_original_(new PointCloudRGB),
-      camera_source_(camera_source), view_points_(view_points) {
+    : cloud_processed_(new PointCloudRGB),
+      cloud_original_(new PointCloudRGB),
+      camera_source_(camera_source),
+      view_points_(view_points) {
   sample_indices_.resize(0);
   samples_.resize(3, 0);
   normals_.resize(3, 0);
@@ -32,8 +34,10 @@ Cloud::Cloud(const PointCloudRGB::Ptr &cloud,
 Cloud::Cloud(const PointCloudPointNormal::Ptr &cloud,
              const Eigen::MatrixXi &camera_source,
              const Eigen::Matrix3Xd &view_points)
-    : cloud_processed_(new PointCloudRGB), cloud_original_(new PointCloudRGB),
-      camera_source_(camera_source), view_points_(view_points) {
+    : cloud_processed_(new PointCloudRGB),
+      cloud_original_(new PointCloudRGB),
+      camera_source_(camera_source),
+      view_points_(view_points) {
   sample_indices_.resize(0);
   samples_.resize(3, 0);
   normals_.resize(3, 0);
@@ -44,7 +48,8 @@ Cloud::Cloud(const PointCloudPointNormal::Ptr &cloud,
 
 Cloud::Cloud(const PointCloudPointNormal::Ptr &cloud, int size_left_cloud,
              const Eigen::Matrix3Xd &view_points)
-    : cloud_processed_(new PointCloudRGB), cloud_original_(new PointCloudRGB),
+    : cloud_processed_(new PointCloudRGB),
+      cloud_original_(new PointCloudRGB),
       view_points_(view_points) {
   sample_indices_.resize(0);
   samples_.resize(3, 0);
@@ -53,10 +58,10 @@ Cloud::Cloud(const PointCloudPointNormal::Ptr &cloud, int size_left_cloud,
   *cloud_processed_ = *cloud_original_;
 
   // set the camera source matrix: (i,j) = 1 if point j is seen by camera i
-  if (size_left_cloud == 0) // one camera
+  if (size_left_cloud == 0)  // one camera
   {
     camera_source_ = Eigen::MatrixXi::Ones(1, cloud->size());
-  } else // two cameras
+  } else  // two cameras
   {
     int size_right_cloud = cloud->size() - size_left_cloud;
     camera_source_ = Eigen::MatrixXi::Zero(2, cloud->size());
@@ -75,17 +80,18 @@ Cloud::Cloud(const PointCloudPointNormal::Ptr &cloud, int size_left_cloud,
 
 Cloud::Cloud(const PointCloudRGB::Ptr &cloud, int size_left_cloud,
              const Eigen::Matrix3Xd &view_points)
-    : cloud_processed_(cloud), cloud_original_(cloud),
+    : cloud_processed_(cloud),
+      cloud_original_(cloud),
       view_points_(view_points) {
   sample_indices_.resize(0);
   samples_.resize(3, 0);
   normals_.resize(3, 0);
 
   // set the camera source matrix: (i,j) = 1 if point j is seen by camera i
-  if (size_left_cloud == 0) // one camera
+  if (size_left_cloud == 0)  // one camera
   {
     camera_source_ = Eigen::MatrixXi::Ones(1, cloud->size());
-  } else // two cameras
+  } else  // two cameras
   {
     int size_right_cloud = cloud->size() - size_left_cloud;
     camera_source_ = Eigen::MatrixXi::Zero(2, cloud->size());
@@ -97,7 +103,8 @@ Cloud::Cloud(const PointCloudRGB::Ptr &cloud, int size_left_cloud,
 }
 
 Cloud::Cloud(const std::string &filename, const Eigen::Matrix3Xd &view_points)
-    : cloud_processed_(new PointCloudRGB), cloud_original_(new PointCloudRGB),
+    : cloud_processed_(new PointCloudRGB),
+      cloud_original_(new PointCloudRGB),
       view_points_(view_points) {
   sample_indices_.resize(0);
   samples_.resize(3, 0);
@@ -112,7 +119,8 @@ Cloud::Cloud(const std::string &filename, const Eigen::Matrix3Xd &view_points)
 Cloud::Cloud(const std::string &filename_left,
              const std::string &filename_right,
              const Eigen::Matrix3Xd &view_points)
-    : cloud_processed_(new PointCloudRGB), cloud_original_(new PointCloudRGB),
+    : cloud_processed_(new PointCloudRGB),
+      cloud_original_(new PointCloudRGB),
       view_points_(view_points) {
   sample_indices_.resize(0);
   samples_.resize(3, 0);
@@ -537,14 +545,14 @@ void Cloud::reverseNormals() {
     bool needs_reverse = true;
 
     for (int j = 0; j < view_points_.cols(); j++) {
-      if (camera_source_(j, i) == 1) // point is seen by this camera
+      if (camera_source_(j, i) == 1)  // point is seen by this camera
       {
         Eigen::Vector3d cam_to_point =
             cloud_processed_->at(i).getVector3fMap().cast<double>() -
             view_points_.col(j);
 
         if (normals_.col(i).dot(cam_to_point) <
-            0) // normal points toward camera
+            0)  // normal points toward camera
         {
           needs_reverse = false;
           break;
@@ -567,10 +575,10 @@ std::vector<std::vector<int>> Cloud::convertCameraSourceMatrixToLists() {
 
   for (int i = 0; i < camera_source_.cols(); i++) {
     for (int j = 0; j < view_points_.cols(); j++) {
-      if (camera_source_(j, i) == 1) // point is seen by this camera
+      if (camera_source_(j, i) == 1)  // point is seen by this camera
       {
         indices[j].push_back(i);
-        break; // TODO: multiple cameras
+        break;  // TODO: multiple cameras
       }
     }
   }
@@ -599,8 +607,8 @@ void Cloud::setNormalsFromFile(const std::string &filename) {
   }
 }
 
-PointCloudRGB::Ptr
-Cloud::loadPointCloudFromFile(const std::string &filename) const {
+PointCloudRGB::Ptr Cloud::loadPointCloudFromFile(
+    const std::string &filename) const {
   PointCloudRGB::Ptr cloud(new PointCloudRGB);
   std::string extension = filename.substr(filename.size() - 3);
   printf("extension: %s\n", extension.c_str());
@@ -620,5 +628,5 @@ Cloud::loadPointCloudFromFile(const std::string &filename) const {
 
 void Cloud::setSamples(const Eigen::Matrix3Xd &samples) { samples_ = samples; }
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd

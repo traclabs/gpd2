@@ -195,6 +195,7 @@ target_link_libraries(${PROJECT_NAME}_hand_search
 target_link_libraries(${PROJECT_NAME}_plot
   ${PROJECT_NAME}_cloud
   ${PROJECT_NAME}_hand_set
+  ${PROJECT_NAME}_image_geometry
 ${PROJECT_NAME}_local_frame)
 
 target_link_libraries(${PROJECT_NAME}_candidates_generator

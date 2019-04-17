@@ -50,12 +50,13 @@ namespace candidate {
  *\brief Label information
  */
 struct Label {
-  double score_{0.0};          ///< the score given by the classifier
-  bool full_antipodal_{false}; ///< whether the grasp is antipodal
-  bool half_antipodal_{false}; ///< whether the grasp is indeterminate
+  double score_{0.0};           ///< the score given by the classifier
+  bool full_antipodal_{false};  ///< whether the grasp is antipodal
+  bool half_antipodal_{false};  ///< whether the grasp is indeterminate
 
   Label(double score, bool full_antipodal, bool half_antipodal)
-      : score_(score), full_antipodal_(full_antipodal),
+      : score_(score),
+        full_antipodal_(full_antipodal),
         half_antipodal_(half_antipodal) {}
 };
 
@@ -77,7 +78,7 @@ struct BoundingBox {
  *
  */
 class Hand {
-public:
+ public:
   /**
    * \brief Default constructor.
    */
@@ -248,7 +249,7 @@ public:
    */
   int getFingerPlacementIndex() const { return finger_placement_index_; }
 
-private:
+ private:
   /**
    * \brief Calculate grasp positions (bottom, top, surface).
    * \param finger_hand the FingerHand object describing a feasible finger
@@ -263,19 +264,19 @@ private:
    */
   std::string vectorToString(const Eigen::VectorXd &v) const;
 
-  Eigen::Vector3d position_; ///< grasp position (bottom center of robot hand)
-  Eigen::Matrix3d orientation_; ///< grasp orientation (rotation of robot hand)
+  Eigen::Vector3d position_;  ///< grasp position (bottom center of robot hand)
+  Eigen::Matrix3d orientation_;  ///< grasp orientation (rotation of robot hand)
 
-  Eigen::Vector3d sample_; ///< the sample at which the grasp was found
-  double grasp_width_;     ///< the width of object enclosed by the fingers
+  Eigen::Vector3d sample_;  ///< the sample at which the grasp was found
+  double grasp_width_;      ///< the width of object enclosed by the fingers
 
-  Label label_;                ///< labeling information
-  int finger_placement_index_; ///< index of the finger placement that resulted
-                               /// in this grasp
-  BoundingBox closing_box_;    ///< defines region surrounded by fingers
+  Label label_;                 ///< labeling information
+  int finger_placement_index_;  ///< index of the finger placement that resulted
+                                /// in this grasp
+  BoundingBox closing_box_;     ///< defines region surrounded by fingers
 };
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd
 
 #endif /* HAND_H_ */

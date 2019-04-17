@@ -163,11 +163,13 @@ int DoMain(int argc, char *argv[]) {
       hand_geom.finger_width_, hand_geom.depth_, hand_geom.height_,
       image_geom.outer_diameter_, image_geom.depth_, image_geom.height_);
 
+  plot.plotHandGeometry(hand, cloud.getCloudProcessed(), hand_geom, image_geom);
+
   return 0;
 }
 
-} // namespace
-} // namespace test
-} // namespace gpd
+}  // namespace
+}  // namespace test
+}  // namespace gpd
 
 int main(int argc, char *argv[]) { return gpd::test::DoMain(argc, argv); }

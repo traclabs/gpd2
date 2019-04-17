@@ -182,8 +182,8 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
                                           hand_search_params.num_orientations_);
 }
 
-std::vector<std::unique_ptr<candidate::Hand>>
-GraspDetector::detectGrasps(const util::Cloud &cloud) {
+std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
+    const util::Cloud &cloud) {
   double t0_total = omp_get_wtime();
   std::vector<std::unique_ptr<candidate::Hand>> hands_out;
 
@@ -562,4 +562,4 @@ void GraspDetector::printStdVector(const std::vector<double> &v,
   printf("\n");
 }
 
-} // namespace gpd
+}  // namespace gpd

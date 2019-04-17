@@ -73,9 +73,9 @@ Eigen::MatrixXi sliceMatrix(const Eigen::MatrixXi &mat,
  * \return the vector containing the rounded down elements
  */
 Eigen::Vector3i floorVector(const Eigen::Vector3f &a);
-} // namespace EigenUtils
+}  // namespace EigenUtils
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd
 
 #endif /* EIGEN_UTILS_H_ */

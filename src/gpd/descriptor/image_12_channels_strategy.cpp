@@ -3,9 +3,9 @@
 namespace gpd {
 namespace descriptor {
 
-std::vector<std::unique_ptr<cv::Mat>>
-Image12ChannelsStrategy::createImages(const candidate::HandSet &hand_set,
-                                      const util::PointList &nn_points) const {
+std::vector<std::unique_ptr<cv::Mat>> Image12ChannelsStrategy::createImages(
+    const candidate::HandSet &hand_set,
+    const util::PointList &nn_points) const {
   const std::vector<std::unique_ptr<candidate::Hand>> &hands =
       hand_set.getHands();
   std::vector<std::unique_ptr<cv::Mat>> images(hands.size());
@@ -32,9 +32,8 @@ void Image12ChannelsStrategy::createImage(const util::PointList &point_list,
   image = calculateImage(points_normals.first, points_normals.second);
 }
 
-cv::Mat
-Image12ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
-                                        const Eigen::Matrix3Xd &normals) const {
+cv::Mat Image12ChannelsStrategy::calculateImage(
+    const Eigen::Matrix3Xd &points, const Eigen::Matrix3Xd &normals) const {
   double t = omp_get_wtime();
   const int kNumProjections = 3;
 
@@ -46,7 +45,8 @@ Image12ChannelsStrategy::calculateImage(const Eigen::Matrix3Xd &points,
 
   for (size_t i = 0; i < kNumProjections; i++) {
     if (i > 0) {
-      points_proj.row(swap_indices[i][0]).swap(points_proj.row(swap_indices[i][1]));
+      points_proj.row(swap_indices[i][0])
+          .swap(points_proj.row(swap_indices[i][1]));
     }
 
     std::vector<cv::Mat> channels_i = calculateChannels(points_proj, normals);
@@ -87,8 +87,8 @@ std::vector<cv::Mat> Image12ChannelsStrategy::calculateChannels(
 
 void Image12ChannelsStrategy::showImage(const cv::Mat &image) const {
   int border = 5;
-  int n = 3; // number of images in each row
-  int m = 2; // number of images in each column
+  int n = 3;  // number of images in each row
+  int m = 2;  // number of images in each column
   int image_size = image_params_.size_;
   int height = n * (image_size + border) + border;
   int width = m * (image_size + border) + border;
@@ -118,5 +118,5 @@ void Image12ChannelsStrategy::showImage(const cv::Mat &image) const {
   cv::waitKey(0);
 }
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd

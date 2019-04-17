@@ -52,7 +52,7 @@ namespace descriptor {
  *
  */
 class ImageGeometry {
-public:
+ public:
   /**
    * \brief Constructor.
    */
@@ -76,17 +76,17 @@ public:
    */
   ImageGeometry(const std::string &filepath);
 
-  double outer_diameter_; ///< the width of the volume
-  double depth_;          ///< the depth of the volume
-  double height_;         ///< the height of the volume
-  int size_; ///< the size of the image (image is square: width = height)
-  int num_channels_; ///< the number of channels in the image
+  double outer_diameter_;  ///< the width of the volume
+  double depth_;           ///< the depth of the volume
+  double height_;          ///< the height of the volume
+  int size_;  ///< the size of the image (image is square: width = height)
+  int num_channels_;  ///< the number of channels in the image
 };
 
 std::ostream &operator<<(std::ostream &stream,
                          const ImageGeometry &hand_geometry);
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd
 
 #endif /* IMAGE_GEOMETRY_H_ */

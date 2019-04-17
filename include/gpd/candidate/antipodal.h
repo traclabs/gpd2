@@ -32,10 +32,10 @@
 #ifndef ANTIPODAL_H_
 #define ANTIPODAL_H_
 
-#include <algorithm>
-#include <iostream>
 #include <math.h>
 #include <stdio.h>
+#include <algorithm>
+#include <iostream>
 #include <vector>
 
 #include <Eigen/Dense>
@@ -53,7 +53,7 @@ namespace candidate {
  *
  */
 class Antipodal {
-public:
+ public:
   Antipodal(double friction_coeff, int min_viable)
       : friction_coeff_(friction_coeff), min_viable_(min_viable) {}
 
@@ -81,15 +81,15 @@ public:
   int evaluateGrasp(const Eigen::Matrix3Xd &normals, double thresh_half,
                     double thresh_full) const;
 
-  double friction_coeff_; ///< angle of friction cone in degrees
-  int min_viable_; ///< minimum number of points on each side to be antipodal
+  double friction_coeff_;  ///< angle of friction cone in degrees
+  int min_viable_;  ///< minimum number of points on each side to be antipodal
 
-  static const int NO_GRASP;   // normals point not toward any finger
-  static const int HALF_GRASP; // normals point towards one finger
-  static const int FULL_GRASP; // normals point towards both fingers
+  static const int NO_GRASP;    // normals point not toward any finger
+  static const int HALF_GRASP;  // normals point towards one finger
+  static const int FULL_GRASP;  // normals point towards both fingers
 };
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd
 
 #endif /* ANTIPODAL_H_ */

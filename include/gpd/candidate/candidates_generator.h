@@ -62,19 +62,19 @@ namespace candidate {
  *
  */
 class CandidatesGenerator {
-public:
+ public:
   /**
    * \brief Parameters for the candidates generator.
    */
   struct Parameters {
-    bool remove_statistical_outliers_; ///< if statistical outliers are removed
-                                       /// from the point cloud
-    bool sample_above_plane_; ///< if samples are drawn above the support plane
-    bool voxelize_;           ///< if the point cloud gets voxelized
-    double voxel_size_;       ///< voxel size
-    int num_samples_; ///< the number of samples to be used in the search
-    int num_threads_; ///< the number of CPU threads to be used in the search
-    std::vector<double> workspace_; ///< the robot's workspace
+    bool remove_statistical_outliers_;  ///< if statistical outliers are removed
+                                        /// from the point cloud
+    bool sample_above_plane_;  ///< if samples are drawn above the support plane
+    bool voxelize_;            ///< if the point cloud gets voxelized
+    double voxel_size_;        ///< voxel size
+    int num_samples_;  ///< the number of samples to be used in the search
+    int num_threads_;  ///< the number of CPU threads to be used in the search
+    std::vector<double> workspace_;  ///< the robot's workspace
   };
 
   /**
@@ -96,25 +96,24 @@ public:
    * \param cloud_cam the point cloud
    * \return list of grasp candidates
    */
-  std::vector<std::unique_ptr<Hand>>
-  generateGraspCandidates(const util::Cloud &cloud_cam);
+  std::vector<std::unique_ptr<Hand>> generateGraspCandidates(
+      const util::Cloud &cloud_cam);
 
   /**
    * \brief Generate grasp candidate sets given a point cloud.
    * \param cloud_cam the point cloud
    * \return lust of grasp candidate sets
    */
-  std::vector<std::unique_ptr<HandSet>>
-  generateGraspCandidateSets(const util::Cloud &cloud_cam);
+  std::vector<std::unique_ptr<HandSet>> generateGraspCandidateSets(
+      const util::Cloud &cloud_cam);
 
   /**
    * \brief Reevaluate grasp candidates on a given point cloud.
    * \param cloud the point cloud
    * \param grasps the grasps to evaluate
    */
-  std::vector<int>
-  reevaluateHypotheses(const util::Cloud &cloud,
-                       std::vector<std::unique_ptr<Hand>> &grasps);
+  std::vector<int> reevaluateHypotheses(
+      const util::Cloud &cloud, std::vector<std::unique_ptr<Hand>> &grasps);
 
   /**
    * \brief Set the number of samples.
@@ -130,13 +129,13 @@ public:
     return hand_search_->getParams();
   }
 
-private:
+ private:
   std::unique_ptr<candidate::HandSearch> hand_search_;
 
   Parameters params_;
 };
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd
 
 #endif /* GRASP_CANDIDATES_GENERATOR_H */

@@ -18,8 +18,8 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-} // namespace
-} // namespace test
-} // namespace gpd
+}  // namespace
+}  // namespace test
+}  // namespace gpd
 
 int main(int argc, char *argv[]) { return gpd::test::DoMain(argc, argv); }

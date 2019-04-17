@@ -69,28 +69,28 @@ typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGB;
  *
  */
 class HandSearch {
-public:
+ public:
   /**
    * \brief Parameters for the hand search.
    */
   struct Parameters {
     /** LRF estimation parameters */
-    double nn_radius_frames_; ///< radius for point neighborhood search for LRF
+    double nn_radius_frames_;  ///< radius for point neighborhood search for LRF
 
     /** grasp candidate generation */
-    int num_threads_;            ///< the number of CPU threads to be used
-    int num_samples_;            ///< the number of samples to be used
-    int num_orientations_;       ///< number of hand orientations to evaluate
-    int num_finger_placements_;  ///< number of finger placements to evaluate
-    std::vector<int> hand_axes_; ///< the axes about which different hand
-                                 /// orientations are generated
-    bool deepen_hand_; ///< if the hand is pushed forward onto the object
+    int num_threads_;             ///< the number of CPU threads to be used
+    int num_samples_;             ///< the number of samples to be used
+    int num_orientations_;        ///< number of hand orientations to evaluate
+    int num_finger_placements_;   ///< number of finger placements to evaluate
+    std::vector<int> hand_axes_;  ///< the axes about which different hand
+                                  /// orientations are generated
+    bool deepen_hand_;  ///< if the hand is pushed forward onto the object
 
     /** antipodal grasp check */
-    double friction_coeff_; ///< angle of friction cone in degrees
-    int min_viable_; ///< minimum number of points required to be antipodal
+    double friction_coeff_;  ///< angle of friction cone in degrees
+    int min_viable_;  ///< minimum number of points required to be antipodal
 
-    HandGeometry hand_geometry_; ///< robot hand geometry
+    HandGeometry hand_geometry_;  ///< robot hand geometry
   };
 
   /**
@@ -104,8 +104,8 @@ public:
    * \param cloud the point cloud
    * \return list of grasp candidate sets
    */
-  std::vector<std::unique_ptr<candidate::HandSet>>
-  searchHands(const util::Cloud &cloud) const;
+  std::vector<std::unique_ptr<candidate::HandSet>> searchHands(
+      const util::Cloud &cloud) const;
 
   /**
    * \brief Reevaluate a list of grasp candidates.
@@ -114,10 +114,10 @@ public:
    * \param grasps the list of grasp candidates
    * \return the list of reevaluated grasp candidates
    */
-  std::vector<int>
-  reevaluateHypotheses(const util::Cloud &cloud_cam,
-                       std::vector<std::unique_ptr<candidate::Hand>> &grasps,
-                       bool plot_samples = false) const;
+  std::vector<int> reevaluateHypotheses(
+      const util::Cloud &cloud_cam,
+      std::vector<std::unique_ptr<candidate::Hand>> &grasps,
+      bool plot_samples = false) const;
 
   /**
    * \brief Return the parameters for the hand search.
@@ -131,7 +131,7 @@ public:
    */
   void setParameters(const Parameters &params) { params_ = params; }
 
-private:
+ private:
   /**
    * \brief Search robot hand configurations given a list of local reference
    * frames.
@@ -140,10 +140,10 @@ private:
    * \param kdtree the KDTree object used for fast neighborhood search
    * \return the list of robot hand configurations
    */
-  std::vector<std::unique_ptr<candidate::HandSet>>
-  evalHands(const util::Cloud &cloud_cam,
-            const std::vector<candidate::LocalFrame> &frames,
-            const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const;
+  std::vector<std::unique_ptr<candidate::HandSet>> evalHands(
+      const util::Cloud &cloud_cam,
+      const std::vector<candidate::LocalFrame> &frames,
+      const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const;
 
   /**
    * \brief Reevaluate a grasp candidate.
@@ -176,23 +176,23 @@ private:
    */
   pcl::PointXYZRGBA eigenVectorToPcl(const Eigen::Vector3d &v) const;
 
-  Parameters params_; ///< parameters for the hand search
+  Parameters params_;  ///< parameters for the hand search
 
-  double nn_radius_; ///< radius for nearest neighbors search
+  double nn_radius_;  ///< radius for nearest neighbors search
 
   std::unique_ptr<Antipodal> antipodal_;
   std::unique_ptr<util::Plot> plot_;
 
   /** plotting parameters (optional, not read in from config file) **/
-  bool plots_local_axes_; ///< if the LRFs are plotted
+  bool plots_local_axes_;  ///< if the LRFs are plotted
 
   /** constants for rotation axis */
-  static const int ROTATION_AXIS_NORMAL;         ///< normal axis of LRF
-  static const int ROTATION_AXIS_BINORMAL;       ///< binormal axis of LRF
-  static const int ROTATION_AXIS_CURVATURE_AXIS; ///< curvature axis of LRF
+  static const int ROTATION_AXIS_NORMAL;          ///< normal axis of LRF
+  static const int ROTATION_AXIS_BINORMAL;        ///< binormal axis of LRF
+  static const int ROTATION_AXIS_CURVATURE_AXIS;  ///< curvature axis of LRF
 };
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd
 
 #endif /* HAND_SEARCH_H */

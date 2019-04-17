@@ -50,7 +50,7 @@ namespace gpd {
  *
  */
 class Clustering {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param min_inliers the minimum number of grasps a cluster is required to
@@ -64,9 +64,9 @@ public:
    * \param remove_inliers if grasps already assigned to a cluster are ignored
    * for the next cluster
    */
-  std::vector<std::unique_ptr<candidate::Hand>>
-  findClusters(const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
-               bool remove_inliers = false);
+  std::vector<std::unique_ptr<candidate::Hand>> findClusters(
+      const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+      bool remove_inliers = false);
 
   /**
    * \brief Return the minimum number of cluster inliers.
@@ -80,11 +80,11 @@ public:
    */
   void setMinInliers(int min_inliers) { min_inliers_ = min_inliers; }
 
-private:
-  int min_inliers_; ///< minimum number of geometrically aligned candidates
-                    /// required to form a cluster
+ private:
+  int min_inliers_;  ///< minimum number of geometrically aligned candidates
+                     /// required to form a cluster
 };
 
-} // namespace gpd
+}  // namespace gpd
 
 #endif /* CLUSTERING_H_ */

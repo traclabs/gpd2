@@ -61,5 +61,5 @@ std::shared_ptr<Classifier> Classifier::create(const std::string &model_file,
 #endif
 }
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd

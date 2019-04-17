@@ -54,7 +54,7 @@ namespace net {
  *
  */
 class EigenClassifier : public Classifier {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param model_file the location of the file that describes the network model
@@ -70,12 +70,12 @@ public:
    * \param image_list the list of grasp images
    * \return the classified grasp candidates
    */
-  std::vector<float>
-  classifyImages(const std::vector<std::unique_ptr<cv::Mat>> &image_list);
+  std::vector<float> classifyImages(
+      const std::vector<std::unique_ptr<cv::Mat>> &image_list);
 
   int getBatchSize() const { return 0; }
 
-private:
+ private:
   /**
    * \brief Forward pass of the network.
    * \param x input to the network
@@ -106,15 +106,15 @@ private:
    */
   std::vector<float> readBinaryFileIntoVector(const std::string &location);
 
-  std::unique_ptr<ConvLayer> conv1_;                 ///< 1st conv layer
-  std::unique_ptr<ConvLayer> conv2_;                 ///< 2nd conv layer
-  std::unique_ptr<DenseLayer> dense1_;               ///< 1st dense layer
-  std::unique_ptr<DenseLayer> dense2_;               ///< 2nd dense layer
-  std::vector<float> x_dense1_, x_dense2_, x_conv2_; ///< inputs for layers
+  std::unique_ptr<ConvLayer> conv1_;                  ///< 1st conv layer
+  std::unique_ptr<ConvLayer> conv2_;                  ///< 2nd conv layer
+  std::unique_ptr<DenseLayer> dense1_;                ///< 1st dense layer
+  std::unique_ptr<DenseLayer> dense2_;                ///< 2nd dense layer
+  std::vector<float> x_dense1_, x_dense2_, x_conv2_;  ///< inputs for layers
   int num_threads_{1};
 };
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd
 
 #endif /* EIGEN_CLASSIFIER_H_ */
