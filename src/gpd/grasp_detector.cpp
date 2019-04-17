@@ -85,6 +85,7 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
 
   printf("============ CLOUD PREPROCESSING =============\n");
   printf("voxelize: %s\n", generator_params.voxelize_ ? "true" : "false");
+  printf("voxl_size: %.3f\n", generator_params.voxel_size_);
   printf("remove_outliers: %s\n",
          generator_params.remove_statistical_outliers_ ? "true" : "false");
   printStdVector(generator_params.workspace_, "workspace");

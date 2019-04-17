@@ -147,7 +147,7 @@ You can use `ccmake` to check out all possible CMake options.
 
 GPD supports the following three frameworks:
 
-1. [OpenVino](https://software.intel.com/en-us/openvino-toolkit)
+1. [OpenVino](https://software.intel.com/en-us/openvino-toolkit): [installation instructions](https://github.com/opencv/dldt/blob/2018/inference-engine/README.md) for open source version
 (CPUs, GPUs, FPGAs from Intel)
 1. [Caffe](https://caffe.berkeleyvision.org/) (GPUs from Nvidia or CPUs)
 1. Custom LeNet implementation using the Eigen library
@@ -159,7 +159,7 @@ Additional classifiers can be added by sub-classing the `classifier` interface.
 To use OpenVino, you need to run the following command before compiling GPD.
 
    ```
-   source /opt/intel/computer_vision_sdk/bin/setupvars.sh
+   export InferenceEngine_DIR=/path/to/dldt/inference-engine/build/
    ```
 
 <a name="pcl_gpu"></a>
