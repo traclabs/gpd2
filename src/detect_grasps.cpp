@@ -68,8 +68,16 @@ int DoMain(int argc, char *argv[]) {
 
   GraspDetector detector(config_filename);
 
-  // Prepare the point cloud.
+  // Preprocess the point cloud.
   detector.preprocessPointCloud(cloud);
+
+  // If the object is centered at the origin, reverse all surface normals.
+  bool centered_at_origin =
+      config_file.getValueOfKey<bool>("centered_at_origin", false);
+  if (centered_at_origin) {
+    printf("Reversing normal directions ...\n");
+    cloud.setNormals(cloud.getNormals() * (-1.0));
+  }
 
   // Detect grasp poses.
   detector.detectGrasps(cloud);
@@ -77,9 +85,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-}  // namespace detect_grasps
-}  // namespace apps
-}  // namespace gpd
+} // namespace detect_grasps
+} // namespace apps
+} // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::detect_grasps::DoMain(argc, argv);

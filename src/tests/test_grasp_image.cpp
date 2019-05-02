@@ -111,8 +111,10 @@ int DoMain(int argc, char *argv[]) {
     image_geom.num_channels_ = boost::lexical_cast<int>(argv[4]);
   }
 
+  double normals_radius = 0.03;
+
   // Calculate surface normals.
-  cloud.calculateNormals(4);
+  cloud.calculateNormals(4, normals_radius);
   cloud.setNormals(cloud.getNormals() * (-1.0));
 
   // Plot the normals.
@@ -168,8 +170,8 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-}  // namespace
-}  // namespace test
-}  // namespace gpd
+} // namespace
+} // namespace test
+} // namespace gpd
 
 int main(int argc, char *argv[]) { return gpd::test::DoMain(argc, argv); }

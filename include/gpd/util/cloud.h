@@ -32,25 +32,26 @@
 #ifndef CLOUD_H_
 #define CLOUD_H_
 
-#include <math.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <math.h>
 #include <vector>
 
 #include <Eigen/Dense>
 
 #include <pcl/features/integral_image_normal.h>
 #include <pcl/features/normal_3d_omp.h>
+#include <pcl/filters/normal_refinement.h>
 #include <pcl/filters/random_sample.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <pcl/search/kdtree.h>
 #include <pcl/search/impl/kdtree.hpp>
+#include <pcl/search/kdtree.h>
 
-#if defined(USE_PCL_GPU)  // switch include ordering if compilation fails
+#if defined(USE_PCL_GPU) // switch include ordering if compilation fails
 #include <pcl/gpu/containers/device_array.hpp>
 #include <pcl/gpu/features/features.hpp>
 #endif
@@ -75,7 +76,7 @@ typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
  *
  */
 class Cloud {
- public:
+public:
   /**
    * \brief Comparator for checking uniqueness of two 3D-vectors.
    */
@@ -183,9 +184,16 @@ class Cloud {
         const Eigen::Matrix3Xd &view_points);
 
   /**
+   * \brief Remove NANs from the point cloud.
+   */
+  void removeNans();
+
+  /**
    * \brief Remove statistical outliers from the point cloud.
    */
   void removeStatisticalOutliers();
+
+  void refineNormals(int k = 10);
 
   /**
    * \brief Filter out points in the point cloud that lie outside the workspace
@@ -242,11 +250,12 @@ class Cloud {
   void subsample(int num_samples);
 
   /**
-   * \brief Calculate surface normals for the point cloud.
-   * \param[in] num_threads the number of CPU threads to be used in the
-   * calculation
+   * \brief Estimate surface normals for the point cloud.
+   * Switches the normals estimation method based on if the point cloud is
+   * organized or not. \param[in] num_threads the number of CPU threads to be
+   * used in the calculation
    */
-  void calculateNormals(int num_threads);
+  void calculateNormals(int num_threads, double radius);
 
   /**
    * \brief Calculate surface normals for an organized point cloud.
@@ -258,7 +267,7 @@ class Cloud {
    * \param[in] num_threads the number of CPU threads to be used in the
    * calculation
    */
-  void calculateNormalsOMP(int num_threads);
+  void calculateNormalsOMP(int num_threads, double radius);
 
 #if defined(USE_PCL_GPU)
   void calculateNormalsGPU();
@@ -363,7 +372,7 @@ class Cloud {
    */
   PointCloudRGB::Ptr loadPointCloudFromFile(const std::string &filename) const;
 
- private:
+private:
   std::vector<std::vector<int>> convertCameraSourceMatrixToLists();
 
   PointCloudRGB::Ptr cloud_processed_;
@@ -378,7 +387,7 @@ class Cloud {
   Eigen::Matrix3Xd samples_;
 };
 
-}  // namespace util
-}  // namespace gpd
+} // namespace util
+} // namespace gpd
 
 #endif /* CLOUD_H_ */

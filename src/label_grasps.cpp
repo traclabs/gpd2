@@ -54,7 +54,11 @@ int DoMain(int argc, char *argv[]) {
   int num_samples = config_file.getValueOfKey<int>("num_samples", 100);
   bool sample_above_plane =
       config_file.getValueOfKey<int>("sample_above_plane", 1);
+  double normals_radius =
+      config_file.getValueOfKey<double>("normals_radius", 0.03);
   printf("num_threads: %d, num_samples: %d\n", num_threads, num_samples);
+  printf("sample_above_plane: %d\n", sample_above_plane);
+  printf("normals_radius: %.3f\n", normals_radius);
 
   // View point from which the camera sees the point cloud.
   Eigen::Matrix3Xd view_points(3, 1);
@@ -77,15 +81,15 @@ int DoMain(int argc, char *argv[]) {
   // Prepare the point cloud.
   cloud.filterWorkspace(workspace);
   cloud.voxelizeCloud(VOXEL_SIZE);
-  cloud.calculateNormals(num_threads);
-  cloud.setNormals(cloud.getNormals() * (-1.0));  // TODO: do not do this!
+  cloud.calculateNormals(num_threads, normals_radius);
+  cloud.setNormals(cloud.getNormals() * (-1.0)); // TODO: do not do this!
   if (sample_above_plane) {
     cloud.sampleAbovePlane();
   }
   cloud.subsample(num_samples);
 
   // Prepare the mesh.
-  mesh.calculateNormals(num_threads);
+  mesh.calculateNormals(num_threads, normals_radius);
   mesh.setNormals(mesh.getNormals() * (-1.0));
 
   // Detect grasp poses.
@@ -121,9 +125,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-}  // namespace detect_grasps
-}  // namespace apps
-}  // namespace gpd
+} // namespace detect_grasps
+} // namespace apps
+} // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::detect_grasps::DoMain(argc, argv);

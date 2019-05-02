@@ -57,6 +57,10 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
       config_file.getValueOfKey<bool>("voxelize", true);
   generator_params.voxel_size_ =
       config_file.getValueOfKey<double>("voxel_size", 0.003);
+  generator_params.normals_radius_ =
+      config_file.getValueOfKey<double>("normals_radius", 0.03);
+  generator_params.refine_normals_k_ =
+      config_file.getValueOfKey<int>("refine_normals_k", 0);
   generator_params.workspace_ =
       config_file.getValueOfKeyAsStdVectorDouble("workspace", "-1 1 -1 1 -1 1");
 
@@ -85,12 +89,14 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
 
   printf("============ CLOUD PREPROCESSING =============\n");
   printf("voxelize: %s\n", generator_params.voxelize_ ? "true" : "false");
-  printf("voxl_size: %.3f\n", generator_params.voxel_size_);
+  printf("voxel_size: %.3f\n", generator_params.voxel_size_);
   printf("remove_outliers: %s\n",
          generator_params.remove_statistical_outliers_ ? "true" : "false");
   printStdVector(generator_params.workspace_, "workspace");
   printf("sample_above_plane: %s\n",
          generator_params.sample_above_plane_ ? "true" : "false");
+  printf("normals_radius: %.3f\n", generator_params.normals_radius_);
+  printf("refine_normals_k: %d\n", generator_params.refine_normals_k_);
   printf("==============================================\n");
 
   printf("============ CANDIDATE GENERATION ============\n");
@@ -183,8 +189,8 @@ GraspDetector::GraspDetector(const std::string &config_filename) {
                                           hand_search_params.num_orientations_);
 }
 
-std::vector<std::unique_ptr<candidate::Hand>> GraspDetector::detectGrasps(
-    const util::Cloud &cloud) {
+std::vector<std::unique_ptr<candidate::Hand>>
+GraspDetector::detectGrasps(const util::Cloud &cloud) {
   double t0_total = omp_get_wtime();
   std::vector<std::unique_ptr<candidate::Hand>> hands_out;
 
@@ -563,4 +569,4 @@ void GraspDetector::printStdVector(const std::vector<double> &v,
   printf("\n");
 }
 
-}  // namespace gpd
+} // namespace gpd

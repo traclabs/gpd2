@@ -176,6 +176,10 @@ GPD can use GPU methods provided within PCL to speed up point cloud processing.
     make -j
     ```
 
+Note that, unfortunately, the surface normals produced by the PCL GPU module
+can often be incorrect. The correctness of these normals depends on the number
+of neighbors considered (a fixed number vs a radius).
+
 <a name="net_train"></a>
 ## 9) Network Training
 

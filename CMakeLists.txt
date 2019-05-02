@@ -277,11 +277,14 @@ set_target_properties(${PROJECT_NAME}_cem_detect_grasps
 set_target_properties(${PROJECT_NAME}_detect_grasps
   PROPERTIES OUTPUT_NAME detect_grasps PREFIX "")
 
+set_target_properties(${PROJECT_NAME}_generate_data
+  PROPERTIES OUTPUT_NAME generate_data PREFIX "")
+
 set_target_properties(${PROJECT_NAME}_label_grasps
-PROPERTIES OUTPUT_NAME label_grasps PREFIX "")
+  PROPERTIES OUTPUT_NAME label_grasps PREFIX "")
 
 set_target_properties(${PROJECT_NAME}_grasp_detector
-PROPERTIES OUTPUT_NAME gpd)
+  PROPERTIES OUTPUT_NAME gpd)
 
 
 # Set the location for library installation

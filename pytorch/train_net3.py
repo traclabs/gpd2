@@ -113,13 +113,17 @@ def eval(model, test_loader, device):
 
     return accuracy
 
+if len(sys.argv) < 4:
+    print('ERROR: Not enough input arguments!')
+    print('Usage: python train_net3.py pathToTrainingSet.h5 pathToTestSet.h5 num_channels')
+    exit(-1)
 
 with h5py.File(sys.argv[1], 'r') as db:
     num_train = len(db['images'])
 print('Have', num_train, 'total training examples')
-num_epochs = 4
+num_epochs = 10
 max_in_memory = 300000
-repeats = 3
+repeats = 1
 early_stop_loss = 0.0000001
 start_idx = 0
 end_idx = max_in_memory
@@ -149,9 +153,9 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9) # not tested
 # optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005) # not tested
 
-#optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
+optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
 #optimizer = optim.Adam(net.parameters(), lr=0.00001, weight_decay=0.001) # works well
-optimizer = optim.Adam(net.parameters(), lr=0.000001, weight_decay=0.001) # works well
+# optimizer = optim.Adam(net.parameters(), lr=0.000001, weight_decay=0.001) # works well
 
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.96)
 

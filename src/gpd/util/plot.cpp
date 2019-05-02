@@ -534,8 +534,13 @@ void Plot::plotNormals(const Cloud &cloud_cam, bool draw_camera_cone) {
                                 {0.0, 0.0, 0.5}, {0.5, 0.5, 0.0},
                                 {0.5, 0.0, 0.5}, {0.0, 0.5, 0.5}};
 
+  if (num_clouds == 1) {
+    normal_colors[0][0] = 0.0;
+    normal_colors[0][2] = 1.0;
+  }
+
   PCLVisualizer viewer = createViewer("Normals");
-  viewer->setBackgroundColor(0.1, 0.1, 0.1);
+  viewer->setBackgroundColor(1.0, 1.0, 1.0);
   for (int i = 0; i < num_clouds; i++) {
     std::string cloud_name = "cloud_" + std::to_string(i);
     std::string normals_name = "normals_" + std::to_string(i);
@@ -797,5 +802,5 @@ pcl::PointXYZRGBA Plot::eigenVector3dToPointXYZRGBA(const Eigen::Vector3d &v) {
   return p;
 }
 
-}  // namespace util
-}  // namespace gpd
+} // namespace util
+} // namespace gpd

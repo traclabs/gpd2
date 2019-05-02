@@ -69,13 +69,16 @@ int DoMain(int argc, char *argv[]) {
   int num_threads = config_file.getValueOfKey<int>("num_threads", 1);
   bool sample_above_plane =
       config_file.getValueOfKey<int>("sample_above_plane", false);
+  double normals_radius =
+      config_file.getValueOfKey<double>("normals_radius", 0.03);
   printf("num_threads: %d\n", num_threads);
   printf("sample_above_plane: %d\n", sample_above_plane);
+  printf("normals_radius: %.3f\n", normals_radius);
 
   // Preprocess the point cloud.
   cloud.filterWorkspace(workspace);
   cloud.voxelizeCloud(VOXEL_SIZE);
-  cloud.calculateNormals(num_threads);
+  cloud.calculateNormals(num_threads, normals_radius);
   if (sample_above_plane) {
     cloud.sampleAbovePlane();
   }
@@ -87,9 +90,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-}  // namespace detect_grasps
-}  // namespace apps
-}  // namespace gpd
+} // namespace detect_grasps
+} // namespace apps
+} // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::detect_grasps::DoMain(argc, argv);

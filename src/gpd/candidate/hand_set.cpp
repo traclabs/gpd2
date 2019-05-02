@@ -23,11 +23,8 @@ HandSet::HandSet(const HandGeometry &hand_geometry,
                  const Eigen::VectorXd &angles,
                  const std::vector<int> &hand_axes, int num_finger_placements,
                  bool deepen_hand, Antipodal &antipodal)
-    : hand_geometry_(hand_geometry),
-      angles_(angles),
-      hand_axes_(hand_axes),
-      num_finger_placements_(num_finger_placements),
-      deepen_hand_(deepen_hand),
+    : hand_geometry_(hand_geometry), angles_(angles), hand_axes_(hand_axes),
+      num_finger_placements_(num_finger_placements), deepen_hand_(deepen_hand),
       antipodal_(antipodal) {
   sample_.setZero();
   hands_.resize(0);
@@ -125,11 +122,11 @@ void HandSet::evalHands(const util::PointList &point_list,
 Eigen::Matrix3Xd HandSet::calculateShadow(const util::PointList &point_list,
                                           double shadow_length) const {
   double voxel_grid_size =
-      0.003;  // voxel size for points that fill occluded region
+      0.003; // voxel size for points that fill occluded region
 
   double num_shadow_points =
       floor(shadow_length /
-            voxel_grid_size);  // number of points along each shadow vector
+            voxel_grid_size); // number of points along each shadow vector
 
   const int num_cams = point_list.getCamSource().rows();
 
@@ -179,7 +176,7 @@ Eigen::Matrix3Xd HandSet::calculateShadow(const util::PointList &point_list,
   Vector3iSet bins_all = shadows[0];
 
   for (int i = 1; i < num_cams; i++) {
-    if (camera_set(i) >= 1)  // check that there are points seen by this camera
+    if (camera_set(i) >= 1) // check that there are points seen by this camera
     {
       bins_all = intersection(bins_all, shadows[i]);
     }
@@ -194,8 +191,9 @@ Eigen::Matrix3Xd HandSet::calculateShadow(const util::PointList &point_list,
   return shadow;
 }
 
-Eigen::Matrix3Xd HandSet::shadowVoxelsToPoints(
-    const std::vector<Eigen::Vector3i> &voxels, double voxel_grid_size) const {
+Eigen::Matrix3Xd
+HandSet::shadowVoxelsToPoints(const std::vector<Eigen::Vector3i> &voxels,
+                              double voxel_grid_size) const {
   // Convert voxels back to points.
   double t0_voxels = omp_get_wtime();
   boost::mt19937 *rng = new boost::mt19937();
@@ -239,11 +237,10 @@ void HandSet::calculateVoxelizedShadowVectorized(
   }
 
   if (MEASURE_TIME) {
-    printf(
-        "Shadow (1 camera) calculation. Runtime: %.3f, #points: %d, "
-        "num_shadow_points: %d, #shadow: %d, max #shadow: %d\n",
-        omp_get_wtime() - t0_set, (int)points.cols(), num_shadow_points,
-        (int)shadow_set.size(), n);
+    printf("Shadow (1 camera) calculation. Runtime: %.3f, #points: %d, "
+           "num_shadow_points: %d, #shadow: %d, max #shadow: %d\n",
+           omp_get_wtime() - t0_set, (int)points.cols(), num_shadow_points,
+           (int)shadow_set.size(), n);
   }
 }
 
@@ -320,5 +317,5 @@ Vector3iSet HandSet::intersection(const Vector3iSet &set1,
   return set_out;
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

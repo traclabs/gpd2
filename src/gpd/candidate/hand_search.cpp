@@ -21,8 +21,8 @@ HandSearch::HandSearch(Parameters params)
                                        params_.num_orientations_);
 }
 
-std::vector<std::unique_ptr<HandSet>> HandSearch::searchHands(
-    const util::Cloud &cloud_cam) const {
+std::vector<std::unique_ptr<HandSet>>
+HandSearch::searchHands(const util::Cloud &cloud_cam) const {
   double t0_total = omp_get_wtime();
 
   // Create KdTree for neighborhood search.
@@ -34,10 +34,10 @@ std::vector<std::unique_ptr<HandSet>> HandSearch::searchHands(
   std::cout << "Estimating local reference frames ...\n";
   std::vector<LocalFrame> frames;
   FrameEstimator frame_estimator(params_.num_threads_);
-  if (cloud_cam.getSamples().cols() > 0) {  // use samples
+  if (cloud_cam.getSamples().cols() > 0) { // use samples
     frames = frame_estimator.calculateLocalFrames(
         cloud_cam, cloud_cam.getSamples(), params_.nn_radius_frames_, kdtree);
-  } else if (cloud_cam.getSampleIndices().size() > 0) {  // use indices
+  } else if (cloud_cam.getSampleIndices().size() > 0) { // use indices
     frames = frame_estimator.calculateLocalFrames(
         cloud_cam, cloud_cam.getSampleIndices(), params_.nn_radius_frames_,
         kdtree);
@@ -93,7 +93,7 @@ std::vector<int> HandSearch::reevaluateHypotheses(
   std::vector<int> labels(grasps.size());
 
 #ifdef _OPENMP
-#pragma omp parallel for private(nn_indices, nn_dists, nn_points) \
+#pragma omp parallel for private(nn_indices, nn_dists, nn_points)              \
     num_threads(params_.num_threads_)
 #endif
   for (int i = 0; i < grasps.size(); i++) {
@@ -141,10 +141,10 @@ pcl::PointXYZRGBA HandSearch::eigenVectorToPcl(const Eigen::Vector3d &v) const {
   return p;
 }
 
-std::vector<std::unique_ptr<candidate::HandSet>> HandSearch::evalHands(
-    const util::Cloud &cloud_cam,
-    const std::vector<candidate::LocalFrame> &frames,
-    const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const {
+std::vector<std::unique_ptr<candidate::HandSet>>
+HandSearch::evalHands(const util::Cloud &cloud_cam,
+                      const std::vector<candidate::LocalFrame> &frames,
+                      const pcl::KdTreeFLANN<pcl::PointXYZRGBA> &kdtree) const {
   double t1 = omp_get_wtime();
 
   // possible angles used for hand orientations
@@ -165,8 +165,8 @@ std::vector<std::unique_ptr<candidate::HandSet>> HandSearch::evalHands(
                                    cloud_cam.getViewPoints());
   util::PointList nn_points;
 
-#ifdef _OPENMP  // parallelization using OpenMP
-#pragma omp parallel for private(nn_indices, nn_dists, nn_points) \
+#ifdef _OPENMP // parallelization using OpenMP
+#pragma omp parallel for private(nn_indices, nn_dists, nn_points)              \
     num_threads(params_.num_threads_)
 #endif
   for (std::size_t i = 0; i < frames.size(); i++) {
@@ -227,5 +227,5 @@ int HandSearch::labelHypothesis(const util::PointList &point_list,
   return antipodal_result;
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

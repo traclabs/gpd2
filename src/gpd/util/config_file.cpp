@@ -118,8 +118,9 @@ std::string ConfigFile::getValueOfKeyAsString(const std::string &key,
   return contents.find(key)->second;
 }
 
-std::vector<double> ConfigFile::getValueOfKeyAsStdVectorDouble(
-    const std::string &key, const std::string &defaultValue) {
+std::vector<double>
+ConfigFile::getValueOfKeyAsStdVectorDouble(const std::string &key,
+                                           const std::string &defaultValue) {
   std::string s = getValueOfKeyAsString(key, defaultValue);
 
   std::vector<double> vec = stringToDouble(s);
@@ -127,8 +128,9 @@ std::vector<double> ConfigFile::getValueOfKeyAsStdVectorDouble(
   return vec;
 }
 
-std::vector<int> ConfigFile::getValueOfKeyAsStdVectorInt(
-    const std::string &key, const std::string &defaultValue) {
+std::vector<int>
+ConfigFile::getValueOfKeyAsStdVectorInt(const std::string &key,
+                                        const std::string &defaultValue) {
   std::string s = getValueOfKeyAsString(key, defaultValue);
 
   std::vector<int> vec = stringToInt(s);
@@ -166,5 +168,5 @@ std::vector<int> ConfigFile::stringToInt(const std::string &str) {
   return values;
 }
 
-}  // namespace util
-}  // namespace gpd
+} // namespace util
+} // namespace gpd

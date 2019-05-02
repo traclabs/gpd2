@@ -28,8 +28,16 @@ DataGenerator::DataGenerator(const std::string &config_filename)
       config_file.getValueOfKeyAsStdVectorInt("test_views", "3 7 11 15 19");
   num_threads_ = config_file.getValueOfKey<int>("num_threads", 1);
   num_samples_ = config_file.getValueOfKey<int>("num_samples", 500);
+  remove_nans_ = config_file.getValueOfKey<bool>("remove_nans", true);
+  voxel_size_views_ =
+      config_file.getValueOfKey<double>("voxel_size_views", 0.003);
+  normals_radius_ = config_file.getValueOfKey<double>("normals_radius", 0.03);
+  reverse_mesh_normals_ =
+      config_file.getValueOfKey<bool>("reverse_mesh_normals", true);
+  reverse_view_normals_ =
+      config_file.getValueOfKey<bool>("reverse_view_normals", true);
 
-  std::cout << "============ DATA ============================\n";
+  printf("============ DATA GENERATION =================\n");
   std::cout << "data_root: " << data_root_ << "\n";
   std::cout << "objects_file_location: " << objects_file_location_ << "\n";
   std::cout << "output_root: " << output_root_ << "\n";
@@ -41,12 +49,24 @@ DataGenerator::DataGenerator(const std::string &config_filename)
     std::cout << test_views_[i] << " ";
   }
   std::cout << "\n";
-  std::cout << "==============================================\n";
+  printf("==============================================\n");
+
+  printf("============ CLOUD PREPROCESSING =============\n");
+  printf("remove_nans: %d\n", remove_nans_);
+  printf("voxel_size_views: %.3f\n", voxel_size_views_);
+  printf("normals_radius_: %.3f\n", normals_radius_);
+  printf("reverse_mesh_normals: %d\n", reverse_mesh_normals_);
+  printf("reverse_view_normals: %d\n", reverse_view_normals_);
+  printf("==============================================\n");
+
+  printf("============ CANDIDATE GENERATION ============\n");
+  printf("num_samples: %d\n", num_samples_);
+  printf("num_threads: %d\n", num_threads_);
+  printf("==============================================\n");
 
   Eigen::VectorXi cam_sources = Eigen::VectorXi::LinSpaced((360 / 3), 0, 360);
   all_cam_sources_.resize(cam_sources.size());
   Eigen::VectorXi::Map(&all_cam_sources_[0], cam_sources.rows()) = cam_sources;
-  //  std::cout << cam_sources << "\n";
 }
 
 void DataGenerator::generateDataBigbird() {
@@ -75,8 +95,6 @@ void DataGenerator::generateDataBigbird() {
   int train_offset = 0;
   int test_offset = 0;
 
-  const double VOXEL_SIZE = 0.003;
-
   for (int i = 0; i < num_objects; i++) {
     printf("===> Generating images for object %d/%d: %s\n", i, num_objects,
            objects[i].c_str());
@@ -85,19 +103,19 @@ void DataGenerator::generateDataBigbird() {
     // Load mesh for ground truth.
     std::string prefix = data_root_ + objects[i];
     util::Cloud mesh = loadMesh(prefix + "_gt.pcd", prefix + "_gt_normals.csv");
-    mesh.calculateNormalsOMP(num_threads_);
+    mesh.calculateNormalsOMP(num_threads_, normals_radius_);
 
     for (int j = 0; j < num_views_per_object_; j++) {
       printf("===> Processing view %d/%d\n", j + 1, num_views_per_object_);
 
       // 1. Load point cloud.
       Eigen::Matrix3Xd view_points(3, 1);
-      view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
-      util::Cloud cloud(
-          prefix + "_" + boost::lexical_cast<std::string>(j + 1) + ".pcd",
-          view_points);
-      cloud.voxelizeCloud(VOXEL_SIZE);
-      cloud.calculateNormalsOMP(num_threads_);
+      view_points << 0.0, 0.0, 0.0; // TODO: Load camera position.
+      util::Cloud cloud(prefix + "_" + boost::lexical_cast<std::string>(j + 1) +
+                            ".pcd",
+                        view_points);
+      cloud.voxelizeCloud(voxel_size_views_);
+      cloud.calculateNormalsOMP(num_threads_, normals_radius_);
       cloud.subsample(num_samples_);
 
       // 2. Find grasps in point cloud.
@@ -239,10 +257,10 @@ void DataGenerator::generateData() {
     // Load mesh for ground truth.
     std::string prefix = data_root_ + objects[i];
     util::Cloud mesh = loadMesh(prefix + "_gt.pcd", prefix + "_gt_normals.csv");
-    mesh.calculateNormalsOMP(num_threads_);
-    mesh.setNormals(mesh.getNormals() * (-1.0));
-
-    const double VOXEL_SIZE = 0.003;
+    mesh.calculateNormalsOMP(num_threads_, normals_radius_);
+    if (reverse_mesh_normals_) {
+      mesh.setNormals(mesh.getNormals() * (-1.0));
+    }
 
     for (int j = 0; j < num_views_per_object_; j++) {
       printf("===> Processing view %d/%d\n", j + 1, num_views_per_object_);
@@ -254,13 +272,18 @@ void DataGenerator::generateData() {
 
       // 1. Load point cloud.
       Eigen::Matrix3Xd view_points(3, 1);
-      view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
-      util::Cloud cloud(
-          prefix + "_" + boost::lexical_cast<std::string>(j + 1) + ".pcd",
-          view_points);
-      cloud.voxelizeCloud(VOXEL_SIZE);
-      cloud.calculateNormalsOMP(num_threads_);
-      cloud.setNormals(cloud.getNormals() * (-1.0));
+      view_points << 0.0, 0.0, 0.0; // TODO: Load camera position.
+      util::Cloud cloud(prefix + "_" + boost::lexical_cast<std::string>(j + 1) +
+                            ".pcd",
+                        view_points);
+      if (remove_nans_) {
+        cloud.removeNans();
+      }
+      cloud.voxelizeCloud(voxel_size_views_);
+      cloud.calculateNormalsOMP(num_threads_, normals_radius_);
+      if (reverse_view_normals_) {
+        cloud.setNormals(cloud.getNormals() * (-1.0));
+      }
 
       while (positives_view.size() < min_grasps_per_view_) {
         cloud.subsampleUniformly(num_samples_);
@@ -437,8 +460,8 @@ util::Cloud DataGenerator::loadMesh(const std::string &mesh_file_path,
   return mesh_cloud_cam;
 }
 
-std::vector<boost::filesystem::path> DataGenerator::loadPointCloudFiles(
-    const std::string &cloud_folder) {
+std::vector<boost::filesystem::path>
+DataGenerator::loadPointCloudFiles(const std::string &cloud_folder) {
   boost::filesystem::path path(cloud_folder);
   boost::filesystem::directory_iterator it(path);
   std::vector<boost::filesystem::path> files;
@@ -459,8 +482,8 @@ std::vector<boost::filesystem::path> DataGenerator::loadPointCloudFiles(
   return files;
 }
 
-std::vector<std::string> DataGenerator::loadObjectNames(
-    const std::string &objects_file_location) {
+std::vector<std::string>
+DataGenerator::loadObjectNames(const std::string &objects_file_location) {
   std::ifstream in;
   in.open(objects_file_location.c_str());
   std::string line;
@@ -781,8 +804,9 @@ Eigen::Matrix4f DataGenerator::calculateTransform(const std::string &object,
   return T;
 }
 
-Eigen::Matrix4f DataGenerator::readPoseFromHDF5(
-    const std::string &hdf5_filename, const std::string &dsname) const {
+Eigen::Matrix4f
+DataGenerator::readPoseFromHDF5(const std::string &hdf5_filename,
+                                const std::string &dsname) const {
   cv::Ptr<cv::hdf::HDF5> h5io = cv::hdf::open(hdf5_filename);
   cv::Mat mat_cv(4, 4, CV_32FC1);
   h5io->dsread(mat_cv, dsname);
@@ -793,4 +817,4 @@ Eigen::Matrix4f DataGenerator::readPoseFromHDF5(
   return mat_eigen;
 }
 
-}  // namespace gpd
+} // namespace gpd

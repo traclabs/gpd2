@@ -15,19 +15,29 @@ void CandidatesGenerator::preprocessPointCloud(util::Cloud &cloud) {
   printf("Processing cloud with %zu points.\n",
          cloud.getCloudOriginal()->size());
 
+  cloud.removeNans();
+
   cloud.filterWorkspace(params_.workspace_);
+
   if (params_.voxelize_) {
     cloud.voxelizeCloud(params_.voxel_size_);
   }
-  cloud.calculateNormals(params_.num_threads_);
+
+  cloud.calculateNormals(params_.num_threads_, params_.normals_radius_);
+
+  if (params_.refine_normals_k_ > 0) {
+    cloud.refineNormals(params_.refine_normals_k_);
+  }
+
   if (params_.sample_above_plane_) {
     cloud.sampleAbovePlane();
   }
+
   cloud.subsample(params_.num_samples_);
 }
 
-std::vector<std::unique_ptr<Hand>> CandidatesGenerator::generateGraspCandidates(
-    const util::Cloud &cloud_cam) {
+std::vector<std::unique_ptr<Hand>>
+CandidatesGenerator::generateGraspCandidates(const util::Cloud &cloud_cam) {
   // Find sets of grasp candidates.
   std::vector<std::unique_ptr<HandSet>> hand_set_list =
       hand_search_->searchHands(cloud_cam);
@@ -63,5 +73,5 @@ std::vector<int> CandidatesGenerator::reevaluateHypotheses(
   return hand_search_->reevaluateHypotheses(cloud, grasps);
 }
 
-}  // namespace candidate
-}  // namespace gpd
+} // namespace candidate
+} // namespace gpd

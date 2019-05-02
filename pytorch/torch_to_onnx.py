@@ -21,6 +21,11 @@ class Net(nn.Module):
         x = self.fc2(x)
         return x
 
+if len(sys.argv) < 4:
+    print('ERROR: Not enough input arguments!')
+    print('Usage: python torch_to_onxx.py pathToPytorchModel.pwf pathToONNXModel.onnx num_channels')
+    exit(-1)
+
 input_channels = int(sys.argv[3])
 net = Net(input_channels)
 net.load_state_dict(torch.load(sys.argv[1]))
