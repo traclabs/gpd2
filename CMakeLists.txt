@@ -277,8 +277,10 @@ set_target_properties(${PROJECT_NAME}_cem_detect_grasps
 set_target_properties(${PROJECT_NAME}_detect_grasps
   PROPERTIES OUTPUT_NAME detect_grasps PREFIX "")
 
-set_target_properties(${PROJECT_NAME}_generate_data
-  PROPERTIES OUTPUT_NAME generate_data PREFIX "")
+if(BUILD_DATA_GENERATION STREQUAL "ON")
+  set_target_properties(${PROJECT_NAME}_generate_data
+    PROPERTIES OUTPUT_NAME generate_data PREFIX "")
+endif()
 
 set_target_properties(${PROJECT_NAME}_label_grasps
   PROPERTIES OUTPUT_NAME label_grasps PREFIX "")
