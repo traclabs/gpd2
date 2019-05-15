@@ -45,7 +45,7 @@ namespace net {
  *
  */
 class Layer {
-public:
+ public:
   /**
    * \brief Constructor.
    */
@@ -68,12 +68,12 @@ public:
     biases_ = biases;
   }
 
-protected:
+ protected:
   std::vector<float> weights_;
   std::vector<float> biases_;
 };
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd
 
 #endif /* LAYER_H */

@@ -51,7 +51,7 @@ namespace net {
  *
  */
 class DenseLayer : public Layer {
-public:
+ public:
   /**
    * \brief Contructor.
    * \param num_units number of units/neurons in this layer
@@ -64,11 +64,11 @@ public:
    */
   Eigen::MatrixXf forward(const std::vector<float> &x) const;
 
-private:
-  int num_units_; ///< the number of units
+ private:
+  int num_units_;  ///< the number of units
 };
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd
 
 #endif /* DENSE_LAYER_H */

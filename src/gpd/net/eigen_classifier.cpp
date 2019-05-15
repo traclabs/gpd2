@@ -61,7 +61,7 @@ std::vector<float> EigenClassifier::classifyImages(
   std::vector<float> predictions;
   predictions.resize(image_list.size());
 
-#ifdef _OPENMP // parallelization using OpenMP
+#ifdef _OPENMP  // parallelization using OpenMP
 #pragma omp parallel for num_threads(num_threads_)
 #endif
   for (int i = 0; i < image_list.size(); i++) {
@@ -182,8 +182,8 @@ Eigen::MatrixXf EigenClassifier::poolForward(const Eigen::MatrixXf &X,
   return M;
 }
 
-std::vector<float>
-EigenClassifier::readBinaryFileIntoVector(const std::string &location) {
+std::vector<float> EigenClassifier::readBinaryFileIntoVector(
+    const std::string &location) {
   std::vector<float> vals;
 
   std::ifstream file(location.c_str(), std::ios::binary | std::ios::in);
@@ -203,5 +203,5 @@ EigenClassifier::readBinaryFileIntoVector(const std::string &location) {
   return vals;
 }
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd

@@ -15,8 +15,8 @@ void Plot::plotHandGeometry(const candidate::Hand &hand,
       hand.getPosition() + 0.5 * image_geom.depth_ * hand.getApproach();
   Eigen::Quaterniond vol_quat(hand.getFrame());
   plotCube(viewer, vol_pos, vol_quat, image_geom.depth_,
-           image_geom.outer_diameter_ - 2 * hand_geom.finger_width_,
-           2.0 * image_geom.height_, "volume", vol_rgb);
+           image_geom.outer_diameter_, 2.0 * image_geom.height_, "volume",
+           vol_rgb);
 
   Eigen::Vector3d dimensions(hand_geom.depth_, hand_geom.outer_diameter_,
                              2.0 * hand_geom.height_);
@@ -28,7 +28,7 @@ void Plot::plotHandGeometry(const candidate::Hand &hand,
   std::vector<std::string> labels;
   labels.push_back("hand_depth");
   labels.push_back("hand_outer_diameter");
-  labels.push_back("hand_height");
+  labels.push_back("hand_height * 2");
   addDimensions(center, hand.getOrientation(), dimensions, colors, labels,
                 viewer);
 
@@ -36,15 +36,15 @@ void Plot::plotHandGeometry(const candidate::Hand &hand,
   Eigen::Vector3d q = p + hand_geom.finger_width_ * hand.getBinormal();
   addDoubleArrow(p, q, "finger_width", Eigen::Vector3d(0.0, 1.0, 1.0), viewer);
 
-  dimensions << hand_geom.depth_, -hand_geom.outer_diameter_,
-      2.0 * hand_geom.height_;
+  dimensions << image_geom.depth_, -image_geom.outer_diameter_,
+      2.0 * image_geom.height_;
   colors *= 0.6;
-  center = hand.getPosition() - hand_geom.height_ * hand.getAxis() +
-           0.5 * hand_geom.outer_diameter_ * hand.getBinormal();
+  center = hand.getPosition() - image_geom.height_ * hand.getAxis() +
+           0.5 * image_geom.outer_diameter_ * hand.getBinormal();
   labels.resize(0);
   labels.push_back("volume_depth");
   labels.push_back("volume_width");
-  labels.push_back("volume_height");
+  labels.push_back("volume_height * 2");
   addDimensions(center, hand.getOrientation(), dimensions, colors, labels,
                 viewer);
 
@@ -99,8 +99,6 @@ void Plot::plotVolumes3D(
   Eigen::Vector3d vol_rgb(0.0, 0.8, 0.0);
   Eigen::Vector3d hand_rgb(0.0, 0.5, 0.5);
 
-  volume_width -= 2 * finger_width;
-
   PCLVisualizer viewer = createViewer(str);
 
   for (int i = 0; i < hand_set_list.size(); i++) {
@@ -144,8 +142,6 @@ void Plot::plotVolumes3D(
     double volume_width, double volume_depth, double volume_height) {
   Eigen::Vector3d vol_rgb(0.0, 0.8, 0.0);
   Eigen::Vector3d hand_rgb(0.0, 0.5, 0.5);
-
-  volume_width -= 2 * finger_width;
 
   PCLVisualizer viewer = createViewer(str);
 
@@ -802,5 +798,5 @@ pcl::PointXYZRGBA Plot::eigenVector3dToPointXYZRGBA(const Eigen::Vector3d &v) {
   return p;
 }
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd

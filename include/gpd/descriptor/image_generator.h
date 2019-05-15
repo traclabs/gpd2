@@ -32,11 +32,11 @@
 #ifndef IMAGE_GENERATOR_H_
 #define IMAGE_GENERATOR_H_
 
+#include <sys/stat.h>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <set>
-#include <sys/stat.h>
 #include <vector>
 
 #include <Eigen/Dense>
@@ -70,7 +70,7 @@ namespace descriptor {
  *
  */
 class ImageGenerator {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param params parameters for grasp images
@@ -103,7 +103,7 @@ public:
     return image_params_;
   }
 
-private:
+ private:
   /**
    * \brief Remove the plane from the point cloud. Sets <point_list> to all
    * non-planar points if the plane is found, otherwise <point_list> has the
@@ -128,7 +128,7 @@ private:
   bool remove_plane_;
 };
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd
 
 #endif /* IMAGE_GENERATOR_H_ */

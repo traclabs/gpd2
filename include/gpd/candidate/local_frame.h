@@ -48,7 +48,7 @@ namespace candidate {
  * binormal, and curvature axis.
  */
 class LocalFrame {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param T_cams the camera poses
@@ -98,14 +98,14 @@ public:
    */
   void setSample(const Eigen::Vector3d &sample) { sample_ = sample; }
 
-private:
+ private:
   Eigen::Vector3d sample_;
   Eigen::Vector3d curvature_axis_;
   Eigen::Vector3d normal_;
   Eigen::Vector3d binormal_;
 };
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd
 
-#endif // LOCAL_FRAME_H_
+#endif  // LOCAL_FRAME_H_

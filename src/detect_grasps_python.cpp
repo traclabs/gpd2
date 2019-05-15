@@ -285,7 +285,7 @@ Grasp *handsToGraspsStruct(const std::vector<Hand> &hands,
     grasps[i].score = hands[i].getScore();
     grasps[i].label = hands[i].isFullAntipodal();
     printf("i: %d\n", i);
-    grasps[i].image = cvMatToArray(images[0]); // new
+    grasps[i].image = cvMatToArray(images[0]);  // new
     // int[images[i].rows*images[i].cols*images[i].channels()];
     //    int* img = cvMatToArray(images[0]);
     //    grasps[i].image = img;
@@ -527,10 +527,9 @@ extern "C" int detectAndEvalGrasps(char *config_filename, float *points,
   return num_out;
 }
 
-extern "C" int
-generateGraspCandidatesInFile(char *config_filename, char *pcd_filename,
-                              char *normals_filename, float *view_points,
-                              int num_view_points, struct Grasp **grasps_out) {
+extern "C" int generateGraspCandidatesInFile(
+    char *config_filename, char *pcd_filename, char *normals_filename,
+    float *view_points, int num_view_points, struct Grasp **grasps_out) {
   // Initialize point cloud.
   Cloud cloud =
       initCloud(pcd_filename, normals_filename, view_points, num_view_points);
@@ -607,5 +606,5 @@ extern "C" int CopyAndFree(float *in, float *out, int n) {
   return 0;
 }
 
-} // namespace detect_grasps_python
-} // namespace gpd
+}  // namespace detect_grasps_python
+}  // namespace gpd

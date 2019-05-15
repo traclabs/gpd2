@@ -3,9 +3,9 @@
 namespace gpd {
 namespace candidate {
 
-const int Antipodal::NO_GRASP = 0;   // normals point not toward any finger
-const int Antipodal::HALF_GRASP = 1; // normals point towards one finger
-const int Antipodal::FULL_GRASP = 2; // normals point towards both fingers
+const int Antipodal::NO_GRASP = 0;    // normals point not toward any finger
+const int Antipodal::HALF_GRASP = 1;  // normals point towards one finger
+const int Antipodal::FULL_GRASP = 2;  // normals point towards both fingers
 
 int Antipodal::evaluateGrasp(const util::PointList &point_list,
                              double extremal_thresh, int lateral_axis,
@@ -38,8 +38,7 @@ int Antipodal::evaluateGrasp(const util::PointList &point_list,
     bool is_left_extremal = pts(lateral_axis, i) < min_x;
     bool is_right_extremal = pts(lateral_axis, i) > max_x;
 
-    if (is_within_left_close && is_left_extremal)
-      left_idx_viable.push_back(i);
+    if (is_within_left_close && is_left_extremal) left_idx_viable.push_back(i);
     if (is_within_right_close && is_right_extremal)
       right_idx_viable.push_back(i);
   }
@@ -159,5 +158,5 @@ int Antipodal::evaluateGrasp(const Eigen::Matrix3Xd &normals,
   return NO_GRASP;
 }
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd

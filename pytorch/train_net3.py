@@ -17,6 +17,7 @@ class H5Dataset(torchdata.Dataset):
         super(H5Dataset, self).__init__()
         with h5py.File(file_path, 'r') as h5_file:
             self.data = torch.from_numpy(np.array(h5_file.get('images')[start_idx : end_idx]))
+            print(self.data.dtype)
             self.target = torch.from_numpy(np.array(h5_file.get('labels')[start_idx : end_idx])).to(torch.int32) #.astype('int32'))
         print("Loaded data")
 
@@ -122,7 +123,7 @@ with h5py.File(sys.argv[1], 'r') as db:
     num_train = len(db['images'])
 print('Have', num_train, 'total training examples')
 num_epochs = 10
-max_in_memory = 300000
+max_in_memory = 60000
 repeats = 1
 early_stop_loss = 0.0000001
 start_idx = 0
@@ -153,9 +154,9 @@ criterion = nn.CrossEntropyLoss()
 # optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9) # not tested
 # optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005) # not tested
 
-optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
-#optimizer = optim.Adam(net.parameters(), lr=0.00001, weight_decay=0.001) # works well
-# optimizer = optim.Adam(net.parameters(), lr=0.000001, weight_decay=0.001) # works well
+# optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
+
+optimizer = optim.Adam(net.parameters(), lr=0.0001, weight_decay=0.0005)
 
 #scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.96)
 

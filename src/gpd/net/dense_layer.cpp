@@ -9,10 +9,10 @@ Eigen::MatrixXf DenseLayer::forward(const std::vector<float> &x) const {
   Eigen::Map<const Eigen::VectorXf> X(x.data(), x.size());
 
   // Calculate the forward pass.
-  Eigen::MatrixXf H = W * X + b; // np.dot(W_row, X_col)
+  Eigen::MatrixXf H = W * X + b;  // np.dot(W_row, X_col)
 
   return H;
 }
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd

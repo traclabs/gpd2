@@ -4,13 +4,19 @@ namespace gpd {
 namespace descriptor {
 
 ImageGeometry::ImageGeometry()
-    : outer_diameter_(0.0), depth_(0.0), height_(0.0), size_(0),
+    : outer_diameter_(0.0),
+      depth_(0.0),
+      height_(0.0),
+      size_(0),
       num_channels_(0) {}
 
 ImageGeometry::ImageGeometry(double outer_diameter, double depth, double height,
                              int size, int num_channels)
-    : outer_diameter_(outer_diameter), depth_(depth), height_(height),
-      size_(size), num_channels_(num_channels) {}
+    : outer_diameter_(outer_diameter),
+      depth_(depth),
+      height_(height),
+      size_(size),
+      num_channels_(num_channels) {}
 
 ImageGeometry::ImageGeometry(const std::string &filepath) {
   util::ConfigFile config_file(filepath);
@@ -35,5 +41,5 @@ std::ostream &operator<<(std::ostream &stream,
   return stream;
 }
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd

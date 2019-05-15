@@ -142,9 +142,9 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-} // namespace generate_candidates
-} // namespace apps
-} // namespace gpd
+}  // namespace generate_candidates
+}  // namespace apps
+}  // namespace gpd
 
 int main(int argc, char *argv[]) {
   return gpd::apps::generate_candidates::DoMain(argc, argv);

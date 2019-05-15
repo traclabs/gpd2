@@ -8,11 +8,11 @@ CaffeClassifier::CaffeClassifier(const std::string &model_file,
                                  Classifier::Device device, int batch_size) {
   // Initialize Caffe.
   switch (device) {
-  case Classifier::Device::eGPU:
-    caffe::Caffe::set_mode(caffe::Caffe::GPU);
-    break;
-  default:
-    caffe::Caffe::set_mode(caffe::Caffe::CPU);
+    case Classifier::Device::eGPU:
+      caffe::Caffe::set_mode(caffe::Caffe::GPU);
+      break;
+    default:
+      caffe::Caffe::set_mode(caffe::Caffe::CPU);
   }
 
   // Load pretrained network.
@@ -75,5 +75,5 @@ std::vector<float> CaffeClassifier::classifyImages(
   return predictions;
 }
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd

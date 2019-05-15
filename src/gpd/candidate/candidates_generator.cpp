@@ -36,8 +36,8 @@ void CandidatesGenerator::preprocessPointCloud(util::Cloud &cloud) {
   cloud.subsample(params_.num_samples_);
 }
 
-std::vector<std::unique_ptr<Hand>>
-CandidatesGenerator::generateGraspCandidates(const util::Cloud &cloud_cam) {
+std::vector<std::unique_ptr<Hand>> CandidatesGenerator::generateGraspCandidates(
+    const util::Cloud &cloud_cam) {
   // Find sets of grasp candidates.
   std::vector<std::unique_ptr<HandSet>> hand_set_list =
       hand_search_->searchHands(cloud_cam);
@@ -73,5 +73,5 @@ std::vector<int> CandidatesGenerator::reevaluateHypotheses(
   return hand_search_->reevaluateHypotheses(cloud, grasps);
 }
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd

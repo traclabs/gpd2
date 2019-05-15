@@ -52,7 +52,7 @@ namespace util {
  *
  */
 class ConfigFile {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param fName the location of the configuration file
@@ -81,8 +81,7 @@ public:
   template <typename ValueType>
   ValueType getValueOfKey(const std::string &key,
                           ValueType const &defaultValue) const {
-    if (!keyExists(key))
-      return defaultValue;
+    if (!keyExists(key)) return defaultValue;
 
     return string_to_T<ValueType>(contents.find(key)->second);
   }
@@ -102,9 +101,8 @@ public:
    * \param defaultValue default value of the given key
    * \return the value as a `std::vector<double>`
    */
-  std::vector<double>
-  getValueOfKeyAsStdVectorDouble(const std::string &key,
-                                 const std::string &defaultValue);
+  std::vector<double> getValueOfKeyAsStdVectorDouble(
+      const std::string &key, const std::string &defaultValue);
 
   /**
    * \brief Return the value at a given key as a `std::vector<int>`.
@@ -120,7 +118,8 @@ public:
    * \param value the value to be converted
    * \return the value as a `string`
    */
-  template <typename T> std::string T_to_string(T const &val) const {
+  template <typename T>
+  std::string T_to_string(T const &val) const {
     std::ostringstream ostr;
     ostr << val;
 
@@ -132,7 +131,8 @@ public:
    * \param value the value to be converted
    * \return the value as type `T`
    */
-  template <typename T> T string_to_T(std::string const &val) const {
+  template <typename T>
+  T string_to_T(std::string const &val) const {
     std::istringstream istr(val);
     T returnVal;
     if (!(istr >> returnVal))
@@ -142,7 +142,7 @@ public:
     return returnVal;
   }
 
-private:
+ private:
   void removeComment(std::string &line) const;
 
   bool onlyWhitespace(const std::string &line) const;
@@ -167,7 +167,7 @@ private:
   std::string fName;
 };
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd
 
 #endif /* CONFIG_FILE_H_ */

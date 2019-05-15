@@ -19,9 +19,8 @@ PointList PointList::slice(const std::vector<int> &indices) const {
   return PointList(points_out, normals_out, cam_source_out, view_points_);
 }
 
-PointList
-PointList::transformToHandFrame(const Eigen::Vector3d &centroid,
-                                const Eigen::Matrix3d &rotation) const {
+PointList PointList::transformToHandFrame(
+    const Eigen::Vector3d &centroid, const Eigen::Matrix3d &rotation) const {
   //  Eigen::Matrix3Xd points_centered = points_ - centroid.replicate(1,
   //  size());
   Eigen::Matrix3Xd points_centered = points_;
@@ -55,5 +54,5 @@ PointList PointList::cropByHandHeight(double height, int dim) const {
   return slice(indices);
 }
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd

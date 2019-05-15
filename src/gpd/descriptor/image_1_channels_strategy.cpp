@@ -3,9 +3,9 @@
 namespace gpd {
 namespace descriptor {
 
-std::vector<std::unique_ptr<cv::Mat>>
-Image1ChannelsStrategy::createImages(const candidate::HandSet &hand_set,
-                                     const util::PointList &nn_points) const {
+std::vector<std::unique_ptr<cv::Mat>> Image1ChannelsStrategy::createImages(
+    const candidate::HandSet &hand_set,
+    const util::PointList &nn_points) const {
   const std::vector<std::unique_ptr<candidate::Hand>> &hands =
       hand_set.getHands();
   std::vector<std::unique_ptr<cv::Mat>> images(hands.size());
@@ -47,5 +47,5 @@ void Image1ChannelsStrategy::createImage(const util::PointList &point_list,
   }
 }
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd

@@ -5,7 +5,11 @@ namespace net {
 
 ConvLayer::ConvLayer(int width, int height, int depth, int num_filters,
                      int spatial_extent, int stride, int padding)
-    : w1(width), h1(height), d1(depth), d2(num_filters), f(spatial_extent),
+    : w1(width),
+      h1(height),
+      d1(depth),
+      d2(num_filters),
+      f(spatial_extent),
       s(stride) {
   w2 = (w1 - spatial_extent + 2 * padding) / stride + 1;
   h2 = (h1 - spatial_extent + 2 * padding) / stride + 1;
@@ -47,7 +51,7 @@ Eigen::MatrixXf ConvLayer::forward(const Eigen::MatrixXf &W,
   Eigen::MatrixXf B = b.replicate(1, X.cols());
 
   // Calculate the forward pass.
-  Eigen::MatrixXf H = W * X + B; // np.dot(W_row, X_col)
+  Eigen::MatrixXf H = W * X + B;  // np.dot(W_row, X_col)
   return H;
 }
 
@@ -93,5 +97,5 @@ void ConvLayer::imageToColumns(const float *data_im, const int channels,
   }
 }
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd

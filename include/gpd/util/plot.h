@@ -57,7 +57,7 @@ typedef boost::shared_ptr<pcl::visualization::PCLVisualizer> PCLVisualizer;
  *
  */
 class Plot {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param num_axes the number of orientation axes
@@ -126,22 +126,20 @@ public:
                      bool draw_all = false, int num_axes = 1,
                      int num_orientations = 8);
 
-  void
-  plotFingers3D(const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
-                const PointCloudRGBA::Ptr &cloud, const std::string &str,
-                const candidate::HandGeometry &geometry,
-                bool use_same_color = true);
+  void plotFingers3D(
+      const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+      const PointCloudRGBA::Ptr &cloud, const std::string &str,
+      const candidate::HandGeometry &geometry, bool use_same_color = true);
 
   void plotAntipodalHands(
       const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
       const PointCloudRGBA::Ptr &cloud, const std::string &str,
       const candidate::HandGeometry &geometry);
 
-  void
-  plotValidHands(const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
-                 const PointCloudRGBA::Ptr &cloud,
-                 const PointCloudRGBA::Ptr &mesh, const std::string &str,
-                 const candidate::HandGeometry &geometry);
+  void plotValidHands(
+      const std::vector<std::unique_ptr<candidate::Hand>> &hand_list,
+      const PointCloudRGBA::Ptr &cloud, const PointCloudRGBA::Ptr &mesh,
+      const std::string &str, const candidate::HandGeometry &geometry);
 
   /**
    * \brief Plot a list of grasps with 3D cubes.
@@ -230,7 +228,7 @@ public:
   void plotCloud(const PointCloudRGBA::Ptr &cloud_rgb,
                  const std::string &title);
 
-private:
+ private:
   void addDimensions(const Eigen::Vector3d &center, const Eigen::Matrix3d &rot,
                      const Eigen::Vector3d &dimensions,
                      const Eigen::Matrix3d &colors,
@@ -329,7 +327,7 @@ private:
   int num_axes_;
 };
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd
 
 #endif /* PLOT_H */

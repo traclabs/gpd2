@@ -110,10 +110,10 @@ void DataGenerator::generateDataBigbird() {
 
       // 1. Load point cloud.
       Eigen::Matrix3Xd view_points(3, 1);
-      view_points << 0.0, 0.0, 0.0; // TODO: Load camera position.
-      util::Cloud cloud(prefix + "_" + boost::lexical_cast<std::string>(j + 1) +
-                            ".pcd",
-                        view_points);
+      view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
+      util::Cloud cloud(
+          prefix + "_" + boost::lexical_cast<std::string>(j + 1) + ".pcd",
+          view_points);
       cloud.voxelizeCloud(voxel_size_views_);
       cloud.calculateNormalsOMP(num_threads_, normals_radius_);
       cloud.subsample(num_samples_);
@@ -272,10 +272,10 @@ void DataGenerator::generateData() {
 
       // 1. Load point cloud.
       Eigen::Matrix3Xd view_points(3, 1);
-      view_points << 0.0, 0.0, 0.0; // TODO: Load camera position.
-      util::Cloud cloud(prefix + "_" + boost::lexical_cast<std::string>(j + 1) +
-                            ".pcd",
-                        view_points);
+      view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
+      util::Cloud cloud(
+          prefix + "_" + boost::lexical_cast<std::string>(j + 1) + ".pcd",
+          view_points);
       if (remove_nans_) {
         cloud.removeNans();
       }
@@ -460,8 +460,8 @@ util::Cloud DataGenerator::loadMesh(const std::string &mesh_file_path,
   return mesh_cloud_cam;
 }
 
-std::vector<boost::filesystem::path>
-DataGenerator::loadPointCloudFiles(const std::string &cloud_folder) {
+std::vector<boost::filesystem::path> DataGenerator::loadPointCloudFiles(
+    const std::string &cloud_folder) {
   boost::filesystem::path path(cloud_folder);
   boost::filesystem::directory_iterator it(path);
   std::vector<boost::filesystem::path> files;
@@ -482,8 +482,8 @@ DataGenerator::loadPointCloudFiles(const std::string &cloud_folder) {
   return files;
 }
 
-std::vector<std::string>
-DataGenerator::loadObjectNames(const std::string &objects_file_location) {
+std::vector<std::string> DataGenerator::loadObjectNames(
+    const std::string &objects_file_location) {
   std::ifstream in;
   in.open(objects_file_location.c_str());
   std::string line;
@@ -804,9 +804,8 @@ Eigen::Matrix4f DataGenerator::calculateTransform(const std::string &object,
   return T;
 }
 
-Eigen::Matrix4f
-DataGenerator::readPoseFromHDF5(const std::string &hdf5_filename,
-                                const std::string &dsname) const {
+Eigen::Matrix4f DataGenerator::readPoseFromHDF5(
+    const std::string &hdf5_filename, const std::string &dsname) const {
   cv::Ptr<cv::hdf::HDF5> h5io = cv::hdf::open(hdf5_filename);
   cv::Mat mat_cv(4, 4, CV_32FC1);
   h5io->dsread(mat_cv, dsname);
@@ -817,4 +816,4 @@ DataGenerator::readPoseFromHDF5(const std::string &hdf5_filename,
   return mat_eigen;
 }
 
-} // namespace gpd
+}  // namespace gpd

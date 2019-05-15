@@ -57,8 +57,19 @@ int DoMain(int argc, char *argv[]) {
   hand_geom.outer_diameter_ = 0.12;
   hand_geom.depth_ = 0.06;
   hand_geom.height_ = 0.02;
-  hand_geom.init_bite_ = 0.015;
+  hand_geom.init_bite_ = 0.01;
   hand_search_params.hand_geometry_ = hand_geom;
+
+  // Image parameters
+  descriptor::ImageGeometry image_geom;
+  image_geom.depth_ = 0.06;
+  image_geom.height_ = 0.02;
+  image_geom.outer_diameter_ = 0.10;
+  image_geom.size_ = 60;
+  image_geom.num_channels_ = 15;
+  if (argc >= 5) {
+    image_geom.num_channels_ = boost::lexical_cast<int>(argv[4]);
+  }
 
   // Local hand search parameters
   hand_search_params.num_samples_ = 1;
@@ -99,17 +110,6 @@ int DoMain(int argc, char *argv[]) {
   generator_params.workspace_[3] = 1.0;
   generator_params.workspace_[4] = -1.0;
   generator_params.workspace_[5] = 1.0;
-
-  // Image parameters
-  descriptor::ImageGeometry image_geom;
-  image_geom.depth_ = 0.06;
-  image_geom.height_ = 0.02;
-  image_geom.outer_diameter_ = 0.12;
-  image_geom.size_ = 60;
-  image_geom.num_channels_ = 15;
-  if (argc >= 5) {
-    image_geom.num_channels_ = boost::lexical_cast<int>(argv[4]);
-  }
 
   double normals_radius = 0.03;
 
@@ -170,8 +170,8 @@ int DoMain(int argc, char *argv[]) {
   return 0;
 }
 
-} // namespace
-} // namespace test
-} // namespace gpd
+}  // namespace
+}  // namespace test
+}  // namespace gpd
 
 int main(int argc, char *argv[]) { return gpd::test::DoMain(argc, argv); }

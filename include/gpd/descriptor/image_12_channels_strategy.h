@@ -52,7 +52,7 @@ namespace descriptor {
  *
  */
 class Image12ChannelsStrategy : public ImageStrategy {
-public:
+ public:
   /**
    * \brief Create a strategy for calculating grasp images.
    * \param image_params the grasp image parameters
@@ -72,15 +72,15 @@ public:
    * \param nn_points the point neighborhoods used to calculate the images
    * \return the grasp images
    */
-  std::vector<std::unique_ptr<cv::Mat>>
-  createImages(const candidate::HandSet &hand_set,
-               const util::PointList &nn_points) const;
+  std::vector<std::unique_ptr<cv::Mat>> createImages(
+      const candidate::HandSet &hand_set,
+      const util::PointList &nn_points) const;
 
-protected:
+ protected:
   void createImage(const util::PointList &point_list,
                    const candidate::Hand &hand, cv::Mat &image) const;
 
-private:
+ private:
   cv::Mat calculateImage(const Eigen::Matrix3Xd &points,
                          const Eigen::Matrix3Xd &normals) const;
 
@@ -90,7 +90,7 @@ private:
   void showImage(const cv::Mat &image) const;
 };
 
-} // namespace descriptor
-} // namespace gpd
+}  // namespace descriptor
+}  // namespace gpd
 
 #endif /* IMAGE_12_CHANNELS_STRATEGY_H_ */

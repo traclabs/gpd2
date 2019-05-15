@@ -4,14 +4,20 @@ namespace gpd {
 namespace candidate {
 
 HandGeometry::HandGeometry()
-    : finger_width_(0.0), outer_diameter_(0.0), depth_(0.0), height_(0.0),
+    : finger_width_(0.0),
+      outer_diameter_(0.0),
+      depth_(0.0),
+      height_(0.0),
       init_bite_(0.0) {}
 
 HandGeometry::HandGeometry(double finger_width, double outer_diameter,
                            double hand_depth, double hand_height,
                            double init_bite)
-    : finger_width_(finger_width), outer_diameter_(outer_diameter),
-      depth_(hand_depth), height_(hand_height), init_bite_(init_bite) {}
+    : finger_width_(finger_width),
+      outer_diameter_(outer_diameter),
+      depth_(hand_depth),
+      height_(hand_height),
+      init_bite_(init_bite) {}
 
 HandGeometry::HandGeometry(const std::string &filepath) {
   util::ConfigFile config_file(filepath);
@@ -36,5 +42,5 @@ std::ostream &operator<<(std::ostream &stream,
   return stream;
 }
 
-} // namespace candidate
-} // namespace gpd
+}  // namespace candidate
+}  // namespace gpd

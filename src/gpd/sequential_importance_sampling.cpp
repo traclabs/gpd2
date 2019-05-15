@@ -268,4 +268,4 @@ void SequentialImportanceSampling::drawUniformSamples(
   }
 }
 
-} // namespace gpd
+}  // namespace gpd

@@ -33,8 +33,7 @@ std::vector<std::unique_ptr<candidate::Hand>> Clustering::findClusters(
     double standard_deviation = 0.0;
 
     for (int j = 0; j < hand_list.size(); j++) {
-      if (i == j || (remove_inliers && has_used[j]))
-        continue;
+      if (i == j || (remove_inliers && has_used[j])) continue;
 
       // Which hands have an axis within <AXIS_ALIGN_ANGLE_THRESH> of this one?
       double axis_aligned =
@@ -105,4 +104,4 @@ std::vector<std::unique_ptr<candidate::Hand>> Clustering::findClusters(
   return hands_out;
 }
 
-} // namespace gpd
+}  // namespace gpd

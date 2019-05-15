@@ -32,10 +32,10 @@
 #ifndef CLOUD_H_
 #define CLOUD_H_
 
+#include <math.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <math.h>
 #include <vector>
 
 #include <Eigen/Dense>
@@ -48,10 +48,10 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <pcl/search/impl/kdtree.hpp>
 #include <pcl/search/kdtree.h>
+#include <pcl/search/impl/kdtree.hpp>
 
-#if defined(USE_PCL_GPU) // switch include ordering if compilation fails
+#if defined(USE_PCL_GPU)  // switch include ordering if compilation fails
 #include <pcl/gpu/containers/device_array.hpp>
 #include <pcl/gpu/features/features.hpp>
 #endif
@@ -76,7 +76,7 @@ typedef pcl::PointCloud<pcl::Normal> PointCloudNormal;
  *
  */
 class Cloud {
-public:
+ public:
   /**
    * \brief Comparator for checking uniqueness of two 3D-vectors.
    */
@@ -372,7 +372,7 @@ public:
    */
   PointCloudRGB::Ptr loadPointCloudFromFile(const std::string &filename) const;
 
-private:
+ private:
   std::vector<std::vector<int>> convertCameraSourceMatrixToLists();
 
   PointCloudRGB::Ptr cloud_processed_;
@@ -387,7 +387,7 @@ private:
   Eigen::Matrix3Xd samples_;
 };
 
-} // namespace util
-} // namespace gpd
+}  // namespace util
+}  // namespace gpd
 
 #endif /* CLOUD_H_ */

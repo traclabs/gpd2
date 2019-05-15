@@ -50,7 +50,7 @@ namespace net {
  *
  */
 class ConvLayer : public Layer {
-public:
+ public:
   /**
    * \brief Constructor.
    * \param width input width
@@ -70,7 +70,7 @@ public:
    */
   Eigen::MatrixXf forward(const std::vector<float> &x) const;
 
-private:
+ private:
   typedef Eigen::Map<const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic,
                                          Eigen::RowMajor>>
       RowMajorMatrixMap;
@@ -108,15 +108,15 @@ private:
                       const int stride_h, const int stride_w,
                       float *data_col) const;
 
-  int w1, h1, d1; // size of input volume: w1 x h1 x d1
-  int w2, h2, d2; // size of output volume: w2 x h2 x d2
-  int k, f, s, p; // number of filters, their spatial extent, stride, amount of
-                  // zero padding
-  int W_row_r, W_row_c; // number of rows and columns in matrix W_row
-  int X_col_r, X_col_c; // number of rows and columns in matrix X_col
+  int w1, h1, d1;  // size of input volume: w1 x h1 x d1
+  int w2, h2, d2;  // size of output volume: w2 x h2 x d2
+  int k, f, s, p;  // number of filters, their spatial extent, stride, amount of
+                   // zero padding
+  int W_row_r, W_row_c;  // number of rows and columns in matrix W_row
+  int X_col_r, X_col_c;  // number of rows and columns in matrix X_col
 };
 
-} // namespace net
-} // namespace gpd
+}  // namespace net
+}  // namespace gpd
 
 #endif /* CONV_LAYER_H */
