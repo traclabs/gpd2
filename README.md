@@ -199,22 +199,28 @@ Next, you need to compile GPD with the flag `DBUILD_DATA_GENERATION` like this:
     make -j
     ```
 
-There are three steps to train a network to predict grasp poses. First, we need to create grasp images:
+There are four steps to train a network to predict grasp poses. First, we need to create grasp images.
 
    ```
-   ./gpd_generate_training_data.py ../cfg/generate_data.cfg
+   ./generate_data ../cfg/generate_data.cfg
    ```
 
 You should modify `generate_data.cfg` according to your needs.
 
-The second step is to train a neural network. The easiest way to training the network is with the existing code. This requires the **pytorch** framework. To train a network, use `train_net.py`:
+Next, you need to resize the created databases to `train_offset` and `test_offset` (see the terminal output of `generate_data`). For example, to resize the training set, use the following commands with `size` set to the value of `train_offset`.
+   ```
+   cd pytorch
+   python reshape_hdf5.py pathToTrainingSet.h5 out.h5 size
+   ```
+
+The third step is to train a neural network. The easiest way to training the network is with the existing code. This requires the **pytorch** framework. To train a network, use the following commands.
 
    ```
    cd pytorch
    python train_net3.py pathToTrainingSet.h5 pathToTestSet.h5 num_channels
    ```
 
-The third step is to convert the model to the ONNX format.
+The fourth step is to convert the model to the ONNX format.
 
    ```
    python torch_to_onxx.py pathToPytorchModel.pwf pathToONNXModel.onnx num_channels
