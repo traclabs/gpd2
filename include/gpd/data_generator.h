@@ -88,6 +88,10 @@ class DataGenerator {
  private:
   void createDatasetsHDF5(const std::string &filepath, int num_data);
 
+  void reshapeHDF5(const std::string &in, const std::string &out,
+                   const std::string &dataset, int num, int chunk_size,
+                   int max_in_memory);
+
   /**
    * \brief Load a point cloud and surface normals given ROS launch parameters.
    * \param mesh_file_path location of the point cloud file
@@ -169,6 +173,7 @@ class DataGenerator {
   int min_grasps_per_view_;
   int max_grasps_per_view_;
   int chunk_size_;
+  int max_in_memory_;
   int num_threads_;
   int num_samples_;
   double voxel_size_views_;

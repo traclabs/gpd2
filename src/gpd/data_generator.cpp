@@ -7,8 +7,7 @@ namespace gpd {
 const std::string DataGenerator::IMAGES_DS_NAME = "images";
 const std::string DataGenerator::LABELS_DS_NAME = "labels";
 
-DataGenerator::DataGenerator(const std::string &config_filename)
-    : chunk_size_(5000) {
+DataGenerator::DataGenerator(const std::string &config_filename) {
   detector_ = std::make_unique<GraspDetector>(config_filename);
 
   // Read parameters from configuration file.
@@ -18,6 +17,8 @@ DataGenerator::DataGenerator(const std::string &config_filename)
   objects_file_location_ =
       config_file.getValueOfKeyAsString("objects_file_location", "");
   output_root_ = config_file.getValueOfKeyAsString("output_root", "");
+  chunk_size_ = config_file.getValueOfKey<int>("chunk_size", 1000);
+  max_in_memory_ = config_file.getValueOfKey<int>("max_in_memory", 100000);
   num_views_per_object_ =
       config_file.getValueOfKey<int>("num_views_per_object", 1);
   min_grasps_per_view_ =
@@ -69,153 +70,6 @@ DataGenerator::DataGenerator(const std::string &config_filename)
   Eigen::VectorXi::Map(&all_cam_sources_[0], cam_sources.rows()) = cam_sources;
 }
 
-void DataGenerator::generateDataBigbird() {
-  const candidate::HandGeometry &hand_geom =
-      detector_->getHandSearchParameters().hand_geometry_;
-
-  std::string train_file_path = output_root_ + "train.h5";
-  std::string test_file_path = output_root_ + "test.h5";
-
-  int store_step = 5;
-  bool plot_grasps = false;
-  // debugging
-  int num_objects = 4;
-  num_views_per_object_ = 4;
-  // int num_objects = objects.size();
-  double total_time = 0.0;
-
-  std::vector<std::string> objects = loadObjectNames(objects_file_location_);
-  std::vector<int> positives_list, negatives_list;
-  std::vector<Instance> train_data, test_data;
-  train_data.reserve(store_step * num_views_per_object_ * 1000);
-  test_data.reserve(store_step * num_views_per_object_ * 1000);
-
-  createDatasetsHDF5(train_file_path, train_data.size() * num_objects);
-  createDatasetsHDF5(test_file_path, test_data.size() * num_objects);
-  int train_offset = 0;
-  int test_offset = 0;
-
-  for (int i = 0; i < num_objects; i++) {
-    printf("===> Generating images for object %d/%d: %s\n", i, num_objects,
-           objects[i].c_str());
-    double t0 = omp_get_wtime();
-
-    // Load mesh for ground truth.
-    std::string prefix = data_root_ + objects[i];
-    util::Cloud mesh = loadMesh(prefix + "_gt.pcd", prefix + "_gt_normals.csv");
-    mesh.calculateNormalsOMP(num_threads_, normals_radius_);
-
-    for (int j = 0; j < num_views_per_object_; j++) {
-      printf("===> Processing view %d/%d\n", j + 1, num_views_per_object_);
-
-      // 1. Load point cloud.
-      Eigen::Matrix3Xd view_points(3, 1);
-      view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
-      util::Cloud cloud(prefix + "_" + std::to_string(j + 1) + ".pcd",
-                        view_points);
-      cloud.voxelizeCloud(voxel_size_views_);
-      cloud.calculateNormalsOMP(num_threads_, normals_radius_);
-      cloud.subsample(num_samples_);
-
-      // 2. Find grasps in point cloud.
-      std::vector<std::unique_ptr<candidate::Hand>> grasps;
-      std::vector<std::unique_ptr<cv::Mat>> images;
-      bool has_grasps = detector_->createGraspImages(cloud, grasps, images);
-
-      if (plot_grasps) {
-        // Plot plotter;
-        //        plotter.plotNormals(cloud.getCloudOriginal(),
-        //        cloud.getNormals());
-        //        plotter.plotFingers(grasps, cloud.getCloudOriginal(), "Grasps
-        //        on view");
-        //        plotter.plotFingers3D(candidates,
-        //        cloud_cam.getCloudOriginal(), "Grasps on view",
-        //        hand_geom.outer_diameter_,
-        //                                  hand_geom.finger_width_,
-        //                                  hand_geom.depth_,
-        //                                  hand_geom.height_);
-      }
-
-      // 3. Evaluate grasps against ground truth (mesh).
-      std::vector<int> labels = detector_->evalGroundTruth(mesh, grasps);
-
-      // 4. Split grasps into positives and negatives.
-      std::vector<int> positives;
-      std::vector<int> negatives;
-      splitInstances(labels, positives, negatives);
-
-      // 5. Balance the number of positives and negatives.
-      balanceInstances(max_grasps_per_view_, positives, negatives,
-                       positives_list, negatives_list);
-      printf("#positives: %d, #negatives: %d\n", (int)positives_list.size(),
-             (int)negatives_list.size());
-
-      // 6. Assign instances to training or test data.
-      if (std::find(test_views_.begin(), test_views_.end(), j) !=
-          test_views_.end()) {
-        addInstances(grasps, images, positives_list, negatives_list, test_data);
-        std::cout << "test view, # test data: " << test_data.size() << "\n";
-      } else {
-        addInstances(grasps, images, positives_list, negatives_list,
-                     train_data);
-        std::cout << "train view, # train data: " << train_data.size() << "\n";
-      }
-      printf("------------\n");
-    }
-
-    if ((i + 1) % store_step == 0) {
-      // Shuffle the data.
-      std::random_shuffle(train_data.begin(), train_data.end());
-      std::random_shuffle(test_data.begin(), test_data.end());
-      train_offset = insertIntoHDF5(train_file_path, train_data, train_offset);
-      test_offset = insertIntoHDF5(test_file_path, test_data, test_offset);
-      printf("train_offset: %d, test_offset: %d\n", train_offset, test_offset);
-      train_data.clear();
-      test_data.clear();
-      train_data.reserve(store_step * num_views_per_object_ * 1000);
-      test_data.reserve(store_step * num_views_per_object_ * 1000);
-    }
-
-    double ti = omp_get_wtime() - t0;
-    total_time += ti;
-    printf("Time for this object: %4.2fs. Total time: %3.2fs.\n", ti,
-           total_time);
-    printf("Estimated time remaining: %4.2fh or %4.2fs.\n",
-           ti * (num_objects - i) * (1.0 / 3600.0), ti * (num_objects - i));
-    printf("======================================\n");
-  }
-
-  // Store remaining data.
-  if (train_data.size() > 0) {
-    printf("Storing remaining instances ...\n");
-
-    // Shuffle the data.
-    std::random_shuffle(train_data.begin(), train_data.end());
-    std::random_shuffle(test_data.begin(), test_data.end());
-    train_offset = insertIntoHDF5(train_file_path, train_data, train_offset);
-    test_offset = insertIntoHDF5(test_file_path, test_data, test_offset);
-    printf("train_offset: %d, test_offset: %d\n", train_offset, test_offset);
-  }
-
-  printf("Generated %d training and test %d instances\n", train_offset,
-         test_offset);
-
-  //  // Shuffle the data.
-  //  std::random_shuffle(train_data.begin(), train_data.end());
-  //  std::random_shuffle(test_data.begin(), test_data.end());
-
-  //  std::vector<Instance> data0;
-  //  data0.push_back(train_data[0]);
-  //  data0.push_back(train_data[1]);
-  //  data0.push_back(train_data[2]);
-  //  storeHDF5(data0, output_root_ + "train.h5");
-
-  // Store the grasp images and their labels in databases.
-  //  storeHDF5(train_data, output_root_ + "train.h5");
-  //  storeHDF5(test_data, output_root_ + "test.h5");
-  printf("Wrote data to training and test databases\n");
-}
-
 void DataGenerator::generateData() {
   double total_time = 0.0;
 
@@ -234,15 +88,13 @@ void DataGenerator::generateData() {
 
   std::vector<int> positives_list, negatives_list;
   std::vector<Instance> train_data, test_data;
-  const int n = store_step * num_views_per_object_ * 2 * max_grasps_per_view_;
+  const int n = store_step * num_views_per_object_ * max_grasps_per_view_;
   train_data.reserve(n);
   test_data.reserve(n);
   std::string train_file_path = output_root_ + "train.h5";
   std::string test_file_path = output_root_ + "test.h5";
-  createDatasetsHDF5(train_file_path, num_views_per_object_ * 2 *
-                                          max_grasps_per_view_ * num_objects);
-  createDatasetsHDF5(test_file_path, num_views_per_object_ * 2 *
-                                         max_grasps_per_view_ * num_objects);
+  createDatasetsHDF5(train_file_path, objects.size() * n);
+  createDatasetsHDF5(test_file_path, objects.size() * n);
   int train_offset = 0;
   int test_offset = 0;
 
@@ -313,8 +165,7 @@ void DataGenerator::generateData() {
         std::vector<int> positives;
         std::vector<int> negatives;
         splitInstances(labels, positives, negatives);
-        printf("  positives, negatives: %zu, %zu\n", positives.size(),
-               negatives.size());
+
         if (positives_view.size() > 0 && positives.size() > 0) {
           for (int k = 0; k < positives.size(); k++) {
             positives[k] += images_view.size();
@@ -408,7 +259,18 @@ void DataGenerator::generateData() {
 
   printf("Generated %d training and test %d instances\n", train_offset,
          test_offset);
-
+  std::string train_file_path_resized = output_root_ + "train2.h5";
+  std::string test_file_path_resized = output_root_ + "test2.h5";
+  printf("Resizing HDF5 training set to remove empty elements ...\n");
+  reshapeHDF5(train_file_path, train_file_path_resized, "images", train_offset,
+              chunk_size_, max_in_memory_);
+  reshapeHDF5(train_file_path, train_file_path_resized, "labels", train_offset,
+              chunk_size_, max_in_memory_);
+  printf("Resizing HDF5 test set to remove empty elements ...\n");
+  reshapeHDF5(test_file_path, test_file_path_resized, "images", test_offset,
+              chunk_size_, max_in_memory_);
+  reshapeHDF5(test_file_path, test_file_path_resized, "labels", test_offset,
+              chunk_size_, max_in_memory_);
   printf("Wrote data to training and test databases\n");
 }
 
@@ -420,8 +282,8 @@ void DataGenerator::createDatasetsHDF5(const std::string &filepath,
   int n_dims_labels = 2;
   int dsdims_labels[n_dims_labels] = {num_data, 1};
   int chunks_labels[n_dims_labels] = {chunk_size_, dsdims_labels[1]};
-  printf("Creating dataset <labels>: %d x %d\n", dsdims_labels[0],
-         dsdims_labels[1]);
+  printf("Creating dataset <%s>: %d x %d\n", LABELS_DS_NAME.c_str(),
+         dsdims_labels[0], dsdims_labels[1]);
   h5io->dscreate(n_dims_labels, dsdims_labels, CV_8UC1, LABELS_DS_NAME, 4,
                  chunks_labels);
 
@@ -431,10 +293,57 @@ void DataGenerator::createDatasetsHDF5(const std::string &filepath,
       num_data, image_geom.size_, image_geom.size_, image_geom.num_channels_};
   int chunks_images[n_dims_images] = {chunk_size_, dsdims_images[1],
                                       dsdims_images[2], dsdims_images[3]};
+  printf("Creating dataset <%s>: %d x %d x %d x %d\n", IMAGES_DS_NAME.c_str(),
+         dsdims_images[0], dsdims_images[1], dsdims_images[2],
+         dsdims_images[3]);
   h5io->dscreate(n_dims_images, dsdims_images, CV_8UC1, IMAGES_DS_NAME,
                  n_dims_images, chunks_images);
-
   h5io->close();
+}
+
+void DataGenerator::reshapeHDF5(const std::string &in, const std::string &out,
+                                const std::string &dataset, int num,
+                                int chunk_size, int max_in_memory) {
+  const int COMPRESSION_LEVEL = 9;
+
+  cv::Ptr<cv::hdf::HDF5> h5io_in = cv::hdf::open(in);
+  std::vector<int> dims = h5io_in->dsgetsize(dataset);
+  std::vector<int> offsets(dims.size());
+  for (int i = 0; i < dims.size(); i++) {
+    offsets[i] = 0;
+  }
+  printf("Resizing dataset %s of length %d to %d\n", dataset.c_str(), dims[0],
+         num);
+
+  std::vector<int> chunks(dims.begin(), dims.end());
+  chunks[0] = chunk_size;
+  dims[0] = num;
+  int type = h5io_in->dsgettype(dataset);
+  cv::Ptr<cv::hdf::HDF5> h5io_out = cv::hdf::open(out);
+  h5io_out->dscreate(dims.size(), &dims[0], type, dataset, COMPRESSION_LEVEL,
+                     &chunks[0]);
+
+  int steps = num / max_in_memory;
+  dims[0] = max_in_memory;
+  for (int i = 0; i < steps; i++) {
+    cv::Mat mat;
+    cv::Mat mat_cont(dims.size(), dims[0], CV_8UC1, cv::Scalar(0.0));
+    h5io_in->dsread(mat, dataset, offsets, dims);
+    printf("Processing (%d) block: %d to %d, mat: %d, %d, %d, %d\n", i,
+           offsets[0], offsets[0] + dims[0], mat.size[0], mat.size[1],
+           mat.size[2], mat.size[3]);
+    if (!mat.isContinuous()) {
+      std::cout << "Error: matrix is not continuous! Consider resizing using "
+                   "python.\n";
+    }
+    const int dims_offset_images = 4;
+    int offsets_images[dims_offset_images] = {offsets[0], 0, 0, 0};
+    h5io_out->dsinsert(mat, dataset, offsets_images);
+    offsets[0] += max_in_memory;
+  }
+
+  h5io_in->close();
+  h5io_out->close();
 }
 
 util::Cloud DataGenerator::loadMesh(const std::string &mesh_file_path,
@@ -499,25 +408,24 @@ void DataGenerator::balanceInstances(int max_grasps_per_view,
                                      const std::vector<int> &negatives_in,
                                      std::vector<int> &positives_out,
                                      std::vector<int> &negatives_out) {
-  int end = 0;
+  size_t end;
   positives_out.resize(0);
   negatives_out.resize(0);
 
-  if (positives_in.size() > 0 && positives_in.size() <= negatives_in.size()) {
-    end = std::min((int)positives_in.size(), max_grasps_per_view);
+  if (negatives_in.size() > positives_in.size()) {
+    end =
+        std::min(positives_in.size(), (size_t)floor(0.5 * max_grasps_per_view));
     positives_out.insert(positives_out.end(), positives_in.begin(),
                          positives_in.begin() + end);
     negatives_out.insert(negatives_out.end(), negatives_in.begin(),
                          negatives_in.begin() + end);
   } else {
-    end = std::min((int)negatives_in.size(), max_grasps_per_view);
+    end =
+        std::min(negatives_in.size(), (size_t)floor(0.5 * max_grasps_per_view));
     negatives_out.insert(negatives_out.end(), negatives_in.begin(),
                          negatives_in.begin() + end);
-
-    if (positives_in.size() > negatives_in.size()) {
-      positives_out.insert(positives_out.end(), positives_in.begin(),
-                           positives_in.begin() + end);
-    }
+    positives_out.insert(positives_out.end(), positives_in.begin(),
+                         positives_in.begin() + end);
   }
 }
 
