@@ -88,13 +88,15 @@ void DataGenerator::generateData() {
 
   std::vector<int> positives_list, negatives_list;
   std::vector<Instance> train_data, test_data;
-  const int n = store_step * num_views_per_object_ * max_grasps_per_view_;
-  train_data.reserve(n);
-  test_data.reserve(n);
+  int num_train_views = num_views_per_object_ - test_views_.size();
+  const int n_train = store_step * num_train_views * max_grasps_per_view_;
+  const int n_test = store_step * test_views_.size() * max_grasps_per_view_;
+  train_data.reserve(n_train);
+  test_data.reserve(n_test);
   std::string train_file_path = output_root_ + "train.h5";
   std::string test_file_path = output_root_ + "test.h5";
-  createDatasetsHDF5(train_file_path, objects.size() * n);
-  createDatasetsHDF5(test_file_path, objects.size() * n);
+  createDatasetsHDF5(train_file_path, objects.size() * n_train);
+  createDatasetsHDF5(test_file_path, objects.size() * n_test);
   int train_offset = 0;
   int test_offset = 0;
 
@@ -323,22 +325,20 @@ void DataGenerator::reshapeHDF5(const std::string &in, const std::string &out,
   h5io_out->dscreate(dims.size(), &dims[0], type, dataset, COMPRESSION_LEVEL,
                      &chunks[0]);
 
-  int steps = num / max_in_memory;
+  int steps = num / max_in_memory + 1;
   dims[0] = max_in_memory;
   for (int i = 0; i < steps; i++) {
     cv::Mat mat;
-    cv::Mat mat_cont(dims.size(), dims[0], CV_8UC1, cv::Scalar(0.0));
+    dims[0] = (i == steps - 1) ? num - offsets[0]  : max_in_memory;
     h5io_in->dsread(mat, dataset, offsets, dims);
-    printf("Processing (%d) block: %d to %d, mat: %d, %d, %d, %d\n", i,
-           offsets[0], offsets[0] + dims[0], mat.size[0], mat.size[1],
-           mat.size[2], mat.size[3]);
+    printf("Processing block %d/%d: %d to %d\n", i + 1, steps, offsets[0],
+        offsets[0] + dims[0]);
     if (!mat.isContinuous()) {
       std::cout << "Error: matrix is not continuous! Consider resizing using "
                    "python.\n";
+      break;
     }
-    const int dims_offset_images = 4;
-    int offsets_images[dims_offset_images] = {offsets[0], 0, 0, 0};
-    h5io_out->dsinsert(mat, dataset, offsets_images);
+    h5io_out->dsinsert(mat, dataset, offsets);
     offsets[0] += max_in_memory;
   }
 
