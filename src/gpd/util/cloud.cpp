@@ -443,9 +443,9 @@ void Cloud::writeNormalsToFile(const std::string &filename,
   myfile.open(filename.c_str());
 
   for (int i = 0; i < normals.cols(); i++) {
-    myfile << boost::lexical_cast<std::string>(normals(0, i)) << ","
-           << boost::lexical_cast<std::string>(normals(1, i)) << ","
-           << boost::lexical_cast<std::string>(normals(2, i)) << "\n";
+    myfile << std::to_string(normals(0, i)) << ","
+           << std::to_string(normals(1, i)) << ","
+           << std::to_string(normals(2, i)) << "\n";
   }
 
   myfile.close();
@@ -635,7 +635,7 @@ void Cloud::setNormalsFromFile(const std::string &filename) {
     int j = 0;
 
     while (std::getline(lineStream, cell, ',')) {
-      normals_(i, j) = boost::lexical_cast<double>(cell);
+      normals_(i, j) = std::stod(cell);
       j++;
     }
 

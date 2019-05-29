@@ -111,9 +111,8 @@ void DataGenerator::generateDataBigbird() {
       // 1. Load point cloud.
       Eigen::Matrix3Xd view_points(3, 1);
       view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
-      util::Cloud cloud(
-          prefix + "_" + boost::lexical_cast<std::string>(j + 1) + ".pcd",
-          view_points);
+      util::Cloud cloud(prefix + "_" + std::to_string(j + 1) + ".pcd",
+                        view_points);
       cloud.voxelizeCloud(voxel_size_views_);
       cloud.calculateNormalsOMP(num_threads_, normals_radius_);
       cloud.subsample(num_samples_);
@@ -273,9 +272,8 @@ void DataGenerator::generateData() {
       // 1. Load point cloud.
       Eigen::Matrix3Xd view_points(3, 1);
       view_points << 0.0, 0.0, 0.0;  // TODO: Load camera position.
-      util::Cloud cloud(
-          prefix + "_" + boost::lexical_cast<std::string>(j + 1) + ".pcd",
-          view_points);
+      util::Cloud cloud(prefix + "_" + std::to_string(j + 1) + ".pcd",
+                        view_points);
       if (remove_nans_) {
         cloud.removeNans();
       }
@@ -458,28 +456,6 @@ util::Cloud DataGenerator::loadMesh(const std::string &mesh_file_path,
          (int)mesh_cloud_cam.getCloudProcessed()->size());
 
   return mesh_cloud_cam;
-}
-
-std::vector<boost::filesystem::path> DataGenerator::loadPointCloudFiles(
-    const std::string &cloud_folder) {
-  boost::filesystem::path path(cloud_folder);
-  boost::filesystem::directory_iterator it(path);
-  std::vector<boost::filesystem::path> files;
-
-  while (it != boost::filesystem::directory_iterator()) {
-    const std::string &filepath = (*it).path().string();
-
-    if (filepath.find("mesh") == std::string::npos &&
-        filepath.find(".pcd") != std::string::npos) {
-      files.push_back((*it).path());
-    }
-
-    it++;
-  }
-
-  std::sort(files.begin(), files.end());
-
-  return files;
 }
 
 std::vector<std::string> DataGenerator::loadObjectNames(

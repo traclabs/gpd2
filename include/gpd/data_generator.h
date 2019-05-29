@@ -98,14 +98,6 @@ class DataGenerator {
                        const std::string &normals_file_path);
 
   /**
-   * \brief Load all point cloud files from a folder.
-   * \param cloud_folder location of the folder
-   * \return list of point cloud files
-   */
-  std::vector<boost::filesystem::path> loadPointCloudFiles(
-      const std::string &cloud_folder);
-
-  /**
    * \brief Load object names from a file.
    * \param objects_file_location location of the file
    * \return list of object names

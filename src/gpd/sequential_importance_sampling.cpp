@@ -1,5 +1,7 @@
 #include <gpd/sequential_importance_sampling.h>
 
+#include <random>
+
 namespace gpd {
 
 // methods for sampling from a set of Gaussians
@@ -97,7 +99,6 @@ SequentialImportanceSampling::detectGrasps(util::Cloud &cloud) {
                           "Initial Grasps", hand_geom);
   }
 
-  // 2. Create random generator for normal distribution.
   int num_rand_samples = prob_rand_samples_ * num_samples_;
   int num_gauss_samples = num_samples_ - num_rand_samples;
   double sigma = radius_;
@@ -105,31 +106,26 @@ SequentialImportanceSampling::detectGrasps(util::Cloud &cloud) {
   diag_sigma.diagonal() << sigma, sigma, sigma;
   Eigen::Matrix3d inv_sigma = diag_sigma.inverse();
   double term = 1.0 / sqrt(pow(2.0 * M_PI, 3.0) * pow(sigma, 3.0));
-  boost::mt19937 *rng = new boost::mt19937();
-  rng->seed(time(NULL));
-  boost::normal_distribution<> distribution(0.0, 1.0);
-  boost::variate_generator<boost::mt19937, boost::normal_distribution<>>
-      generator(*rng, distribution);
   Eigen::Matrix3Xd samples(3, num_samples_);
 
-  // 3. Find grasp hypotheses using importance sampling.
+  // 2. Find grasp hypotheses using importance sampling.
   for (int i = 0; i < num_iterations_; i++) {
     std::cout << i << " " << num_gauss_samples << std::endl;
 
-    // 3.1 Draw samples close to existing affordances.
+    // 2.1 Draw samples close to existing affordances.
     if (this->sampling_method_ == SUM_OF_GAUSSIANS) {
-      drawSamplesFromSumOfGaussians(hand_set_list, generator, sigma,
-                                    num_gauss_samples, samples);
+      drawSamplesFromSumOfGaussians(hand_set_list, sigma, num_gauss_samples,
+                                    samples);
     } else if (this->sampling_method_ == MAX_OF_GAUSSIANS) {
-      drawSamplesFromMaxOfGaussians(hand_set_list, generator, sigma,
-                                    num_gauss_samples, samples, term);
+      drawSamplesFromMaxOfGaussians(hand_set_list, sigma, num_gauss_samples,
+                                    samples, term);
     }
 
-    // 3.2 Draw random samples.
+    // 2.2 Draw random samples.
     drawUniformSamples(cloud, num_rand_samples, num_samples_ - num_rand_samples,
                        samples);
 
-    // 3.3 Evaluate grasp hypotheses at <samples>.
+    // 2.3 Evaluate grasp hypotheses at <samples>.
     cloud.setSamples(samples);
     std::vector<std::unique_ptr<candidate::HandSet>> hand_set_list_new =
         grasp_detector_->generateGraspCandidates(cloud);
@@ -165,7 +161,7 @@ SequentialImportanceSampling::detectGrasps(util::Cloud &cloud) {
                           "Grasp Candidates", hand_geom);
   }
 
-  // Classify the grasps.
+  // 3. Classify the grasps.
   std::vector<std::unique_ptr<candidate::Hand>> valid_grasps;
   valid_grasps =
       grasp_detector_->pruneGraspCandidates(cloud, hand_set_list, min_score_);
@@ -192,27 +188,32 @@ SequentialImportanceSampling::detectGrasps(util::Cloud &cloud) {
 
 void SequentialImportanceSampling::drawSamplesFromSumOfGaussians(
     const std::vector<std::unique_ptr<candidate::HandSet>> &hand_sets,
-    Gaussian &generator, double sigma, int num_gauss_samples,
-    Eigen::Matrix3Xd &samples_out) {
+    double sigma, int num_gauss_samples, Eigen::Matrix3Xd &samples_out) {
+  static std::random_device rd{};
+  static std::mt19937 gen{rd()};
+  static std::normal_distribution<double> distr{0.0, sigma};
   for (std::size_t j = 0; j < num_gauss_samples; j++) {
     int idx = rand() % hand_sets.size();
     Eigen::Vector3d rand_vec;
-    rand_vec << generator() * sigma, generator() * sigma, generator() * sigma;
+    rand_vec << distr(gen), distr(gen), distr(gen);
     samples_out.col(j) = hand_sets[idx]->getSample() + rand_vec;
   }
 }
 
 void SequentialImportanceSampling::drawSamplesFromMaxOfGaussians(
     const std::vector<std::unique_ptr<candidate::HandSet>> &hand_sets,
-    Gaussian &generator, double sigma, int num_gauss_samples,
-    Eigen::Matrix3Xd &samples_out, double term) {
+    double sigma, int num_gauss_samples, Eigen::Matrix3Xd &samples_out,
+    double term) {
   int j = 0;
+  static std::random_device rd{};
+  static std::mt19937 gen{rd()};
+  static std::normal_distribution<double> distr{0.0, sigma};
 
   // Draw samples using rejection sampling.
   while (j < num_gauss_samples) {
     int idx = rand() % hand_sets.size();
     Eigen::Vector3d rand_vec;
-    rand_vec << generator() * sigma, generator() * sigma, generator() * sigma;
+    rand_vec << distr(gen), distr(gen), distr(gen);
     Eigen::Vector3d x = hand_sets[idx]->getSample() + rand_vec;
 
     double maxp = 0;

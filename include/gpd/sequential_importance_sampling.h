@@ -45,9 +45,6 @@ namespace gpd {
 
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloudRGB;
 
-typedef boost::variate_generator<boost::mt19937, boost::normal_distribution<>>
-    Gaussian;
-
 /**
  *
  * \brief Grasp pose detection with the Cross Entropy Method.
@@ -91,28 +88,25 @@ class SequentialImportanceSampling {
   /**
    * \brief Draw (x,y,z) grasp samples from sum of Gaussians.
    * \param hands the list of grasp candidate sets
-   * \param generator Gaussian random number generator
    * \param sigma standard deviation of the Gaussian
    * \param num_gauss_samples number of samples to be drawn
    * \return the samples drawn from the sum of Gaussians
    */
   void drawSamplesFromSumOfGaussians(
       const std::vector<std::unique_ptr<candidate::HandSet>> &hand_sets,
-      Gaussian &generator, double sigma, int num_gauss_samples,
-      Eigen::Matrix3Xd &samples_out);
+      double sigma, int num_gauss_samples, Eigen::Matrix3Xd &samples_out);
 
   /**
    * \brief Draw (x,y,z) grasp samples from max of Gaussians.
    * \param hands the list of grasp candidate sets
-   * \param generator Gaussian random number generator
    * \param sigma standard deviation of the Gaussian
    * \param num_gauss_samples number of samples to be drawn
    * \return the samples drawn from the sum of Gaussians
    */
   void drawSamplesFromMaxOfGaussians(
       const std::vector<std::unique_ptr<candidate::HandSet>> &hands,
-      Gaussian &generator, double sigma, int num_gauss_samples,
-      Eigen::Matrix3Xd &samples_out, double term);
+      double sigma, int num_gauss_samples, Eigen::Matrix3Xd &samples_out,
+      double term);
 
   void drawUniformSamples(const util::Cloud &cloud, int num_samples,
                           int start_idx, Eigen::Matrix3Xd &samples);

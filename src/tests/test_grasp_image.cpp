@@ -1,4 +1,4 @@
-#include <boost/lexical_cast.hpp>
+#include <string>
 
 #include <gpd/candidate/candidates_generator.h>
 #include <gpd/candidate/hand.h>
@@ -37,7 +37,7 @@ int DoMain(int argc, char *argv[]) {
   }
 
   // Read the sample index from the terminal.
-  int sample_idx = boost::lexical_cast<int>(argv[2]);
+  int sample_idx = std::stoi(argv[2]);
   if (sample_idx >= cloud.getCloudOriginal()->size()) {
     std::cout << "Error: Sample index is larger than the number of points in "
                  "the cloud!\n";
@@ -68,7 +68,7 @@ int DoMain(int argc, char *argv[]) {
   image_geom.size_ = 60;
   image_geom.num_channels_ = 15;
   if (argc >= 5) {
-    image_geom.num_channels_ = boost::lexical_cast<int>(argv[4]);
+    image_geom.num_channels_ = std::stoi(argv[4]);
   }
 
   // Local hand search parameters
@@ -84,7 +84,7 @@ int DoMain(int argc, char *argv[]) {
   std::vector<int> hand_axes;
   if (argc >= 6) {
     for (int i = 5; i < argc; i++) {
-      hand_axes.push_back(boost::lexical_cast<int>(argv[i]));
+      hand_axes.push_back(std::stoi(argv[i]));
     }
   } else {
     hand_axes.push_back(2);
@@ -142,7 +142,7 @@ int DoMain(int argc, char *argv[]) {
 
   // Create the image for this grasp candidate.
   bool plot_images = true;
-  plot_images = boost::lexical_cast<bool>(argv[3]);
+  plot_images = (std::stoi(argv[3]) == 1);
   printf("Creating grasp image ...\n");
   printf("plot images: %d\n", plot_images);
   const int kNumThreads = 1;

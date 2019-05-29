@@ -156,7 +156,7 @@ GPD supports the following three frameworks:
 1. [OpenVino](https://software.intel.com/en-us/openvino-toolkit): [installation instructions](https://github.com/opencv/dldt/blob/2018/inference-engine/README.md) for open source version
 (CPUs, GPUs, FPGAs from Intel)
 1. [Caffe](https://caffe.berkeleyvision.org/) (GPUs from Nvidia or CPUs)
-1. Custom LeNet implementation using the Eigen library
+1. Custom LeNet implementation using the Eigen library (CPU)
 
 Additional classifiers can be added by sub-classing the `classifier` interface.
 
@@ -182,9 +182,9 @@ GPD can use GPU methods provided within PCL to speed up point cloud processing.
     make -j
     ```
 
-Note that, unfortunately, the surface normals produced by the PCL GPU module
+**Note:** unfortunately, the surface normals produced by the PCL GPU module
 can often be incorrect. The correctness of these normals depends on the number
-of neighbors considered (a fixed number vs a radius).
+of neighbors considered (a parameter).
 
 <a name="net_train"></a>
 ## 9) Network Training

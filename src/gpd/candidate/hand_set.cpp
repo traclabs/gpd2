@@ -1,5 +1,7 @@
 #include <gpd/candidate/hand_set.h>
 
+#include <random>
+
 namespace gpd {
 namespace candidate {
 
@@ -10,14 +12,6 @@ const Eigen::Vector3d HandSet::AXES[3] = {Eigen::Vector3d::UnitX(),
 const bool HandSet::MEASURE_TIME = false;
 
 int HandSet::seed_ = 0;
-
-// HandSet::HandSet() {
-//  sample_.setZero();
-//  hands_.resize(0);
-//  is_valid_.resize(0);
-//  angles_.resize(0);
-//  deepen_hand_ = true;
-//}
 
 HandSet::HandSet(const HandGeometry &hand_geometry,
                  const Eigen::VectorXd &angles,
@@ -198,18 +192,15 @@ Eigen::Matrix3Xd HandSet::shadowVoxelsToPoints(
     const std::vector<Eigen::Vector3i> &voxels, double voxel_grid_size) const {
   // Convert voxels back to points.
   double t0_voxels = omp_get_wtime();
-  boost::mt19937 *rng = new boost::mt19937();
-  rng->seed(time(NULL));
-  boost::normal_distribution<> distribution(0.0, 1.0);
-  boost::variate_generator<boost::mt19937, boost::normal_distribution<>>
-      generator(*rng, distribution);
-
+  std::random_device rd{};
+  std::mt19937 gen{rd()};
+  std::normal_distribution<double> distr{0.0, 1.0};
   Eigen::Matrix3Xd shadow(3, voxels.size());
 
   for (int i = 0; i < voxels.size(); i++) {
     shadow.col(i) =
         voxels[i].cast<double>() * voxel_grid_size +
-        Eigen::Vector3d::Ones() * generator() * voxel_grid_size * 0.3;
+        Eigen::Vector3d::Ones() * distr(gen) * voxel_grid_size * 0.3;
   }
   if (MEASURE_TIME)
     std::cout << "voxels-to-points runtime: " << omp_get_wtime() - t0_voxels
