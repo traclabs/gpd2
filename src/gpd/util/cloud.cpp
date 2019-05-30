@@ -1,5 +1,6 @@
 #include <gpd/util/cloud.h>
 
+#include <pcl/common/common.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/segmentation/sac_segmentation.h>
@@ -151,9 +152,15 @@ Cloud::Cloud(const std::string &filename_left,
 }
 
 void Cloud::removeNans() {
-  std::vector<int> indices;
-  pcl::removeNaNFromPointCloud(*cloud_processed_, *cloud_processed_, indices);
-  printf("Cloud after removing NANs: %zu\n", cloud_processed_->size());
+  pcl::PointIndices::Ptr inliers(new pcl::PointIndices());
+  pcl::removeNaNFromPointCloud(*cloud_processed_, inliers->indices);
+  if (inliers->indices.size() < cloud_processed_->size()) {
+    pcl::ExtractIndices<pcl::PointXYZRGBA> eifilter(true);
+    eifilter.setInputCloud(cloud_processed_);
+    eifilter.setIndices(inliers);
+    eifilter.filter(*cloud_processed_);
+    printf("Cloud after removing NANs: %zu\n", cloud_processed_->size());
+  }
 }
 
 void Cloud::removeStatisticalOutliers() {
@@ -277,37 +284,29 @@ void Cloud::filterSamples(const std::vector<double> &workspace) {
 }
 
 void Cloud::voxelizeCloud(float cell_size) {
-  const Eigen::MatrixXf pts = cloud_processed_->getMatrixXfMap();
-  Eigen::Vector3f min_xyz;
-  min_xyz << pts.row(0).minCoeff(), pts.row(1).minCoeff(),
-      pts.row(2).minCoeff();
-
   // Find the cell that each point falls into.
-  std::set<Eigen::Vector4i, Cloud::UniqueVectorFirstThreeElementsComparator>
-      bins;
-  std::vector<Eigen::Vector3d> avg_normals;
-  avg_normals.resize(pts.cols());
-  std::vector<int> counts;
-  counts.resize(pts.cols());
+  pcl::PointXYZRGBA min_pt_pcl;
+  pcl::PointXYZRGBA max_pt_pcl;
+  pcl::getMinMax3D(*cloud_processed_, min_pt_pcl, max_pt_pcl);
+  const Eigen::Vector3f min_pt = min_pt_pcl.getVector3fMap();
+  std::set<Eigen::Vector4i, Cloud::UniqueVector4First3Comparator> bins;
+  Eigen::Matrix3Xd avg_normals = Eigen::Matrix3Xd::Zero(3, cloud_processed_->size());
+  Eigen::VectorXi counts = Eigen::VectorXi::Zero(cloud_processed_->size());
 
-  for (int i = 0; i < pts.cols(); i++) {
+  for (int i = 0; i < cloud_processed_->size(); i++) {
+    const Eigen::Vector3f pt = cloud_processed_->at(i).getVector3fMap();
     Eigen::Vector4i v4;
-    v4.head(3) =
-        EigenUtils::floorVector((pts.col(i).head(3) - min_xyz) / cell_size);
+    v4.head(3) = EigenUtils::floorVector((pt - min_pt) / cell_size);
     v4(3) = i;
-    std::pair<
-        std::set<Eigen::Vector4i,
-                 Cloud::UniqueVectorFirstThreeElementsComparator>::iterator,
+    std::pair<std::set<Eigen::Vector4i,
+                 Cloud::UniqueVector4First3Comparator>::iterator,
         bool>
         res = bins.insert(v4);
 
-    if (res.second && normals_.cols() > 0) {
-      avg_normals[i] = normals_.col(i);
-      counts[i] = 1;
-    } else if (normals_.cols() > 0) {
+    if (normals_.cols() > 0) {
       const int &idx = (*res.first)(3);
-      avg_normals[idx] += normals_.col(i);
-      counts[idx]++;
+      avg_normals.col(idx) += normals_.col(i);
+      counts(idx)++;
     }
   }
 
@@ -318,22 +317,20 @@ void Cloud::voxelizeCloud(float cell_size) {
   Eigen::MatrixXi camera_source(camera_source_.rows(), bins.size());
   int i = 0;
   std::set<Eigen::Vector4i,
-           Cloud::UniqueVectorFirstThreeElementsComparator>::iterator it;
+           Cloud::UniqueVector4First3Comparator>::iterator it;
 
   for (it = bins.begin(); it != bins.end(); it++) {
-    voxels.col(i) = (*it).block(0, 0, 3, 1).cast<float>();
+    voxels.col(i) = min_pt + cell_size * (*it).head(3).cast<float>();
     const int &idx = (*it)(3);
 
     for (int j = 0; j < camera_source_.rows(); j++) {
       camera_source(j, i) = (camera_source_(j, idx) == 1) ? 1 : 0;
     }
     if (normals_.cols() > 0) {
-      normals.col(i) = avg_normals[idx] / (double)counts[idx];
+      normals.col(i) = avg_normals.col(idx) / (double) counts(idx);
     }
     i++;
   }
-  voxels *= cell_size;
-  voxels.colwise() += min_xyz;
 
   // Copy the voxels into the point cloud.
   cloud_processed_->points.resize(voxels.cols());

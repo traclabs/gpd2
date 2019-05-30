@@ -102,7 +102,7 @@ class Cloud {
   /**
    * \brief Comparator for checking uniqueness of two 4D-vectors.
    */
-  struct UniqueVectorFirstThreeElementsComparator {
+  struct UniqueVector4First3Comparator {
     /**
      * \brief Compares two 4D-vectors for uniqueness (ignores the last element).
      * \param a the first 4D-vector
