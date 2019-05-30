@@ -37,7 +37,7 @@
 #include <Eigen/Dense>
 
 #include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include <gpd/candidate/hand_set.h>
 #include <gpd/descriptor/image_geometry.h>

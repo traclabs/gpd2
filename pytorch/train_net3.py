@@ -1,6 +1,7 @@
 # Use tensors to speed up loading data onto the GPU during training.
 
 import h5py
+import h5py_cache as h5c
 import numpy as np
 import torch
 import torch.nn as nn
@@ -12,66 +13,8 @@ import sys
 
 #torch.multiprocessing.set_start_method('spawn')
 
-class H5Dataset(torchdata.Dataset):
-    def __init__(self, file_path, start_idx, end_idx):
-        super(H5Dataset, self).__init__()
-        with h5py.File(file_path, 'r') as h5_file:
-            self.data = torch.from_numpy(np.array(h5_file.get('images')[start_idx : end_idx]))
-            print(self.data.dtype)
-            self.target = torch.from_numpy(np.array(h5_file.get('labels')[start_idx : end_idx])).to(torch.int32) #.astype('int32'))
-        print("Loaded data")
-
-    def __getitem__(self, index):
-        image = self.data[index,:,:].to(torch.float32) * 1/256.0
-        # Pytorch uses NCHW format
-        image = image.reshape((image.shape[2], image.shape[0], image.shape[1]))
-        target = self.target[index,:][0]
-        return (image, target)
-
-    def __len__(self):
-        return self.data.shape[0]
-
-class Net2(nn.Module):
-    def __init__(self, input_channels):
-        super(Net2, self).__init__()
-        self.conv1 = nn.Conv2d(input_channels, 20, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(20, 50, 5)
-        self.fc1 = nn.Linear(50 * 12 * 12, 500)
-        self.fc2 = nn.Linear(500, 2)
-        # self.fc2 = nn.Linear(120, 84)
-        # self.fc3 = nn.Linear(84, 2)
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 50 * x.shape[2] * x.shape[3])
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        # x = F.relu(self.fc2(x))
-        # x = self.fc3(x)
-        return x
-
-class Net(nn.Module):
-    def __init__(self, input_channels):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(input_channels, 20, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(20, 50, 5)
-#        self.drop2d = nn.Dropout2d(p=0.2)
-        self.fc1 = nn.Linear(50 * 12 * 12, 500)
-#        self.drop1 = nn.Dropout(p=0.5)
-        self.fc2 = nn.Linear(500, 2)
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-#        x = self.pool(F.relu(self.drop2d(self.conv2(x))))
-        x = x.view(-1, x.shape[1] * x.shape[2] * x.shape[3])
-        x = F.relu(self.fc1(x))
-#        x = self.drop1(x)
-        x = self.fc2(x)
-        return x
+from hdf5_dataset import H5Dataset
+from network import Net, NetCCFFF
 
 def train(model, criterion, optimizer, data, device):
     # Get the inputs and transfer them to the CPU/GPU.
@@ -114,16 +57,17 @@ def eval(model, test_loader, device):
 
     return accuracy
 
-if len(sys.argv) < 4:
+if len(sys.argv) < 3:
     print('ERROR: Not enough input arguments!')
-    print('Usage: python train_net3.py pathToTrainingSet.h5 pathToTestSet.h5 num_channels')
+    print('Usage: python train_net3.py pathToTrainingSet.h5')
     exit(-1)
 
 with h5py.File(sys.argv[1], 'r') as db:
     num_train = len(db['images'])
 print('Have', num_train, 'total training examples')
 num_epochs = 10
-max_in_memory = 60000
+max_in_memory = 80000
+print_step = 250
 repeats = 1
 early_stop_loss = 0.0000001
 start_idx = 0
@@ -138,30 +82,33 @@ print(indices)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 
-# Load the training data.
-print('Loading data ...')
+# Load the test data.
+print('Loading test data ...')
+test_set = H5Dataset(sys.argv[2], 0, 10000)
+test_loader = torchdata.DataLoader(test_set, batch_size=64, shuffle=True)
 
 # Create the network.
-input_channels = int(sys.argv[3])
+input_channels = test_set.images.shape[-1]
+#net = NetCCFFF(input_channels)
 net = Net(input_channels)
 print(net)
 
 print('Copying network to GPU ...')
+if torch.cuda.device_count() > 1:
+    print("Let's use", torch.cuda.device_count(), "GPUs.")
+    net = nn.DataParallel(net)
 net.to(device)
 
 # Define the loss function and optimizer.
+#LR = 0.1
+#LR = 0.01
+LR = 0.001
 criterion = nn.CrossEntropyLoss()
-# optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.9) # not tested
-# optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005) # not tested
+#optimizer = optim.SGD(net.parameters(), lr=LR, momentum=0.9, weight_decay=0.0005)
 
-# optimizer = optim.Adam(net.parameters(), lr=0.001, weight_decay=0.001) # works well
+optimizer = optim.Adam(net.parameters(), lr=LR, weight_decay=0.0005)
 
-optimizer = optim.Adam(net.parameters(), lr=0.0001, weight_decay=0.0005)
-
-#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.96)
-
-test_set = H5Dataset(sys.argv[2], 0, 20000)
-test_loader = torchdata.DataLoader(test_set, batch_size=64, shuffle=True)
+#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
 accuracy = eval(net, test_loader, device)
 accuracies = []
 accuracies.append(accuracy)
@@ -175,7 +122,6 @@ for epoch in range(num_epochs):
     print('epoch: %d/%d' % (epoch + 1, num_epochs))
     net.train()
 
- #   scheduler.step()
     for param_group in optimizer.param_groups:
         print('learning rate:', param_group['lr'])
 
@@ -198,14 +144,9 @@ for epoch in range(num_epochs):
 
                 # print statistics
                 running_loss += loss.item()
-                if i % 1000 == 999:
-                    print('epoch: %d, batch: %5d, loss: %.5f' %
-                          (epoch + 1, i + 1, running_loss / 1000))
+                if i % print_step == print_step - 1:
+                    print('epoch: {}, batch: {}, loss: {:.4f}'.format(epoch + 1, i + 1, running_loss / print_step))
                     losses.append(running_loss)
-                    if running_loss / 1000 < early_stop_loss:
-                        print('reached loss threshold for early stopping: %.5f', early_stop_loss)
-                        early_stop = True
-                        break
                     running_loss = 0.0
             # Evaluate the network on the test dataset.
             accuracy = eval(net, test_loader, device)
@@ -225,6 +166,7 @@ for epoch in range(num_epochs):
     accuracies.append(accuracy)
     model_path = 'model_' + str(accuracy) + '.pwf'
     torch.save(net.state_dict(), model_path)
+    #scheduler.step()
 
 print('Finished Training')
 
