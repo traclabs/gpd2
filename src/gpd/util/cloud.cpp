@@ -290,7 +290,8 @@ void Cloud::voxelizeCloud(float cell_size) {
   pcl::getMinMax3D(*cloud_processed_, min_pt_pcl, max_pt_pcl);
   const Eigen::Vector3f min_pt = min_pt_pcl.getVector3fMap();
   std::set<Eigen::Vector4i, Cloud::UniqueVector4First3Comparator> bins;
-  Eigen::Matrix3Xd avg_normals = Eigen::Matrix3Xd::Zero(3, cloud_processed_->size());
+  Eigen::Matrix3Xd avg_normals =
+      Eigen::Matrix3Xd::Zero(3, cloud_processed_->size());
   Eigen::VectorXi counts = Eigen::VectorXi::Zero(cloud_processed_->size());
 
   for (int i = 0; i < cloud_processed_->size(); i++) {
@@ -299,8 +300,8 @@ void Cloud::voxelizeCloud(float cell_size) {
     v4.head(3) = EigenUtils::floorVector((pt - min_pt) / cell_size);
     v4(3) = i;
     std::pair<std::set<Eigen::Vector4i,
-                 Cloud::UniqueVector4First3Comparator>::iterator,
-        bool>
+                       Cloud::UniqueVector4First3Comparator>::iterator,
+              bool>
         res = bins.insert(v4);
 
     if (normals_.cols() > 0) {
@@ -316,8 +317,7 @@ void Cloud::voxelizeCloud(float cell_size) {
   Eigen::Matrix3Xd normals(3, bins.size());
   Eigen::MatrixXi camera_source(camera_source_.rows(), bins.size());
   int i = 0;
-  std::set<Eigen::Vector4i,
-           Cloud::UniqueVector4First3Comparator>::iterator it;
+  std::set<Eigen::Vector4i, Cloud::UniqueVector4First3Comparator>::iterator it;
 
   for (it = bins.begin(); it != bins.end(); it++) {
     voxels.col(i) = min_pt + cell_size * (*it).head(3).cast<float>();
@@ -327,7 +327,7 @@ void Cloud::voxelizeCloud(float cell_size) {
       camera_source(j, i) = (camera_source_(j, idx) == 1) ? 1 : 0;
     }
     if (normals_.cols() > 0) {
-      normals.col(i) = avg_normals.col(idx) / (double) counts(idx);
+      normals.col(i) = avg_normals.col(idx) / (double)counts(idx);
     }
     i++;
   }

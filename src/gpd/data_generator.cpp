@@ -329,10 +329,10 @@ void DataGenerator::reshapeHDF5(const std::string &in, const std::string &out,
   dims[0] = max_in_memory;
   for (int i = 0; i < steps; i++) {
     cv::Mat mat;
-    dims[0] = (i == steps - 1) ? num - offsets[0]  : max_in_memory;
+    dims[0] = (i == steps - 1) ? num - offsets[0] : max_in_memory;
     h5io_in->dsread(mat, dataset, offsets, dims);
     printf("Processing block %d/%d: %d to %d\n", i + 1, steps, offsets[0],
-        offsets[0] + dims[0]);
+           offsets[0] + dims[0]);
     if (!mat.isContinuous()) {
       std::cout << "Error: matrix is not continuous! Consider resizing using "
                    "python.\n";

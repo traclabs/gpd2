@@ -109,8 +109,7 @@ void HandSet::evalHands(const util::PointList &point_list,
       }
 
       is_valid_[start + i] = true;
-      modifyCandidate(*hands_[start + i], local_frame.getSample(),
-                      point_list_cropped, indices_closing, frame_rot,
+      modifyCandidate(*hands_[start + i], point_list_cropped, indices_closing,
                       finger_hand);
     }
   }
@@ -118,12 +117,10 @@ void HandSet::evalHands(const util::PointList &point_list,
 
 Eigen::Matrix3Xd HandSet::calculateShadow(const util::PointList &point_list,
                                           double shadow_length) const {
-  double voxel_grid_size =
-      0.003;  // voxel size for points that fill occluded region
-
-  double num_shadow_points =
-      floor(shadow_length /
-            voxel_grid_size);  // number of points along each shadow vector
+  // Set voxel size for points that fill occluded region.
+  const double voxel_grid_size = 0.003;
+  // Calculate number of points along each shadow vector.
+  double num_shadow_points = floor(shadow_length / voxel_grid_size);
 
   const int num_cams = point_list.getCamSource().rows();
 
@@ -151,10 +148,9 @@ Eigen::Matrix3Xd HandSet::calculateShadow(const util::PointList &point_list,
       // Scale that vector by the shadow length.
       shadow_vec = shadow_length * shadow_vec / shadow_vec.norm();
 
-      // Calculate occluded points.
-      calculateVoxelizedShadowVectorized(point_list.getPoints(), shadow_vec,
-                                         num_shadow_points, voxel_grid_size,
-                                         shadows[i]);
+      // Calculate occluded points for this camera.
+      calculateShadowForCamera(point_list.getPoints(), shadow_vec,
+                               num_shadow_points, voxel_grid_size, shadows[i]);
     }
   }
 
@@ -173,14 +169,14 @@ Eigen::Matrix3Xd HandSet::calculateShadow(const util::PointList &point_list,
   Vector3iSet bins_all = shadows[0];
 
   for (int i = 1; i < num_cams; i++) {
-    if (camera_set(i) >= 1)  // check that there are points seen by this camera
-    {
+    // Check that there are points seen by this camera.
+    if (camera_set(i) >= 1) {
       bins_all = intersection(bins_all, shadows[i]);
     }
   }
-  if (MEASURE_TIME)
-    std::cout << "intersection runtime: " << omp_get_wtime() - t0_intersection
-              << "s\n";
+  if (MEASURE_TIME) {
+    printf("intersection runtime: %.3fs\n", omp_get_wtime() - t0_intersection);
+  }
 
   // Convert voxels back to points.
   std::vector<Eigen::Vector3i> voxels(bins_all.begin(), bins_all.end());
@@ -202,27 +198,25 @@ Eigen::Matrix3Xd HandSet::shadowVoxelsToPoints(
         voxels[i].cast<double>() * voxel_grid_size +
         Eigen::Vector3d::Ones() * distr(gen) * voxel_grid_size * 0.3;
   }
-  if (MEASURE_TIME)
-    std::cout << "voxels-to-points runtime: " << omp_get_wtime() - t0_voxels
-              << "s\n";
+  if (MEASURE_TIME) {
+    printf("voxels-to-points runtime: %.3fs\n", omp_get_wtime() - t0_voxels);
+  }
 
   return shadow;
 }
 
-void HandSet::calculateVoxelizedShadowVectorized(
-    const Eigen::Matrix3Xd &points, const Eigen::Vector3d &shadow_vec,
-    int num_shadow_points, double voxel_grid_size,
-    Vector3iSet &shadow_set) const {
+void HandSet::calculateShadowForCamera(const Eigen::Matrix3Xd &points,
+                                       const Eigen::Vector3d &shadow_vec,
+                                       int num_shadow_points,
+                                       double voxel_grid_size,
+                                       Vector3iSet &shadow_set) const {
   double t0_set = omp_get_wtime();
   const int n = points.cols() * num_shadow_points;
   const double voxel_grid_size_mult = 1.0 / voxel_grid_size;
   const double max = 1.0 / 32767.0;
-  //  Eigen::Vector3d w;
 
   for (int i = 0; i < n; i++) {
     const int pt_idx = i / num_shadow_points;
-    //    const Eigen::Vector3d w = (points.col(pt_idx) + ((double) fastrand() *
-    //    max) * shadow_vec) * voxel_grid_size_mult;
     shadow_set.insert(
         ((points.col(pt_idx) + ((double)fastrand() * max) * shadow_vec) *
          voxel_grid_size_mult)
@@ -238,45 +232,22 @@ void HandSet::calculateVoxelizedShadowVectorized(
   }
 }
 
-void HandSet::modifyCandidate(Hand &hand, const Eigen::Vector3d &sample,
-                              const util::PointList &point_list,
-                              const std::vector<int> &indices_learning,
-                              const Eigen::Matrix3d &hand_frame,
+void HandSet::modifyCandidate(Hand &hand, const util::PointList &point_list,
+                              const std::vector<int> &indices,
                               const FingerHand &finger_hand) const {
-  // Extract data for classification.
-  util::PointList point_list_learning = point_list.slice(indices_learning);
-
-  // Calculate grasp width (hand opening width).
-  double width = point_list_learning.getPoints().row(1).maxCoeff() -
-                 point_list_learning.getPoints().row(1).minCoeff();
-
   // Modify the grasp.
   hand.construct(finger_hand);
+
+  // Extract points in hand closing region.
+  util::PointList point_list_closing = point_list.slice(indices);
+
+  // Calculate grasp width (hand opening width).
+  double width = point_list_closing.getPoints().row(1).maxCoeff() -
+                 point_list_closing.getPoints().row(1).minCoeff();
   hand.setGraspWidth(width);
 
   // Evaluate if the grasp is antipodal.
-  labelHypothesis(point_list_learning, finger_hand, hand);
-}
-
-Hand HandSet::createHypothesis(const Eigen::Vector3d &sample,
-                               const util::PointList &point_list,
-                               const std::vector<int> &indices_learning,
-                               const Eigen::Matrix3d &hand_frame,
-                               const FingerHand &finger_hand) const {
-  // Extract data for classification.
-  util::PointList point_list_learning = point_list.slice(indices_learning);
-
-  // Calculate grasp width (hand opening width).
-  double width = point_list_learning.getPoints().row(1).maxCoeff() -
-                 point_list_learning.getPoints().row(1).minCoeff();
-
-  // Create the grasp.
-  Hand hand(sample, hand_frame, finger_hand, width);
-
-  // Evaluate if the grasp is antipodal.
-  labelHypothesis(point_list_learning, finger_hand, hand);
-
-  return hand;
+  labelHypothesis(point_list_closing, finger_hand, hand);
 }
 
 void HandSet::labelHypothesis(const util::PointList &point_list,

@@ -208,7 +208,7 @@ class HandSet {
 
  private:
   /**
-   * \brief Calculate a single shadow.
+   * \brief Calculate shadow for one camera.
    * \param[in] points the list of points for which the shadow is calculated
    * \param[in] shadow_vec the vector that describes the direction of the shadow
    * relative to the camera origin
@@ -216,32 +216,22 @@ class HandSet {
    * \param[in] voxel_grid_size the size of the voxel grid
    * \param[out] shadow_set the set of shadow points
    */
-  void calculateVoxelizedShadowVectorized(const Eigen::Matrix3Xd &points,
-                                          const Eigen::Vector3d &shadow_vec,
-                                          int num_shadow_points,
-                                          double voxel_grid_size,
-                                          Vector3iSet &shadow_set) const;
+  void calculateShadowForCamera(const Eigen::Matrix3Xd &points,
+                                const Eigen::Vector3d &shadow_vec,
+                                int num_shadow_points, double voxel_grid_size,
+                                Vector3iSet &shadow_set) const;
 
   /**
-   * \brief Create a grasp candidate.
-   * \param sample the center of the point neighborhood
+   * \brief Modify a grasp candidate.
+   * \param hand the grasp candidate to be modified
    * \param point_list the point neighborhood
-   * \param indices_learning the indices of the points used for learning
-   * \param hand_frame the orientation of the grasp as a rotation matrix
+   * \param indices the indices of the points in the hand closing region
    * \param finger_hand the FingerHand object that describes valid finger
    * placements
-   * \return the grasp
+   * \return the modified grasp candidate
    */
-  Hand createHypothesis(const Eigen::Vector3d &sample,
-                        const util::PointList &point_list,
-                        const std::vector<int> &indices_learning,
-                        const Eigen::Matrix3d &hand_frame,
-                        const FingerHand &finger_hand) const;
-
-  void modifyCandidate(Hand &hand, const Eigen::Vector3d &sample,
-                       const util::PointList &point_list,
-                       const std::vector<int> &indices_learning,
-                       const Eigen::Matrix3d &hand_frame,
+  void modifyCandidate(Hand &hand, const util::PointList &point_list,
+                       const std::vector<int> &indices,
                        const FingerHand &finger_hand) const;
 
   /**
