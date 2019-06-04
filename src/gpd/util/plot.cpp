@@ -218,8 +218,8 @@ void Plot::plotFingers3D(
     const candidate::HandGeometry &geometry, bool use_same_color) {
   PCLVisualizer viewer = createViewer(str);
 
-  float min = std::numeric_limits<float>::max();
-  float max = std::numeric_limits<float>::min();
+  double min = std::numeric_limits<float>::max();
+  double max = std::numeric_limits<float>::min();
   for (int i = 0; i < hand_list.size(); i++) {
     if (hand_list[i]->getScore() < min) {
       min = hand_list[i]->getScore();
@@ -236,14 +236,8 @@ void Plot::plotFingers3D(
 
   for (int i = 0; i < hand_list.size(); i++) {
     if (!use_same_color) {
-      float c = (hand_list[i]->getScore() - min) / (max - min);
-      if (c <= 0.33) {
-        hand_rgb << c, 0.0, 0.0;
-      } else if (c <= 0.66) {
-        hand_rgb << c, c, 0.0;
-      } else {
-        hand_rgb << 0.0, c, 0.0;
-      }
+      double c = (hand_list[i]->getScore() - min) / (max - min);
+      hand_rgb = Eigen::Vector3d(1.0 - c, c, 0.0);
     }
     plotHand3D(viewer, *hand_list[i], geometry, i, hand_rgb);
   }
