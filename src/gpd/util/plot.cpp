@@ -766,11 +766,11 @@ void Plot::keyboardEventOccurred(const pcl::visualization::KeyboardEvent &event,
   pcl::visualization::PCLVisualizer *viewer =
       static_cast<pcl::visualization::PCLVisualizer *>(viewer_void);
   if (event.getKeySym() == "a" && event.keyDown()) {
-    if (viewer->contains("ref")) {
+    /*if (viewer->contains("ref")) {
       viewer->removeCoordinateSystem("ref");
     } else {
       viewer->addCoordinateSystem(0.1, "ref");
-    }
+    }*/ // HACK TO USE DEFAULT PCL 1.7, CONTAINS EXISTS FROM 1.8 UP
   }
 }
 
